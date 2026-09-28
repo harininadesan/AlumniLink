@@ -16,9 +16,9 @@ class Config:
     DB_NAME = os.environ.get('DB_NAME', 'alumnilink_db')
     
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'DATABASE_URL', 
-        f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-    )
+    'DATABASE_URL',
+    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{os.environ.get('DB_PORT', '3306')}/{DB_NAME}?ssl_verify_cert=true"
+)
 
 class DevelopmentConfig(Config):
     """Development configuration."""
