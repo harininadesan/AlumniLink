@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Post a New Job | AlumniLink Alumni Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+
+            <!-- Header -->
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a href="{{ url_for('alumni.manage_jobs') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btnBackToJobs">
+                    <i class="fa-solid fa-arrow-left me-1"></i>Back
+                </a>
+                <div>
+                    <h1 class="h4 font-weight-extrabold text-dark-theme mb-0">
+                        <i class="fa-solid fa-plus-circle text-primary me-2"></i>Post a New Job / Internship
+                    </h1>
+                    <p class="text-muted text-xs mb-0 mt-1">Fill in the details below. Students will see this listing on the portal.</p>
+                </div>
+            </div>
+
+            <!-- Form Card -->
+            <form action="{{ url_for('alumni.create_job') }}" method="POST" id="createJobForm">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 rounded-top-4 px-4 pt-4 pb-2">
+                        <h5 class="h6 font-weight-bold text-dark-theme mb-0">
+                            <i class="fa-solid fa-1 text-primary me-2"></i>Basic Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <!-- Title -->
+                            <div class="col-sm-8">
+                                <label for="title" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Job Title <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control shadow-none py-2" id="title" name="title"
+                                       placeholder="e.g. Backend Intern, Full Stack Developer" required maxlength="150">
+                            </div>
+                            <!-- Job Type -->
+                            <div class="col-sm-4">
+                                <label for="job_type" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Job Type <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select shadow-none py-2" id="job_type" name="job_type" required>
+                                    <option value="Internship">Internship</option>
+                                    <option value="Full-Time" selected>Full-Time</option>
+                                    <option value="Part-Time">Part-Time</option>
+                                </select>
+                            </div>
+                            <!-- Company -->
+                            <div class="col-sm-6">
+                                <label for="company" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Company <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control shadow-none py-2" id="company" name="company"
+                                       value="{{ prefill_company or '' }}"
+                                       placeholder="e.g. Google, TCS, Startup Inc." required maxlength="150">
+                            </div>
+                            <!-- Work Mode -->
+                            <div class="col-sm-3">
+                                <label for="work_mode" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Work Mode</label>
+                                <select class="form-select shadow-none py-2" id="work_mode" name="work_mode">
+                                    <option value="Remote">Remote</option>
+                                    <option value="Hybrid">Hybrid</option>
+                                    <option value="On-site" selected>On-site</option>
+                                </select>
+                            </div>
+                            <!-- Location -->
+                            <div class="col-sm-3">
+                                <label for="location" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Location</label>
+                                <input type="text" class="form-control shadow-none py-2" id="location" name="location"
+                                       placeholder="e.g. Bangalore, Remote" maxlength="150">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compensation & Deadline -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 rounded-top-4 px-4 pt-4 pb-2">
+                        <h5 class="h6 font-weight-bold text-dark-theme mb-0">
+                            <i class="fa-solid fa-2 text-primary me-2"></i>Compensation &amp; Timeline
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <!-- Stipend / Salary -->
+                            <div class="col-sm-6">
+                                <label for="stipend_salary" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Stipend / Salary
+                                </label>
+                                <input type="text" class="form-control shadow-none py-2" id="stipend_salary" name="stipend_salary"
+                                       placeholder="e.g. ₹15,000/month, 5–8 LPA" maxlength="100">
+                                <div class="form-text text-xs">Leave blank if not applicable or undisclosed.</div>
+                            </div>
+                            <!-- Deadline -->
+                            <div class="col-sm-6">
+                                <label for="deadline" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Application Deadline</label>
+                                <input type="date" class="form-control shadow-none py-2" id="deadline" name="deadline">
+                                <div class="form-text text-xs">Leave blank for a rolling/open application.</div>
+                            </div>
+                            <!-- Application Link -->
+                            <div class="col-12">
+                                <label for="application_link" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    External Application Link
+                                </label>
+                                <input type="url" class="form-control shadow-none py-2" id="application_link" name="application_link"
+                                       placeholder="https://company.com/careers/apply — optional">
+                                <div class="form-text text-xs">
+                                    <i class="fa-solid fa-info-circle me-1 text-info"></i>
+                                    If provided, students will be redirected here to apply. Otherwise, applications are collected through AlumniLink.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills & Eligibility -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 rounded-top-4 px-4 pt-4 pb-2">
+                        <h5 class="h6 font-weight-bold text-dark-theme mb-0">
+                            <i class="fa-solid fa-3 text-primary me-2"></i>Requirements
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <!-- Required Skills -->
+                            <div class="col-12">
+                                <label for="required_skills" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Required Skills
+                                </label>
+                                <input type="text" class="form-control shadow-none py-2" id="required_skills" name="required_skills"
+                                       placeholder="Python, Flask, MySQL, React, Git (comma-separated)" maxlength="500">
+                                <div class="form-text text-xs">Enter skills separated by commas. They'll appear as tags on the listing.</div>
+                            </div>
+                            <!-- Eligibility -->
+                            <div class="col-12">
+                                <label for="eligibility" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Eligibility Criteria
+                                </label>
+                                <textarea class="form-control shadow-none py-2" id="eligibility" name="eligibility"
+                                          rows="3" placeholder="e.g. Final year IT/CS students, 7.0+ CGPA, prior internship preferred…"
+                                          maxlength="1000"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 rounded-top-4 px-4 pt-4 pb-2">
+                        <h5 class="h6 font-weight-bold text-dark-theme mb-0">
+                            <i class="fa-solid fa-4 text-primary me-2"></i>Job Description
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <label for="description" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                            Description <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control shadow-none py-2" id="description" name="description"
+                                  rows="6"
+                                  placeholder="Describe the role, responsibilities, day-to-day tasks, team culture, and any perks. A detailed description attracts better candidates."
+                                  required maxlength="5000"></textarea>
+                        <div class="form-text text-xs d-flex justify-content-between">
+                            <span>Be specific about what the student will work on.</span>
+                            <span id="descCharCount" class="text-muted">0 / 5000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Actions -->
+                <div class="d-flex gap-3 justify-content-end">
+                    <a href="{{ url_for('alumni.manage_jobs') }}"
+                       class="btn btn-outline-secondary px-4 py-2 rounded-pill font-weight-semibold" id="btnCancelCreate">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill font-weight-bold shadow-sm" id="btnSubmitJob">
+                        <i class="fa-solid fa-bullhorn me-2"></i>Publish Listing
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+// Character counter for description
+const descArea = document.getElementById('description');
+const descCount = document.getElementById('descCharCount');
+if (descArea && descCount) {
+    descArea.addEventListener('input', function() {
+        descCount.textContent = `${this.value.length} / 5000`;
+    });
+}
+</script>
+{% endblock %}

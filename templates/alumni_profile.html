@@ -1,0 +1,1287 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if is_student_view %}
+        {{ alumnus.full_name }} - Profile | AlumniLink
+    {% else %}
+        My Profile | AlumniLink
+    {% endif %}
+{% endblock %}
+
+{% block navbar %}
+    {% if is_student_view %}
+        <nav class="navbar navbar-expand-lg navbar-dark alumni-profile-student-navbar" id="studentNavbar">
+            <div class="container-fluid px-lg-4">
+
+                <a class="navbar-brand d-flex align-items-center"
+                   href="{{ url_for('student.dashboard') }}"
+                   id="studentNavBrand">
+
+                    <div class="alumni-profile-brand-icon me-2">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+
+                    <span class="brand-text">
+                        Alumni<span class="brand-text-highlight">Link</span>
+                    </span>
+
+                    <span class="badge alumni-student-badge ms-2 text-xs d-none d-sm-inline-block">
+                        Student Portal
+                    </span>
+                </a>
+
+                <button class="navbar-toggler border-0 shadow-none"
+                        type="button"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#studentSidebarCanvas"
+                        aria-controls="studentSidebarCanvas"
+                        id="sidebarToggleMobile">
+                    <i class="fa-solid fa-bars text-white fs-5"></i>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-end"
+                     id="studentNavbarContent">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <a href="{{ url_for('student.view_notifications') }}"
+                           class="position-relative text-white p-2 rounded-circle alumni-profile-nav-icon"
+                           title="Notifications"
+                           id="navNotificationBtn">
+
+                            <i class="fa-solid fa-bell fs-5"></i>
+
+                            {% set unread_cnt = unread_notifications_count if unread_notifications_count is defined else 0 %}
+
+                            {% if unread_cnt > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-xs">
+                                    {{ unread_cnt }}
+                                </span>
+                            {% endif %}
+                        </a>
+
+                        <div class="dropdown">
+                            <button class="btn alumni-profile-user-btn dropdown-toggle d-flex align-items-center gap-2 py-1 px-3 rounded-pill"
+                                    type="button"
+                                    id="studentProfileDropdown"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+
+                                {% if profile.profile_photo %}
+                                    <img src="{{ url_for('static', filename=profile.profile_photo) }}"
+                                         alt="Avatar"
+                                         class="rounded-circle"
+                                         style="width:30px;height:30px;object-fit:cover;">
+                                {% else %}
+                                    <div class="alumni-profile-avatar-small rounded-circle">
+                                        {{ (profile.full_name or 'S')[0] | upper }}
+                                    </div>
+                                {% endif %}
+
+                                <span class="text-white text-sm font-weight-semibold d-none d-md-inline-block">
+                                    {{ profile.full_name or 'Student' }}
+                                </span>
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2"
+                                aria-labelledby="studentProfileDropdown">
+
+                                <li>
+                                    <div class="dropdown-header text-muted text-xs text-uppercase font-weight-bold">
+                                        Signed in as
+                                    </div>
+
+                                    <div class="px-3 pb-2 text-dark font-weight-bold text-sm">
+                                        {{ profile.email }}
+                                    </div>
+                                </li>
+
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+                                       href="{{ url_for('student.view_profile') }}">
+                                        <i class="fa-solid fa-user text-primary"></i>
+                                        My Profile
+                                    </a>
+                                </li>
+
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger"
+                                       href="{{ url_for('auth.logout') }}">
+                                        <i class="fa-solid fa-right-from-bracket"></i>
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+    {% else %}
+        {{ super() }}
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+{% if is_student_view %}
+
+<!-- =========================================================
+     STUDENT VIEWING ALUMNI PROFILE
+     ========================================================= -->
+
+<div class="alumni-profile-view-page">
+
+    <div class="container-fluid px-3 px-lg-4 px-xl-5 py-4 py-lg-5">
+
+        <!-- Back -->
+        <div class="mb-4">
+            <a href="{{ url_for('student.search_alumni') }}"
+               class="btn alumni-profile-back-btn">
+                <i class="fa-solid fa-arrow-left me-2"></i>
+                Back to Directory
+            </a>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- =================================================
+                 LEFT PROFILE CARD
+                 ================================================= -->
+            <div class="col-lg-4 col-xl-3">
+
+                <div class="card alumni-profile-card profile-sidebar-card">
+
+                    <div class="profile-accent-line"></div>
+
+                    <div class="text-center">
+
+                        <!-- Profile Photo -->
+                        <div class="alumni-profile-photo-wrap mx-auto mb-3">
+
+                            {% if alumnus.profile_photo %}
+
+                                <img src="{{ url_for('static', filename=alumnus.profile_photo) }}"
+                                     alt="Alumni Photo"
+                                     class="alumni-profile-photo">
+
+                            {% else %}
+
+                                <div class="alumni-profile-photo-placeholder">
+                                    {{ (alumnus.full_name or 'A')[0] | upper }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <h2 class="alumni-profile-name">
+                            {{ alumnus.full_name }}
+                        </h2>
+
+                        <p class="alumni-profile-role mb-2">
+                            {{ alumnus.designation or 'Professional' }}
+                        </p>
+
+                        <span class="alumni-batch-badge">
+                            <i class="fa-solid fa-graduation-cap me-1"></i>
+                            Class of {{ alumnus.graduation_year or '2021' }} · IT
+                        </span>
+
+                    </div>
+
+                    <!-- Professional Summary -->
+                    <div class="profile-summary-box mt-4">
+
+                        <div class="profile-summary-row">
+                            <span>
+                                <i class="fa-solid fa-building"></i>
+                                Company
+                            </span>
+
+                            <strong>
+                                {{ alumnus.company or 'N/A' }}
+                            </strong>
+                        </div>
+
+                        <div class="profile-summary-row">
+                            <span>
+                                <i class="fa-solid fa-location-dot"></i>
+                                Location
+                            </span>
+
+                            <strong>
+                                {{ alumnus.location or 'Remote / Global' }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="profile-contact-section">
+
+                        <h6 class="profile-section-label">
+                            Contact Details
+                        </h6>
+
+                        <div class="profile-contact-item">
+
+                            <div class="profile-contact-icon">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+
+                            <div class="flex-grow-1">
+
+                                <span class="profile-contact-label">
+                                    Email
+                                </span>
+
+                                {% if alumnus.share_email %}
+
+                                    <a href="mailto:{{ alumnus.email }}"
+                                       class="profile-contact-value">
+                                        {{ alumnus.email }}
+                                    </a>
+
+                                {% else %}
+
+                                    <span class="profile-private-value">
+                                        <i class="fa-solid fa-lock me-1"></i>
+                                        Private
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                        <div class="profile-contact-item">
+
+                            <div class="profile-contact-icon">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+
+                            <div class="flex-grow-1">
+
+                                <span class="profile-contact-label">
+                                    Phone
+                                </span>
+
+                                {% if alumnus.share_phone and alumnus.phone %}
+
+                                    <span class="profile-contact-value">
+                                        {{ alumnus.phone }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="profile-private-value">
+                                        <i class="fa-solid fa-lock me-1"></i>
+                                        Private
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Social Links -->
+                    {% if alumnus.linkedin or alumnus.github %}
+
+                    <div class="profile-social-section">
+
+                        {% if alumnus.linkedin %}
+                            <a href="{{ alumnus.linkedin }}"
+                               target="_blank"
+                               class="profile-social-btn"
+                               aria-label="LinkedIn">
+                                <i class="fa-brands fa-linkedin-in"></i>
+                            </a>
+                        {% endif %}
+
+                        {% if alumnus.github %}
+                            <a href="{{ alumnus.github }}"
+                               target="_blank"
+                               class="profile-social-btn"
+                               aria-label="GitHub">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                        {% endif %}
+
+                    </div>
+
+                    {% endif %}
+
+                    <!-- Mentorship -->
+                    <div class="profile-mentorship-area">
+
+                        {% if alumnus.mentor_status %}
+
+                            {% if request_status == 'pending' %}
+
+                                <button class="btn profile-status-btn pending"
+                                        disabled>
+                                    <i class="fa-solid fa-clock me-2"></i>
+                                    Request Pending
+                                </button>
+
+                            {% elif request_status == 'approved' %}
+
+                                <button class="btn profile-status-btn connected"
+                                        disabled>
+                                    <i class="fa-solid fa-circle-check me-2"></i>
+                                    Connected
+                                </button>
+
+                            {% else %}
+
+                                <button class="btn profile-mentorship-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#requestMentorshipModal">
+                                    <i class="fa-solid fa-paper-plane me-2"></i>
+                                    Request Mentorship
+                                </button>
+
+                            {% endif %}
+
+                        {% else %}
+
+                            <button class="btn profile-status-btn unavailable"
+                                    disabled>
+                                <i class="fa-solid fa-user-slash me-2"></i>
+                                Not Accepting Mentees
+                            </button>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- =================================================
+                 RIGHT PROFILE INFORMATION
+                 ================================================= -->
+            <div class="col-lg-8 col-xl-9">
+
+                <div class="card alumni-profile-card profile-content-card">
+
+                    <!-- Page Header -->
+                    <div class="profile-content-header">
+
+                        <div>
+                            <span class="profile-eyebrow">
+                                ALUMNI PROFILE
+                            </span>
+
+                            <h1>
+                                Professional Overview
+                            </h1>
+
+                            <p>
+                                Explore professional experience, skills and achievements.
+                            </p>
+                        </div>
+
+                        {% if alumnus.mentor_status %}
+                            <span class="profile-available-badge">
+                                <span class="availability-dot"></span>
+                                Available for Mentorship
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Biography -->
+                    <section class="profile-info-section">
+
+                        <div class="profile-info-heading">
+                            <div class="profile-heading-icon">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+
+                            <div>
+                                <h3>Professional Biography</h3>
+                                <span>About this alumni</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-text-box">
+                            {{ alumnus.bio or 'This alumni has not added a biography yet.' }}
+                        </div>
+
+                    </section>
+
+
+                    <!-- Skills -->
+                    <section class="profile-info-section">
+
+                        <div class="profile-info-heading">
+                            <div class="profile-heading-icon">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+
+                            <div>
+                                <h3>Key Technical Skills</h3>
+                                <span>Areas of expertise</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-skills">
+
+                            {% if alumnus.skills %}
+
+                                {% for skill in alumnus.skills.split(',') %}
+
+                                    <span class="profile-skill-tag">
+                                        {{ skill.strip() }}
+                                    </span>
+
+                                {% endfor %}
+
+                            {% else %}
+
+                                <span class="profile-skill-tag">
+                                    Software Engineering
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- Experience -->
+                    <section class="profile-info-section">
+
+                        <div class="profile-info-heading">
+                            <div class="profile-heading-icon">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+
+                            <div>
+                                <h3>Career & Mentoring Experience</h3>
+                                <span>Professional journey</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-detail-box">
+                            <p>
+                                {{ alumnus.experience or 'No experience details specified yet.' }}
+                            </p>
+                        </div>
+
+                    </section>
+
+
+                    <!-- Achievements -->
+                    <section class="profile-info-section last-section">
+
+                        <div class="profile-info-heading">
+                            <div class="profile-heading-icon">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+
+                            <div>
+                                <h3>Achievements & Awards</h3>
+                                <span>Highlights and accomplishments</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-detail-box">
+                            <p>
+                                {{ alumnus.achievements or 'No achievements documented yet.' }}
+                            </p>
+                        </div>
+
+                    </section>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     MENTORSHIP REQUEST MODAL
+     ========================================================= -->
+
+{% if alumnus.mentor_status and request_status not in ['pending', 'approved'] %}
+
+<div class="modal fade"
+     id="requestMentorshipModal"
+     tabindex="-1"
+     aria-labelledby="requestMentorshipModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content alumni-profile-modal">
+
+            <div class="modal-header">
+
+                <div>
+                    <span class="modal-eyebrow">
+                        CONNECT
+                    </span>
+
+                    <h5 class="modal-title" id="requestMentorshipModalLabel">
+                        Request Mentorship
+                    </h5>
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <form action="{{ url_for('student.request_mentorship') }}"
+                  method="POST">
+
+                <input type="hidden"
+                       name="alumni_id"
+                       value="{{ alumnus.alumni_id }}">
+
+                <div class="modal-body p-4">
+
+                    <div class="modal-profile-preview">
+
+                        <div class="modal-avatar">
+                            {{ (alumnus.full_name or 'A')[0] | upper }}
+                        </div>
+
+                        <div>
+                            <strong>
+                                {{ alumnus.full_name }}
+                            </strong>
+
+                            <span>
+                                {{ alumnus.designation }} · {{ alumnus.company }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label for="modalMessage"
+                               class="form-label profile-form-label">
+                            Personalized Message
+                        </label>
+
+                        <textarea class="form-control profile-message-input"
+                                  id="modalMessage"
+                                  name="message"
+                                  rows="5"
+                                  placeholder="Hello {{ alumnus.full_name }}, I am an IT student looking for guidance on..."
+                                  required></textarea>
+
+                        <small class="profile-form-help">
+                            Briefly explain your goals or the area where you would like guidance.
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-light border"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn profile-modal-submit">
+                        <i class="fa-solid fa-paper-plane me-2"></i>
+                        Send Request
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+
+{% else %}
+
+
+<!-- =========================================================
+     ALUMNI EDIT PROFILE
+     ========================================================= -->
+
+<div class="alumni-edit-profile-page">
+
+    <div class="container py-4 py-lg-5">
+
+        <!-- Back -->
+        <div class="mb-4">
+            <a href="{{ url_for('alumni.dashboard') }}"
+               class="btn alumni-edit-back-btn"
+               id="backToDashboardBtn">
+                <i class="fa-solid fa-arrow-left me-2"></i>
+                Back to Dashboard
+            </a>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- =================================================
+                 LEFT SIDEBAR
+                 ================================================= -->
+            <div class="col-lg-4 col-xl-3">
+
+                <!-- Profile Photo -->
+                <div class="card alumni-edit-card text-center p-4 mb-4">
+
+                    <span class="edit-card-label">
+                        PROFILE PHOTO
+                    </span>
+
+                    <div class="edit-photo-wrap mx-auto">
+
+                        {% if profile.profile_photo %}
+
+                            <img src="{{ url_for('static', filename=profile.profile_photo) }}"
+                                 alt="Profile Photo"
+                                 class="edit-profile-photo">
+
+                        {% else %}
+
+                            <div class="edit-profile-placeholder">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <h5 class="edit-profile-name">
+                        {{ profile.full_name }}
+                    </h5>
+
+                    <p class="edit-profile-email">
+                        {{ profile.email }}
+                    </p>
+
+                    <form action="{{ url_for('alumni.upload_photo') }}"
+                          method="POST"
+                          enctype="multipart/form-data"
+                          id="photoUploadForm">
+
+                        <div class="mb-3 text-start">
+
+                            <label for="profile_photo"
+                                   class="form-label edit-form-label">
+                                Upload New Photo
+                            </label>
+
+                            <input class="form-control form-control-sm"
+                                   type="file"
+                                   id="profile_photo"
+                                   name="profile_photo"
+                                   accept="image/*"
+                                   required>
+
+                            <div class="form-text">
+                                PNG, JPG, JPEG or GIF
+                            </div>
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn edit-upload-btn w-100"
+                                id="photoSubmitBtn">
+                            <i class="fa-solid fa-cloud-arrow-up me-2"></i>
+                            Change Profile Image
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- Availability -->
+                <div class="card alumni-edit-card p-4">
+
+                    <span class="edit-card-label">
+                        PROFILE STATUS
+                    </span>
+
+                    {% if profile.mentor_status %}
+
+                        <div class="status-panel active">
+
+                            <div class="status-icon">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+
+                            <h6>
+                                Active Mentor
+                            </h6>
+
+                            <p>
+                                Your profile is visible to students.
+                            </p>
+
+                            <span class="status-badge active">
+                                Available for Mentorship
+                            </span>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="status-panel inactive">
+
+                            <div class="status-icon">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                            </div>
+
+                            <h6>
+                                Busy / Private
+                            </h6>
+
+                            <p>
+                                Your profile is hidden from the mentorship directory.
+                            </p>
+
+                            <span class="status-badge inactive">
+                                Not Accepting Mentees
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 EDIT FORM
+                 ================================================= -->
+            <div class="col-lg-8 col-xl-9">
+
+                <div class="card alumni-edit-card edit-main-card">
+
+                    <div class="edit-main-header">
+
+                        <div class="edit-main-icon">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+
+                        <div>
+                            <span class="edit-card-label">
+                                ALUMNI PORTAL
+                            </span>
+
+                            <h1>
+                                Professional Profile
+                            </h1>
+
+                            <p>
+                                Manage your professional identity and connection permissions.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <form action="{{ url_for('alumni.edit_profile') }}"
+                          method="POST"
+                          id="editAlumniProfileForm">
+
+
+                        <!-- Account Information -->
+                        <div class="edit-section">
+
+                            <div class="edit-section-title">
+                                <span class="section-number">01</span>
+
+                                <div>
+                                    <h3>Account Information</h3>
+                                    <p>Your registered account details</p>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+
+                                    <label class="edit-form-label">
+                                        Registered Email
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control edit-form-control disabled-field"
+                                           value="{{ profile.email }}"
+                                           disabled>
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label for="graduation_year"
+                                           class="edit-form-label">
+                                        Graduation Year
+                                    </label>
+
+                                    <input type="number"
+                                           class="form-control edit-form-control"
+                                           id="graduation_year"
+                                           name="graduation_year"
+                                           value="{{ profile.graduation_year or '' }}"
+                                           placeholder="e.g. 2018"
+                                           required>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Identity -->
+                        <div class="edit-section">
+
+                            <div class="edit-section-title">
+                                <span class="section-number">02</span>
+
+                                <div>
+                                    <h3>Professional Identity</h3>
+                                    <p>Tell students who you are professionally</p>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+
+                                <div class="col-12">
+
+                                    <label for="full_name"
+                                           class="edit-form-label">
+                                        Full Name
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control edit-form-control"
+                                           id="full_name"
+                                           name="full_name"
+                                           value="{{ profile.full_name }}"
+                                           required>
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label for="company"
+                                           class="edit-form-label">
+                                        Current Company / Employer
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control edit-form-control"
+                                           id="company"
+                                           name="company"
+                                           value="{{ profile.company or '' }}"
+                                           required>
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label for="designation"
+                                           class="edit-form-label">
+                                        Job Title / Designation
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control edit-form-control"
+                                           id="designation"
+                                           name="designation"
+                                           value="{{ profile.designation or '' }}"
+                                           required>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Career Details -->
+                        <div class="edit-section">
+
+                            <div class="edit-section-title">
+                                <span class="section-number">03</span>
+
+                                <div>
+                                    <h3>Career Details</h3>
+                                    <p>Your current professional information</p>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+
+                                <div class="col-md-4">
+
+                                    <label for="experience"
+                                           class="edit-form-label">
+                                        Experience
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control edit-form-control"
+                                           id="experience"
+                                           name="experience"
+                                           value="{{ profile.experience or '' }}"
+                                           placeholder="e.g. 5+ Years"
+                                           required>
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label for="location"
+                                           class="edit-form-label">
+                                        Location
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control edit-form-control"
+                                           id="location"
+                                           name="location"
+                                           value="{{ profile.location or '' }}"
+                                           placeholder="e.g. Chennai"
+                                           required>
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label for="phone"
+                                           class="edit-form-label">
+                                        Phone Number
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control edit-form-control"
+                                           id="phone"
+                                           name="phone"
+                                           value="{{ profile.phone or '' }}"
+                                           placeholder="Phone number">
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Social -->
+                        <div class="edit-section">
+
+                            <div class="edit-section-title">
+                                <span class="section-number">04</span>
+
+                                <div>
+                                    <h3>Professional Links</h3>
+                                    <p>Connect your professional profiles</p>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+
+                                    <label for="linkedin"
+                                           class="edit-form-label">
+                                        LinkedIn Profile
+                                    </label>
+
+                                    <div class="input-group edit-input-group">
+
+                                        <span class="input-group-text">
+                                            <i class="fa-brands fa-linkedin-in"></i>
+                                        </span>
+
+                                        <input type="url"
+                                               class="form-control edit-form-control"
+                                               id="linkedin"
+                                               name="linkedin"
+                                               value="{{ profile.linkedin or '' }}"
+                                               placeholder="https://linkedin.com/in/username">
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label for="github"
+                                           class="edit-form-label">
+                                        GitHub Profile
+                                    </label>
+
+                                    <div class="input-group edit-input-group">
+
+                                        <span class="input-group-text">
+                                            <i class="fa-brands fa-github"></i>
+                                        </span>
+
+                                        <input type="url"
+                                               class="form-control edit-form-control"
+                                               id="github"
+                                               name="github"
+                                               value="{{ profile.github or '' }}"
+                                               placeholder="https://github.com/username">
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Skills -->
+                        <div class="edit-section">
+
+                            <div class="edit-section-title">
+                                <span class="section-number">05</span>
+
+                                <div>
+                                    <h3>Skills & Expertise</h3>
+                                    <p>Help students understand your areas of expertise</p>
+                                </div>
+                            </div>
+
+                            <label for="skills"
+                                   class="edit-form-label">
+                                Technical Skills
+                            </label>
+
+                            <textarea class="form-control edit-form-control"
+                                      id="skills"
+                                      name="skills"
+                                      rows="3"
+                                      placeholder="Python, Flask, SQL, AWS, Systems Design..."
+                                      required>{{ profile.skills or '' }}</textarea>
+
+                            <div class="edit-help-text">
+                                Separate multiple skills with commas.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Bio -->
+                        <div class="edit-section">
+
+                            <div class="edit-section-title">
+                                <span class="section-number">06</span>
+
+                                <div>
+                                    <h3>Professional Biography</h3>
+                                    <p>Share your career journey with students</p>
+                                </div>
+                            </div>
+
+                            <label for="bio"
+                                   class="edit-form-label">
+                                About You
+                            </label>
+
+                            <textarea class="form-control edit-form-control"
+                                      id="bio"
+                                      name="bio"
+                                      rows="5"
+                                      placeholder="Briefly describe your career journey, interests and how you can support student growth...">{{ profile.bio or '' }}</textarea>
+
+                        </div>
+
+
+                        <!-- Achievements -->
+                        <div class="edit-section">
+
+                            <div class="edit-section-title">
+                                <span class="section-number">07</span>
+
+                                <div>
+                                    <h3>Achievements & Awards</h3>
+                                    <p>Highlight important accomplishments</p>
+                                </div>
+                            </div>
+
+                            <textarea class="form-control edit-form-control"
+                                      id="achievements"
+                                      name="achievements"
+                                      rows="4"
+                                      placeholder="Patents, awards, speaking engagements, open-source projects...">{{ profile.achievements or '' }}</textarea>
+
+                        </div>
+
+
+                        <!-- Privacy -->
+                        <div class="edit-section privacy-section">
+
+                            <div class="edit-section-title">
+
+                                <span class="section-number">08</span>
+
+                                <div>
+                                    <h3>Privacy & Visibility</h3>
+                                    <p>Control what students can see</p>
+                                </div>
+
+                            </div>
+
+                            <div class="privacy-settings">
+
+                                <div class="privacy-setting">
+
+                                    <div class="privacy-setting-icon">
+                                        <i class="fa-solid fa-handshake"></i>
+                                    </div>
+
+                                    <div class="privacy-setting-content">
+                                        <strong>
+                                            Accept Mentorship Requests
+                                        </strong>
+
+                                        <span>
+                                            Make your profile visible in the student search directory.
+                                        </span>
+                                    </div>
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               role="switch"
+                                               id="mentor_status"
+                                               name="mentor_status"
+                                               value="1"
+                                               {% if profile.mentor_status %}checked{% endif %}>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="privacy-setting">
+
+                                    <div class="privacy-setting-icon">
+                                        <i class="fa-solid fa-envelope"></i>
+                                    </div>
+
+                                    <div class="privacy-setting-content">
+                                        <strong>
+                                            Show Email Address
+                                        </strong>
+
+                                        <span>
+                                            Allow students to view your email address.
+                                        </span>
+                                    </div>
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               role="switch"
+                                               id="share_email"
+                                               name="share_email"
+                                               value="1"
+                                               {% if profile.share_email %}checked{% endif %}>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="privacy-setting">
+
+                                    <div class="privacy-setting-icon">
+                                        <i class="fa-solid fa-phone"></i>
+                                    </div>
+
+                                    <div class="privacy-setting-content">
+                                        <strong>
+                                            Show Phone Number
+                                        </strong>
+
+                                        <span>
+                                            Allow students to view your phone number.
+                                        </span>
+                                    </div>
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               role="switch"
+                                               id="share_phone"
+                                               name="share_phone"
+                                               value="1"
+                                               {% if profile.share_phone %}checked{% endif %}>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Submit -->
+                        <div class="edit-form-actions">
+
+                            <a href="{{ url_for('alumni.dashboard') }}"
+                               class="btn edit-cancel-btn"
+                               id="btnCancelEdit">
+                                Cancel Changes
+                            </a>
+
+                            <button type="submit"
+                                    class="btn edit-save-btn"
+                                    id="btnSaveProfile">
+                                <i class="fa-solid fa-circle-check me-2"></i>
+                                Save Professional Profile
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% endif %}
+
+{% endblock %}

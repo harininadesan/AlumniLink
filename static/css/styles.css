@@ -1,0 +1,3513 @@
+/* --------------------------------------------------------
+   AlumniLink - Custom Design System & Stylesheet
+   Created exclusively for the IT Department Alumni Networking Platform
+   -------------------------------------------------------- */
+
+:root {
+    /* Color Palette */
+    --color-primary: #4361ee;
+    --color-primary-light: #4cc9f0;
+    --color-primary-dark: #3f37c9;
+    --color-dark: #0f172a;
+    --color-dark-surface: #1e293b;
+    --color-light: #f8fafc;
+    --color-light-surface: #ffffff;
+    --color-success: #10b981;
+    --color-info: #06b6d4;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+
+    /* Text Custom */
+    --text-muted: #64748b;
+    --text-muted-dark: #94a3b8;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --gradient-accent: linear-gradient(135deg, #4361ee 0%, #4cc9f0 100%);
+    --gradient-glow: radial-gradient(circle, rgba(67, 97, 238, 0.15) 0%, rgba(76, 201, 240, 0) 70%);
+
+    /* Transitions & Shadows */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* General Resets and Core Typography */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #334155;
+    background-color: var(--color-light);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--color-dark);
+}
+
+.font-weight-medium {
+    font-weight: 500;
+}
+
+.font-weight-semibold {
+    font-weight: 600;
+}
+
+.font-weight-bold {
+    font-weight: 700;
+}
+
+.font-weight-extrabold {
+    font-weight: 800;
+}
+
+.small-tracking {
+    letter-spacing: 0.075em;
+}
+
+.z-index-2 {
+    z-index: 2;
+}
+
+/* Glassmorphism Navigation Bar */
+.main-navbar {
+    background-color: rgba(15, 23, 42, 0.9) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 1rem 0;
+    transition: var(--transition-smooth);
+}
+
+.brand-logo-container {
+    background: var(--gradient-accent);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+}
+
+.brand-icon {
+    font-size: 1.1rem;
+    color: #ffffff;
+}
+
+.brand-text {
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: -0.025em;
+    color: #ffffff !important;
+}
+
+.brand-text-highlight {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.navbar-nav .nav-link {
+    color: var(--text-muted-dark) !important;
+    font-weight: 500;
+    padding: 0.5rem 1.2rem !important;
+    transition: var(--transition-smooth);
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #ffffff !important;
+}
+
+/* Buttons with Rich Styling */
+.btn-premium {
+    background: var(--gradient-accent);
+    border: none;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: var(--transition-smooth);
+    box-shadow: 0 4px 14px rgba(67, 97, 238, 0.3);
+}
+
+.btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+    background: linear-gradient(135deg, #3f37c9 0%, #4361ee 100%);
+    color: #ffffff;
+}
+
+.btn-premium-outline {
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: var(--transition-smooth);
+}
+
+.btn-premium-outline:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* Hero Section with Glowing Backdrops */
+.hero-section {
+    background: var(--gradient-hero);
+    min-height: 85vh;
+}
+
+.hero-bg-glow-1 {
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(67, 97, 238, 0.2) 0%, rgba(76, 201, 240, 0) 70%);
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hero-bg-glow-2 {
+    position: absolute;
+    bottom: -10%;
+    left: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(76, 201, 240, 0.12) 0%, rgba(67, 97, 238, 0) 70%);
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.premium-badge {
+    background-color: rgba(67, 97, 238, 0.15);
+    border: 1px solid rgba(67, 97, 238, 0.3);
+    color: var(--color-primary-light);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.text-highlight-color {
+    color: var(--color-primary-light);
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+}
+
+.gradient-text {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+    font-size: 1.6rem;
+    letter-spacing: -0.01em;
+}
+
+.text-muted-custom {
+    color: var(--text-muted-dark);
+}
+
+/* Glassmorphism Mockup Cards */
+.glass-card {
+    background: rgba(30, 41, 59, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.premium-mockup-card {
+    border-color: rgba(67, 97, 238, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-mockup-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(76, 201, 240, 0.5), transparent);
+}
+
+.dot-red,
+.dot-yellow,
+.dot-green {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-red {
+    background-color: #ff5f56;
+}
+
+.dot-yellow {
+    background-color: #ffbd2e;
+}
+
+.dot-green {
+    background-color: #27c93f;
+}
+
+.card-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: var(--transition-smooth);
+}
+
+.card-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.icon-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 1.1rem;
+}
+
+.bg-primary-soft {
+    background-color: rgba(67, 97, 238, 0.15);
+    color: var(--color-primary);
+}
+
+.bg-success-soft {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+}
+
+.bg-info-soft {
+    background-color: rgba(6, 182, 212, 0.15);
+    color: var(--color-info);
+}
+
+.bg-warning-soft {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning);
+}
+
+.bg-danger-soft {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger);
+}
+
+.bg-primary-soft-badge {
+    background-color: rgba(67, 97, 238, 0.2);
+    color: var(--color-primary-light);
+}
+
+.bg-warning-soft-badge {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: var(--color-warning);
+}
+
+.pulse-dot {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.9);
+        opacity: 0.4;
+    }
+}
+
+/* Sections Configuration */
+.bg-section-light {
+    background-color: #f8fafc;
+}
+
+.max-w-700 {
+    max-width: 700px;
+}
+
+.section-title {
+    font-size: 2.2rem;
+    letter-spacing: -0.02em;
+}
+
+/* Role Selection Cards */
+.role-card {
+    border-radius: 16px;
+    background-color: var(--color-light-surface);
+    transition: var(--transition-smooth);
+}
+
+.role-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.role-icon-wrapper {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.role-feature-list {
+    font-size: 0.9rem;
+}
+
+.role-feature-list li {
+    margin-bottom: 0.6rem;
+}
+
+.btn-role {
+    font-weight: 600;
+    border-radius: 8px;
+    transition: var(--transition-smooth);
+}
+
+/* Features List on Dark Theme */
+.features-section {
+    background-color: var(--color-dark);
+}
+
+.feature-item-card {
+    border-radius: 16px;
+    transition: var(--transition-smooth);
+}
+
+.feature-item-card:hover {
+    background: rgba(30, 41, 59, 0.6);
+    transform: scale(1.01);
+}
+
+.feature-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.text-primary-light {
+    color: var(--color-primary-light);
+}
+
+.text-info-light {
+    color: var(--color-primary-light);
+}
+
+.text-success-light {
+    color: var(--color-success);
+}
+
+.text-warning-light {
+    color: var(--color-warning);
+}
+
+/* About and Specifications */
+.bullet-tag {
+    font-size: 0.85rem;
+    font-weight: 600;
+    background-color: rgba(67, 97, 238, 0.06);
+    padding: 6px 12px;
+    border-radius: 50px;
+    color: var(--color-dark);
+}
+
+.about-card {
+    border-radius: 16px;
+    background-color: #ffffff;
+    box-shadow: var(--shadow-premium);
+}
+
+.specification-table td {
+    border: none !important;
+}
+
+/* Premium Alert Styles */
+.premium-alert {
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.alert-icon {
+    font-size: 1.1rem;
+}
+
+/* Footer Custom Styling */
+.bg-dark-theme {
+    background-color: #0b0f19 !important;
+}
+
+.text-muted-custom {
+    color: #94a3b8;
+}
+
+.footer-logo-container {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}
+
+.footer-logo-container .brand-icon {
+    font-size: 0.9rem;
+}
+
+.social-link {
+    width: 36px;
+    height: 36px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+}
+
+.social-link:hover {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    transform: translateY(-3px);
+}
+
+.footer-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.92rem;
+    transition: var(--transition-smooth);
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+    padding-left: 4px;
+}
+
+.bg-secondary-custom {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.text-sm {
+    font-size: 0.85rem;
+}
+
+.hover-highlight:hover {
+    color: #ffffff !important;
+}
+
+/* Responsive Configurations */
+@media (max-width: 991.98px) {
+    .hero-title {
+        font-size: 2.8rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+    }
+
+    .navbar-collapse {
+        background-color: #0f172a;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-top: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .nav-actions .btn {
+        width: 100%;
+    }
+}
+
+/* =======================================================
+   Additional Theme Classes
+   ======================================================= */
+
+.bg-light-theme {
+    background-color: #f8fafc;
+}
+
+.auth-page-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    position: relative;
+}
+
+.shadow-premium {
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =======================================================
+   Custom Form Styling
+   ======================================================= */
+
+.form-control-custom {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 12px 16px 12px 45px;
+    transition: 0.3s;
+}
+
+.form-control-custom:focus {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #4cc9f0;
+    color: white;
+    outline: none;
+    box-shadow: 0 0 12px rgba(76, 201, 240, .3);
+}
+
+.form-control-custom::placeholder {
+    color: rgba(255, 255, 255, .5);
+}
+
+.input-group-custom {
+    position: relative;
+}
+
+.input-icon-wrapper {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    z-index: 2;
+}
+
+/* =======================================================
+   Login Card
+   ======================================================= */
+
+.glass-card {
+    background: rgba(30, 41, 59, 0.75);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, .08);
+}
+
+.glass-card h1,
+.glass-card h2,
+.glass-card h3,
+.glass-card h4,
+.glass-card h5,
+.glass-card h6,
+.glass-card label {
+    color: white;
+}
+
+.glass-card p {
+    color: #cbd5e1;
+}
+
+/* =======================================================
+   Checkbox
+   ======================================================= */
+
+.form-check-input {
+    background-color: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .25);
+}
+
+.form-check-input:checked {
+    background-color: #4361ee;
+    border-color: #4361ee;
+}
+
+/* =======================================================
+   Premium Buttons
+   ======================================================= */
+
+.btn-premium {
+    background: linear-gradient(135deg, #4361ee, #4cc9f0);
+    border: none;
+    color: white;
+}
+
+.btn-premium:hover {
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* =======================================================
+   Dashboard Cards (For future modules)
+   ======================================================= */
+
+.dashboard-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+    transition: .3s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+.dashboard-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #4361ee;
+    color: white;
+    font-size: 24px;
+}
+
+/* =======================================================
+   Tables
+   ======================================================= */
+
+.table-modern {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+}
+
+/* =======================================================
+   Profile Image
+   ======================================================= */
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #4361ee;
+}
+
+/* =======================================================
+   Student Dashboard Module Custom Styling
+   ======================================================= */
+
+/* Student Top Navbar */
+.student-navbar {
+    background: rgba(15, 23, 42, 0.95) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.75rem 0;
+    z-index: 1040;
+}
+
+.btn-dark-glass {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    transition: var(--transition-smooth);
+}
+
+.btn-dark-glass:hover,
+.btn-dark-glass:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.glass-dropdown {
+    background: rgba(15, 23, 42, 0.95) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 14px;
+}
+
+.glass-dropdown .dropdown-item {
+    color: #cbd5e1;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: var(--transition-smooth);
+}
+
+.glass-dropdown .dropdown-item:hover {
+    background: rgba(67, 97, 238, 0.2);
+    color: #ffffff;
+}
+
+.hover-white:hover i {
+    color: #4cc9f0 !important;
+    transform: scale(1.1);
+    transition: var(--transition-smooth);
+}
+
+/* Sidebar Navigation */
+.student-sidebar {
+    width: 260px;
+    background: #0f172a;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    position: sticky;
+    top: 65px;
+    height: calc(100vh - 65px);
+    overflow-y: auto;
+}
+
+.sidebar-nav .sidebar-link {
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+}
+
+.sidebar-nav .sidebar-link .sidebar-icon {
+    font-size: 1.1rem;
+    width: 22px;
+    text-align: center;
+    transition: var(--transition-smooth);
+}
+
+.sidebar-nav .sidebar-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateX(3px);
+}
+
+.sidebar-nav .sidebar-link.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+    box-shadow: 0 4px 14px rgba(67, 97, 238, 0.35);
+}
+
+.sidebar-nav .sidebar-link.active .sidebar-icon {
+    color: #ffffff;
+}
+
+/* Premium Gradient Dashboard Cards with Hover Animation */
+.dash-card-gradient {
+    border: none;
+    border-radius: 18px;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.dash-card-gradient:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.22);
+}
+
+.gradient-card-1 {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+}
+
+.gradient-card-2 {
+    background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+}
+
+.gradient-card-3 {
+    background: linear-gradient(135deg, #5b21b6 0%, #8b5cf6 100%);
+}
+
+.gradient-card-4 {
+    background: linear-gradient(135deg, #991b1b 0%, #f43f5e 100%);
+}
+
+.dash-card-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.card-bg-decoration {
+    position: absolute;
+    right: -15px;
+    bottom: -15px;
+    font-size: 6rem;
+    opacity: 0.12;
+    pointer-events: none;
+    transition: var(--transition-smooth);
+}
+
+.dash-card-gradient:hover .card-bg-decoration {
+    transform: scale(1.15) rotate(-5deg);
+    opacity: 0.2;
+}
+
+/* Quick Action Buttons */
+.quick-action-card {
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: var(--color-dark);
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-sm);
+}
+
+.quick-action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    color: var(--color-primary);
+    border-color: rgba(67, 97, 238, 0.3);
+}
+
+.quick-action-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* Recent Activity Timeline */
+.activity-timeline {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: #e2e8f0;
+}
+
+.activity-item {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.activity-item:last-child {
+    margin-bottom: 0;
+}
+
+.activity-badge {
+    position: absolute;
+    left: -1.5rem;
+    top: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: var(--color-primary);
+    z-index: 1;
+}
+
+/* Cards & Badges */
+.badge-mentor {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    font-weight: 600;
+}
+
+.badge-mentor-busy {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #b91c1c;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    font-weight: 600;
+}
+
+.skill-tag {
+    background-color: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 50px;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.alumni-card-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(67, 97, 238, 0.2);
+}
+
+/* =======================================================
+   Search Alumni & Profile View Additions
+   ======================================================= */
+.bg-dark-glass-input {
+    background: rgba(15, 23, 42, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+.bg-dark-glass-input:focus {
+    background: rgba(15, 23, 42, 0.7) !important;
+    border-color: var(--color-primary-light) !important;
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.25) !important;
+}
+.search-bar-premium {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.btn-xs {
+    padding: 5px 12px;
+    font-size: 0.75rem;
+}
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.white-space-pre {
+    white-space: pre-line;
+}
+.alumni-card-item {
+    transition: var(--transition-smooth);
+}
+.alumni-card-item:hover {
+    transform: translateY(-5px);
+}
+/* =========================================================
+   AlumniLink - New Professional Student Portal UI
+   ========================================================= */
+
+:root {
+    --al-primary: #0f4c5c;
+    --al-primary-dark: #0b3540;
+    --al-accent: #14b8a6;
+    --al-accent-light: #ccfbf1;
+    --al-bg: #f5f7fa;
+    --al-card: #ffffff;
+    --al-text: #172033;
+    --al-muted: #64748b;
+    --al-border: #e5e7eb;
+}
+
+/* Student page background */
+.student-dashboard-layout {
+    background: var(--al-bg);
+}
+
+/* Student navbar */
+.student-navbar {
+    background: #0f4c5c !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 10px rgba(15, 76, 92, 0.12);
+}
+
+/* Brand */
+.student-navbar .brand-logo-container {
+    background: #ffffff !important;
+    color: var(--al-primary) !important;
+    box-shadow: none;
+}
+
+.student-navbar .brand-text {
+    color: #ffffff !important;
+}
+
+.student-navbar .brand-text-highlight {
+    color: #5eead4 !important;
+}
+
+/* Student sidebar */
+.student-sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid var(--al-border);
+    box-shadow: 2px 0 12px rgba(15, 23, 42, 0.04);
+}
+
+.student-sidebar .nav-link {
+    color: #64748b !important;
+    border-radius: 10px;
+    margin: 4px 12px;
+    padding: 11px 14px;
+    transition: all 0.2s ease;
+}
+
+.student-sidebar .nav-link:hover {
+    background: #f0fdfa !important;
+    color: var(--al-primary) !important;
+}
+
+.student-sidebar .nav-link.active {
+    background: var(--al-accent-light) !important;
+    color: var(--al-primary) !important;
+    font-weight: 600;
+}
+
+.student-sidebar .nav-link i {
+    color: inherit;
+}
+
+/* Main content */
+.student-main-content {
+    background: var(--al-bg);
+}
+
+/* General cards */
+.student-main-content .card {
+    border: 1px solid var(--al-border) !important;
+    border-radius: 16px !important;
+    background: var(--al-card);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+}
+
+/* Remove excessive glass effect */
+.student-main-content .glass-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* Dashboard hero */
+.student-main-content .hero-section,
+.student-main-content [style*="var(--gradient-hero)"] {
+    background: linear-gradient(135deg, #0f4c5c 0%, #176b78 100%) !important;
+    border-radius: 18px !important;
+}
+
+/* Buttons */
+.student-main-content .btn-premium {
+    background: var(--al-primary) !important;
+    border-color: var(--al-primary) !important;
+    border-radius: 9px;
+}
+
+.student-main-content .btn-premium:hover {
+    background: var(--al-primary-dark) !important;
+    border-color: var(--al-primary-dark) !important;
+}
+
+.student-main-content .btn-premium-outline {
+    color: var(--al-primary) !important;
+    border-color: var(--al-primary) !important;
+    background: #ffffff !important;
+    border-radius: 9px;
+}
+
+.student-main-content .btn-premium-outline:hover {
+    background: var(--al-primary) !important;
+    color: #ffffff !important;
+}
+
+/* Statistics cards */
+.student-main-content .card-item {
+    background: #ffffff;
+    border: 1px solid var(--al-border);
+    border-radius: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.student-main-content .card-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+/* Quick action cards */
+.student-main-content .quick-action,
+.student-main-content .action-card {
+    border-radius: 14px;
+    transition: all 0.2s ease;
+}
+
+.student-main-content .quick-action:hover,
+.student-main-content .action-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Links */
+.student-main-content a:not(.btn) {
+    color: var(--al-primary);
+}
+
+/* Headings */
+.student-main-content h1,
+.student-main-content h2,
+.student-main-content h3,
+.student-main-content h4,
+.student-main-content h5 {
+    color: var(--al-text);
+}
+
+/* Mobile */
+@media (max-width: 991.98px) {
+    .student-main-content {
+        padding: 1rem !important;
+    }
+
+    .student-main-content .card {
+        border-radius: 14px !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .student-main-content {
+        padding: 0.75rem !important;
+    }
+
+    .student-main-content h1 {
+        font-size: 1.6rem;
+    }
+
+    .student-main-content h2 {
+        font-size: 1.3rem;
+    }
+}
+/* =========================================================
+   AlumniLink - Student Portal Text Visibility Fix
+   ========================================================= */
+
+.student-main-content {
+    color: #172033 !important;
+}
+
+/* Normal text */
+.student-main-content p,
+.student-main-content span,
+.student-main-content div,
+.student-main-content li,
+.student-main-content label {
+    color: #172033;
+}
+
+/* Headings */
+.student-main-content h1,
+.student-main-content h2,
+.student-main-content h3,
+.student-main-content h4,
+.student-main-content h5,
+.student-main-content h6 {
+    color: #172033 !important;
+}
+
+/* Muted/supporting text */
+.student-main-content .text-muted {
+    color: #64748b !important;
+}
+
+/* Links */
+.student-main-content a:not(.btn) {
+    color: #0f4c5c !important;
+}
+
+/* Cards */
+.student-main-content .card,
+.student-main-content .card-body,
+.student-main-content .card-item {
+    color: #172033 !important;
+    background-color: #ffffff !important;
+}
+
+/* Card text */
+.student-main-content .card p,
+.student-main-content .card span,
+.student-main-content .card div,
+.student-main-content .card h1,
+.student-main-content .card h2,
+.student-main-content .card h3,
+.student-main-content .card h4,
+.student-main-content .card h5,
+.student-main-content .card h6 {
+    color: #172033 !important;
+}
+
+/* Buttons should keep their own text colors */
+.student-main-content .btn,
+.student-main-content .btn * {
+    color: inherit !important;
+}
+
+/* Don't affect the dark welcome/hero section */
+.student-main-content .bg-dark,
+.student-main-content .text-white,
+.student-main-content .text-white *,
+.student-main-content [class*="hero"] {
+    color: #ffffff !important;
+}
+/* =========================================================
+   AlumniLink - Student Dashboard Hero & Button Correction
+   ========================================================= */
+
+/* ---------- Welcome Hero ---------- */
+
+.student-main-content .glass-card[style*="var(--gradient-hero)"] {
+    background: linear-gradient(135deg, #0f4c5c 0%, #176b78 100%) !important;
+    color: #ffffff !important;
+}
+
+/* Hero heading */
+.student-main-content .glass-card[style*="var(--gradient-hero)"] h1,
+.student-main-content .glass-card[style*="var(--gradient-hero)"] h2,
+.student-main-content .glass-card[style*="var(--gradient-hero)"] h3 {
+    color: #ffffff !important;
+}
+
+/* Hero paragraph */
+.student-main-content .glass-card[style*="var(--gradient-hero)"] p {
+    color: rgba(255, 255, 255, 0.88) !important;
+}
+
+/* Hero small text / labels */
+.student-main-content .glass-card[style*="var(--gradient-hero)"] span,
+.student-main-content .glass-card[style*="var(--gradient-hero)"] div {
+    color: inherit;
+}
+
+/* ---------- Hero Buttons ---------- */
+
+/* Main hero button */
+.student-main-content .glass-card[style*="var(--gradient-hero)"] .btn-premium {
+    background: #ffffff !important;
+    color: #0f4c5c !important;
+    border: 1px solid #ffffff !important;
+    font-weight: 600;
+}
+
+.student-main-content .glass-card[style*="var(--gradient-hero)"] .btn-premium:hover {
+    background: #ccfbf1 !important;
+    color: #0f4c5c !important;
+}
+
+/* Secondary hero button */
+.student-main-content .glass-card[style*="var(--gradient-hero)"] .btn-premium-outline {
+    background: transparent !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+    font-weight: 600;
+}
+
+.student-main-content .glass-card[style*="var(--gradient-hero)"] .btn-premium-outline:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* Icons inside hero buttons */
+.student-main-content .glass-card[style*="var(--gradient-hero)"] .btn i,
+.student-main-content .glass-card[style*="var(--gradient-hero)"] .btn svg {
+    color: inherit !important;
+}
+/* =========================================================
+   AlumniLink - Student Statistics Cards
+   ========================================================= */
+
+.student-main-content .card-item {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 22px !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.student-main-content .card-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.09) !important;
+}
+
+/* Card title */
+.student-main-content .card-item h5 {
+    color: #475569 !important;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Main number */
+.student-main-content .card-item .display-6,
+.student-main-content .card-item .display-5 {
+    color: #0f4c5c !important;
+    font-weight: 700;
+}
+
+/* Description */
+.student-main-content .card-item p {
+    color: #64748b !important;
+}
+
+/* View / Track / Explore / Read links */
+.student-main-content .card-item a {
+    color: #0f4c5c !important;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.student-main-content .card-item a:hover {
+    color: #14b8a6 !important;
+}
+
+/* Card icons */
+.student-main-content .card-item i {
+    color: #0f4c5c !important;
+}
+
+/* Small accent icon background if present */
+.student-main-content .card-item .icon-box,
+.student-main-content .card-item .stat-icon {
+    background: #ecfeff !important;
+    color: #0f4c5c !important;
+}
+/* =========================================================
+   AlumniLink - Student Quick Actions
+   ========================================================= */
+
+.student-main-content .quick-action,
+.student-main-content .action-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 14px !important;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04) !important;
+    transition: all 0.2s ease;
+}
+
+.student-main-content .quick-action:hover,
+.student-main-content .action-card:hover {
+    transform: translateY(-3px);
+    border-color: #99f6e4 !important;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08) !important;
+}
+
+.student-main-content .quick-action h5,
+.student-main-content .quick-action h6,
+.student-main-content .action-card h5,
+.student-main-content .action-card h6 {
+    color: #172033 !important;
+    font-weight: 600;
+}
+
+.student-main-content .quick-action p,
+.student-main-content .action-card p {
+    color: #64748b !important;
+}
+
+.student-main-content .quick-action i,
+.student-main-content .action-card i {
+    color: #0f4c5c !important;
+}
+
+.student-main-content .quick-action a,
+.student-main-content .action-card a {
+    color: #0f4c5c !important;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.student-main-content .quick-action a:hover,
+.student-main-content .action-card a:hover {
+    color: #14b8a6 !important;
+}
+/* =========================================================
+   AlumniLink - Activity, Alumni & Jobs Sections
+   ========================================================= */
+
+/* Section headings */
+.student-main-content .section-title,
+.student-main-content .section-heading {
+    color: #172033 !important;
+    font-weight: 700;
+}
+
+/* General content cards */
+.student-main-content .activity-card,
+.student-main-content .mentor-card,
+.student-main-content .job-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Activity items */
+.student-main-content .activity-card *,
+.student-main-content .activity-item * {
+    color: #172033;
+}
+
+.student-main-content .activity-card p,
+.student-main-content .activity-item p {
+    color: #64748b !important;
+}
+
+/* Activity icons */
+.student-main-content .activity-icon {
+    background: #ecfeff !important;
+    color: #0f4c5c !important;
+}
+
+/* Featured alumni cards */
+.student-main-content .mentor-card,
+.student-main-content .alumni-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.student-main-content .mentor-card:hover,
+.student-main-content .alumni-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+.student-main-content .mentor-card h5,
+.student-main-content .mentor-card h6,
+.student-main-content .alumni-card h5,
+.student-main-content .alumni-card h6 {
+    color: #172033 !important;
+}
+
+.student-main-content .mentor-card p,
+.student-main-content .alumni-card p {
+    color: #64748b !important;
+}
+
+/* Alumni profile images */
+.student-main-content .mentor-card img,
+.student-main-content .alumni-card img {
+    border: 3px solid #ccfbf1;
+}
+
+/* Job cards */
+.student-main-content .job-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.student-main-content .job-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+.student-main-content .job-card h5,
+.student-main-content .job-card h6 {
+    color: #172033 !important;
+}
+
+.student-main-content .job-card p {
+    color: #64748b !important;
+}
+
+.student-main-content .job-card .badge {
+    background: #ccfbf1 !important;
+    color: #0f4c5c !important;
+}
+
+/* Section links */
+.student-main-content .view-all,
+.student-main-content .section-link {
+    color: #0f4c5c !important;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.student-main-content .view-all:hover,
+.student-main-content .section-link:hover {
+    color: #14b8a6 !important;
+}
+
+/* Mobile spacing */
+@media (max-width: 767.98px) {
+    .student-main-content .activity-card,
+    .student-main-content .mentor-card,
+    .student-main-content .alumni-card,
+    .student-main-content .job-card {
+        border-radius: 14px !important;
+    }
+}
+/* =========================================================
+   AlumniLink - Student Portal Mobile Responsive Design
+   ========================================================= */
+
+/* Tablets and smaller laptops */
+@media (max-width: 991.98px) {
+
+    .student-main-content {
+        width: 100%;
+        padding: 1rem !important;
+    }
+
+    .student-main-content .row {
+        --bs-gutter-x: 1rem;
+        --bs-gutter-y: 1rem;
+    }
+
+    /* Hero */
+    .student-main-content .glass-card[style*="var(--gradient-hero)"] {
+        padding: 1.5rem !important;
+    }
+
+    .student-main-content .glass-card[style*="var(--gradient-hero)"] h1 {
+        font-size: 1.7rem;
+    }
+
+    /* Statistics */
+    .student-main-content .card-item {
+        padding: 18px !important;
+    }
+}
+
+
+/* Phones */
+@media (max-width: 575.98px) {
+
+    .student-main-content {
+        padding: 0.75rem !important;
+    }
+
+    /* Navbar */
+    .student-navbar {
+        padding: 0.65rem 0 !important;
+    }
+
+    .student-navbar .brand-text {
+        font-size: 1rem;
+    }
+
+    .student-navbar .badge {
+        display: none;
+    }
+
+    /* Welcome section */
+    .student-main-content .glass-card[style*="var(--gradient-hero)"] {
+        padding: 1.25rem !important;
+        border-radius: 14px !important;
+    }
+
+    .student-main-content .glass-card[style*="var(--gradient-hero)"] h1 {
+        font-size: 1.45rem;
+        line-height: 1.3;
+    }
+
+    .student-main-content .glass-card[style*="var(--gradient-hero)"] p {
+        font-size: 0.9rem;
+        line-height: 1.55;
+    }
+
+    /* Hero buttons */
+    .student-main-content .glass-card[style*="var(--gradient-hero)"] .btn {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    /* Statistics cards */
+    .student-main-content .card-item {
+        padding: 16px !important;
+        border-radius: 14px !important;
+    }
+
+    .student-main-content .card-item .display-6,
+    .student-main-content .card-item .display-5 {
+        font-size: 1.7rem;
+    }
+
+    /* Quick action cards */
+    .student-main-content .quick-action,
+    .student-main-content .action-card {
+        padding: 16px !important;
+        border-radius: 14px !important;
+    }
+
+    /* General cards */
+    .student-main-content .card {
+        border-radius: 14px !important;
+    }
+
+    /* Prevent horizontal overflow */
+    .student-dashboard-layout {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    .student-main-content {
+        overflow-x: hidden;
+    }
+}
+/* =========================================================
+   AlumniLink - Student Navbar & Sidebar
+   ========================================================= */
+
+/* ---------- Student Navbar ---------- */
+
+.student-navbar {
+    background: #0f4c5c !important;
+    min-height: 68px;
+    padding: 0.75rem 0 !important;
+    box-shadow: 0 3px 12px rgba(15, 76, 92, 0.15) !important;
+    z-index: 1030;
+}
+
+.student-navbar .navbar-brand {
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+.student-navbar .brand-text {
+    color: #ffffff !important;
+}
+
+.student-navbar .brand-text-highlight {
+    color: #5eead4 !important;
+}
+
+.student-navbar .badge {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #d1fae5 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Navbar icons */
+.student-navbar .nav-link,
+.student-navbar .dropdown-toggle {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.student-navbar .nav-link:hover,
+.student-navbar .dropdown-toggle:hover {
+    color: #5eead4 !important;
+}
+
+/* Notification icon */
+.student-navbar .notification-icon {
+    color: #ffffff !important;
+}
+
+/* Profile area */
+.student-navbar .dropdown-menu {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12) !important;
+    padding: 0.5rem !important;
+}
+
+.student-navbar .dropdown-item {
+    color: #334155 !important;
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+}
+
+.student-navbar .dropdown-item:hover {
+    background: #f0fdfa !important;
+    color: #0f4c5c !important;
+}
+
+/* ---------- Student Sidebar ---------- */
+
+.student-sidebar {
+    width: 250px;
+    min-width: 250px;
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb !important;
+    box-shadow: 2px 0 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+.student-sidebar .nav {
+    padding-top: 0.75rem;
+}
+
+.student-sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #64748b !important;
+    background: transparent !important;
+    border-radius: 10px !important;
+    margin: 3px 12px !important;
+    padding: 11px 14px !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.student-sidebar .nav-link:hover {
+    color: #0f4c5c !important;
+    background: #f0fdfa !important;
+    transform: translateX(2px);
+}
+
+.student-sidebar .nav-link.active {
+    color: #0f4c5c !important;
+    background: #ccfbf1 !important;
+    font-weight: 700;
+}
+
+.student-sidebar .nav-link i {
+    width: 20px;
+    text-align: center;
+    color: inherit !important;
+}
+
+/* Sidebar section text */
+.student-sidebar .text-muted {
+    color: #94a3b8 !important;
+}
+
+/* Privacy card inside sidebar */
+.student-sidebar .privacy-card,
+.student-sidebar .privacy-first-card {
+    background: #f0fdfa !important;
+    border: 1px solid #ccfbf1 !important;
+    border-radius: 14px !important;
+    color: #334155 !important;
+}
+
+.student-sidebar .privacy-card h6,
+.student-sidebar .privacy-first-card h6 {
+    color: #0f4c5c !important;
+}
+
+.student-sidebar .privacy-card p,
+.student-sidebar .privacy-first-card p {
+    color: #64748b !important;
+}
+
+/* ---------- Mobile Sidebar ---------- */
+
+.student-mobile-sidebar {
+    background: #ffffff !important;
+}
+
+.student-mobile-sidebar .offcanvas-header {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.student-mobile-sidebar .nav-link {
+    color: #64748b !important;
+    border-radius: 10px;
+    margin: 3px 8px;
+    padding: 11px 12px;
+}
+
+.student-mobile-sidebar .nav-link:hover,
+.student-mobile-sidebar .nav-link.active {
+    background: #ccfbf1 !important;
+    color: #0f4c5c !important;
+}
+
+.student-mobile-sidebar .nav-link i {
+    color: inherit !important;
+}
+
+/* ---------- Mobile Navbar ---------- */
+
+@media (max-width: 575.98px) {
+
+    .student-navbar {
+        min-height: 60px;
+    }
+
+    .student-navbar .brand-logo-container {
+        width: 34px;
+        height: 34px;
+    }
+
+    .student-navbar .brand-text {
+        font-size: 0.95rem;
+    }
+
+    .student-navbar .navbar-brand {
+        margin-right: 0.5rem;
+    }
+}
+/* =========================================================
+   AlumniLink - Alumni Portal Professional UI
+   ========================================================= */
+
+/* Alumni page background */
+.alumni-dashboard-layout {
+    background: #f5f7fa !important;
+}
+
+/* Alumni navbar */
+.alumni-navbar {
+    background: #0f4c5c !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 3px 12px rgba(15, 76, 92, 0.15);
+}
+
+.alumni-navbar .brand-text {
+    color: #ffffff !important;
+}
+
+.alumni-navbar .brand-text-highlight {
+    color: #5eead4 !important;
+}
+
+.alumni-navbar .nav-link,
+.alumni-navbar .dropdown-toggle {
+    color: rgba(255,255,255,0.9) !important;
+}
+
+.alumni-navbar .nav-link:hover,
+.alumni-navbar .dropdown-toggle:hover {
+    color: #5eead4 !important;
+}
+
+/* Alumni sidebar */
+.alumni-sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb !important;
+    box-shadow: 2px 0 12px rgba(15,23,42,0.04);
+}
+
+.alumni-sidebar .nav-link {
+    color: #64748b !important;
+    background: transparent !important;
+    border-radius: 10px !important;
+    margin: 3px 12px !important;
+    padding: 11px 14px !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.alumni-sidebar .nav-link:hover {
+    color: #0f4c5c !important;
+    background: #f0fdfa !important;
+    transform: translateX(2px);
+}
+
+.alumni-sidebar .nav-link.active {
+    color: #0f4c5c !important;
+    background: #ccfbf1 !important;
+    font-weight: 700;
+}
+
+.alumni-sidebar .nav-link i {
+    color: inherit !important;
+}
+
+/* Alumni main content */
+.alumni-main-content {
+    background: #f5f7fa !important;
+    color: #172033;
+}
+
+/* Alumni cards */
+.alumni-main-content .card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.05) !important;
+}
+
+/* Alumni headings */
+.alumni-main-content h1,
+.alumni-main-content h2,
+.alumni-main-content h3,
+.alumni-main-content h4,
+.alumni-main-content h5,
+.alumni-main-content h6 {
+    color: #172033 !important;
+}
+
+/* Alumni normal text */
+.alumni-main-content p {
+    color: #64748b;
+}
+
+/* Alumni links */
+.alumni-main-content a:not(.btn) {
+    color: #0f4c5c !important;
+}
+
+.alumni-main-content a:not(.btn):hover {
+    color: #14b8a6 !important;
+}
+
+/* Alumni buttons */
+.alumni-main-content .btn-premium {
+    background: #0f4c5c !important;
+    border-color: #0f4c5c !important;
+    color: #ffffff !important;
+    border-radius: 9px;
+}
+
+.alumni-main-content .btn-premium:hover {
+    background: #0b3540 !important;
+    border-color: #0b3540 !important;
+}
+
+.alumni-main-content .btn-premium-outline {
+    background: #ffffff !important;
+    color: #0f4c5c !important;
+    border: 1px solid #0f4c5c !important;
+    border-radius: 9px;
+}
+
+.alumni-main-content .btn-premium-outline:hover {
+    background: #0f4c5c !important;
+    color: #ffffff !important;
+}
+
+/* Alumni mobile sidebar */
+.alumni-mobile-sidebar {
+    background: #ffffff !important;
+}
+
+.alumni-mobile-sidebar .nav-link {
+    color: #64748b !important;
+    border-radius: 10px;
+    margin: 3px 8px;
+    padding: 11px 12px;
+}
+
+.alumni-mobile-sidebar .nav-link:hover,
+.alumni-mobile-sidebar .nav-link.active {
+    background: #ccfbf1 !important;
+    color: #0f4c5c !important;
+}
+
+.alumni-mobile-sidebar .nav-link i {
+    color: inherit !important;
+}
+
+/* Alumni responsive */
+@media (max-width: 991.98px) {
+    .alumni-main-content {
+        width: 100%;
+        padding: 1rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .alumni-main-content {
+        padding: 0.75rem !important;
+    }
+
+    .alumni-main-content .card {
+        border-radius: 14px !important;
+    }
+}
+/* =========================================================
+   AlumniLink - Alumni Dashboard Exact UI
+   ========================================================= */
+
+/* ---------- Page ---------- */
+
+body:has(.alumni-dashboard-page) {
+    background: #f5f7fa !important;
+}
+
+.alumni-dashboard-page {
+    color: #172033;
+}
+
+/* ---------- Main Welcome Card ---------- */
+
+.alumni-dashboard-page .alumni-welcome-card {
+    background: linear-gradient(135deg, #0f4c5c 0%, #176b78 100%) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 10px 30px rgba(15, 76, 92, 0.16) !important;
+}
+
+/* Welcome text */
+.alumni-dashboard-page .alumni-welcome-card h1,
+.alumni-dashboard-page .alumni-welcome-card h2,
+.alumni-dashboard-page .alumni-welcome-card h3,
+.alumni-dashboard-page .alumni-welcome-card p,
+.alumni-dashboard-page .alumni-welcome-card strong {
+    color: #ffffff !important;
+}
+
+.alumni-dashboard-page .alumni-welcome-card .text-muted-custom {
+    color: rgba(255,255,255,0.82) !important;
+}
+
+/* ---------- Main Cards ---------- */
+
+.alumni-dashboard-page .alumni-section-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.05) !important;
+}
+
+/* Card headings */
+.alumni-dashboard-page .alumni-section-card h4,
+.alumni-dashboard-page .alumni-section-card h5 {
+    color: #172033 !important;
+}
+
+/* Card descriptions */
+.alumni-dashboard-page .alumni-section-card > p,
+.alumni-dashboard-page .alumni-section-card p {
+    color: #64748b;
+}
+
+/* ---------- Dashboard Navigation ---------- */
+
+.alumni-dashboard-page .alumni-dashboard-nav {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+}
+
+.alumni-dashboard-page .alumni-dashboard-nav .nav-link {
+    color: #64748b !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.alumni-dashboard-page .alumni-dashboard-nav .nav-link:hover {
+    background: #f0fdfa !important;
+    color: #0f4c5c !important;
+}
+
+.alumni-dashboard-page .alumni-dashboard-nav .nav-link.active {
+    background: #ccfbf1 !important;
+    color: #0f4c5c !important;
+}
+
+/* ---------- Buttons ---------- */
+
+.alumni-dashboard-page .btn-primary,
+.alumni-dashboard-page .btn-info {
+    background: #0f4c5c !important;
+    border-color: #0f4c5c !important;
+    color: #ffffff !important;
+}
+
+.alumni-dashboard-page .btn-primary:hover,
+.alumni-dashboard-page .btn-info:hover {
+    background: #0b3540 !important;
+    border-color: #0b3540 !important;
+}
+
+.alumni-dashboard-page .btn-outline-primary {
+    color: #0f4c5c !important;
+    border-color: #0f4c5c !important;
+    background: #ffffff !important;
+}
+
+.alumni-dashboard-page .btn-outline-primary:hover {
+    background: #0f4c5c !important;
+    color: #ffffff !important;
+}
+
+.alumni-dashboard-page .btn-outline-info {
+    color: #0f4c5c !important;
+    border-color: #0f4c5c !important;
+    background: #ffffff !important;
+}
+
+.alumni-dashboard-page .btn-outline-info:hover {
+    background: #0f4c5c !important;
+    color: #ffffff !important;
+}
+
+/* ---------- Inner Request / Job Items ---------- */
+
+.alumni-dashboard-page .alumni-item {
+    background: #f8fafc !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+}
+
+.alumni-dashboard-page .alumni-item h5,
+.alumni-dashboard-page .alumni-item strong {
+    color: #172033 !important;
+}
+
+.alumni-dashboard-page .alumni-item small,
+.alumni-dashboard-page .alumni-item p {
+    color: #64748b !important;
+}
+
+/* ---------- Right-side Information ---------- */
+
+.alumni-dashboard-page .alumni-info-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.05) !important;
+}
+
+.alumni-dashboard-page .alumni-info-card h4,
+.alumni-dashboard-page .alumni-info-card h5 {
+    color: #172033 !important;
+}
+
+.alumni-dashboard-page .alumni-info-card strong {
+    color: #172033 !important;
+}
+
+.alumni-dashboard-page .alumni-info-card .text-muted {
+    color: #64748b !important;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 767.98px) {
+
+    .alumni-dashboard-page {
+        padding-top: 1rem;
+    }
+
+    .alumni-dashboard-page .alumni-welcome-card {
+        border-radius: 14px !important;
+    }
+
+    .alumni-dashboard-page .alumni-welcome-card h1 {
+        font-size: 1.5rem;
+    }
+
+    .alumni-dashboard-page .alumni-welcome-card .btn {
+        width: 100%;
+        margin-top: 0.4rem;
+    }
+
+    .alumni-dashboard-page .alumni-section-card,
+    .alumni-dashboard-page .alumni-info-card {
+        border-radius: 14px !important;
+    }
+}
+/* =========================================================
+   AlumniLink - Alumni Dashboard Item Polish
+   ========================================================= */
+
+/* Individual cards */
+.alumni-dashboard-page .alumni-item {
+    background: #f8fafc !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease;
+}
+
+.alumni-dashboard-page .alumni-item:hover {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
+    transform: translateY(-1px);
+}
+
+/* Item headings */
+.alumni-dashboard-page .alumni-item h5,
+.alumni-dashboard-page .alumni-item strong {
+    color: #172033 !important;
+}
+
+/* Item secondary text */
+.alumni-dashboard-page .alumni-item small,
+.alumni-dashboard-page .alumni-item .text-muted,
+.alumni-dashboard-page .alumni-item p {
+    color: #64748b !important;
+}
+
+/* Job listing company icon */
+.alumni-dashboard-page .alumni-item .fa-building {
+    color: #0f4c5c !important;
+}
+
+/* Posted / deadline information */
+.alumni-dashboard-page .alumni-item .border-top {
+    border-color: #e5e7eb !important;
+}
+
+/* Edit / applicant buttons */
+.alumni-dashboard-page .alumni-item .btn-outline-primary {
+    color: #0f4c5c !important;
+    border-color: #0f4c5c !important;
+    background: #ffffff !important;
+}
+
+.alumni-dashboard-page .alumni-item .btn-outline-primary:hover {
+    background: #0f4c5c !important;
+    color: #ffffff !important;
+}
+
+.alumni-dashboard-page .alumni-item .btn-outline-info {
+    color: #176b78 !important;
+    border-color: #176b78 !important;
+    background: #ffffff !important;
+}
+
+.alumni-dashboard-page .alumni-item .btn-outline-info:hover {
+    background: #176b78 !important;
+    color: #ffffff !important;
+}
+
+/* Testimonial styling */
+.alumni-dashboard-page #testimonialsList .alumni-item {
+    background: #f8fafc !important;
+}
+
+.alumni-dashboard-page #testimonialsList .italic-style {
+    color: #334155 !important;
+}
+
+/* Notification cards */
+.alumni-dashboard-page .alumni-info-card .alumni-item {
+    background: #f8fafc !important;
+}
+
+.alumni-dashboard-page .alumni-info-card .alumni-item.bg-light {
+    background: #f0fdfa !important;
+    border-color: #99f6e4 !important;
+}
+
+/* Notification title */
+.alumni-dashboard-page .alumni-info-card .alumni-item strong {
+    color: #172033 !important;
+}
+
+/* Notification message */
+.alumni-dashboard-page .alumni-info-card .alumni-item p {
+    color: #64748b !important;
+}
+
+/* Availability switch */
+.alumni-dashboard-page .form-check-input:checked {
+    background-color: #0f4c5c !important;
+    border-color: #0f4c5c !important;
+}
+
+.alumni-dashboard-page .form-check-input:focus {
+    border-color: #14b8a6 !important;
+    box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.18) !important;
+}
+
+/* Profile details */
+.alumni-dashboard-page .profile-details > div {
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.alumni-dashboard-page .profile-details > div:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.alumni-dashboard-page .profile-details .text-muted {
+    color: #64748b !important;
+}
+
+.alumni-dashboard-page .profile-details strong {
+    color: #172033 !important;
+}
+
+.alumni-dashboard-page .profile-details a {
+    color: #0f4c5c !important;
+}
+
+.alumni-dashboard-page .profile-details a:hover {
+    color: #14b8a6 !important;
+}
+
+/* Empty states */
+.alumni-dashboard-page .text-center.py-5 .fa-inbox,
+.alumni-dashboard-page .text-center.py-4 .fa-bell-slash {
+    color: #94a3b8 !important;
+}
+
+/* Better section spacing */
+.alumni-dashboard-page .alumni-section-card {
+    overflow: hidden;
+}
+
+/* Mobile */
+@media (max-width: 767.98px) {
+
+    .alumni-dashboard-page .alumni-item:hover {
+        transform: none;
+    }
+
+    .alumni-dashboard-page .alumni-item .d-flex.justify-content-between {
+        gap: 0.75rem;
+    }
+
+    .alumni-dashboard-page .profile-details > div {
+        align-items: flex-start !important;
+    }
+
+    .alumni-dashboard-page .profile-details strong {
+        text-align: right;
+        max-width: 55%;
+        overflow-wrap: anywhere;
+    }
+
+}
+/* =========================================================
+   AlumniLink - Professional Alumni Profile
+   ========================================================= */
+
+.alumni-profile-view-page,
+.alumni-edit-profile-page {
+    background: #f5f7fa;
+    min-height: calc(100vh - 70px);
+    color: #172033;
+}
+
+/* Student navbar */
+
+.alumni-profile-student-navbar {
+    background: #0f4c5c !important;
+    min-height: 68px;
+    box-shadow: 0 3px 15px rgba(15, 23, 42, 0.12);
+}
+
+.alumni-profile-brand-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #14b8a6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alumni-student-badge {
+    background: rgba(255,255,255,0.12);
+    color: #ccfbf1;
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.alumni-profile-nav-icon {
+    transition: 0.2s ease;
+}
+
+.alumni-profile-nav-icon:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.alumni-profile-user-btn {
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+}
+
+.alumni-profile-avatar-small {
+    width: 30px;
+    height: 30px;
+    background: #14b8a6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+
+/* Back button */
+
+.alumni-profile-back-btn,
+.alumni-edit-back-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #0f4c5c;
+    border-radius: 9px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.55rem 1rem;
+    transition: 0.2s ease;
+}
+
+.alumni-profile-back-btn:hover,
+.alumni-edit-back-btn:hover {
+    background: #0f4c5c;
+    border-color: #0f4c5c;
+    color: white;
+}
+
+
+/* Main cards */
+
+.alumni-profile-card,
+.alumni-edit-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 18px !important;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, 0.06) !important;
+}
+
+
+/* =========================================================
+   STUDENT VIEW
+   ========================================================= */
+
+.profile-sidebar-card {
+    position: relative;
+    overflow: hidden;
+    padding: 2rem;
+}
+
+.profile-accent-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #0f4c5c, #14b8a6);
+}
+
+.alumni-profile-photo-wrap {
+    width: 132px;
+    height: 132px;
+}
+
+.alumni-profile-photo,
+.alumni-profile-photo-placeholder {
+    width: 132px;
+    height: 132px;
+    border-radius: 50%;
+}
+
+.alumni-profile-photo {
+    object-fit: cover;
+    border: 5px solid #f0fdfa;
+    box-shadow: 0 6px 18px rgba(15, 76, 92, 0.14);
+}
+
+.alumni-profile-photo-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0f4c5c;
+    color: white;
+    font-size: 3.4rem;
+    font-weight: 800;
+    border: 5px solid #f0fdfa;
+}
+
+.alumni-profile-name {
+    color: #172033;
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+}
+
+.alumni-profile-role {
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.alumni-batch-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    background: #ecfdf5;
+    color: #0f766e;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+
+/* Profile summary */
+
+.profile-summary-box {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+}
+
+.profile-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.78rem;
+}
+
+.profile-summary-row:last-child {
+    border-bottom: 0;
+}
+
+.profile-summary-row span {
+    color: #64748b;
+}
+
+.profile-summary-row span i {
+    width: 18px;
+    color: #0f4c5c;
+}
+
+.profile-summary-row strong {
+    color: #172033;
+    text-align: right;
+    max-width: 60%;
+}
+
+
+/* Contact */
+
+.profile-contact-section {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.profile-section-label,
+.edit-card-label {
+    display: block;
+    color: #64748b;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
+}
+
+.profile-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.9rem;
+}
+
+.profile-contact-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: #f0fdfa;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.profile-contact-label {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.68rem;
+    margin-bottom: 0.1rem;
+}
+
+.profile-contact-value {
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.profile-contact-value:hover {
+    color: #0f766e;
+}
+
+.profile-private-value {
+    color: #94a3b8;
+    font-size: 0.76rem;
+}
+
+
+/* Social */
+
+.profile-social-section {
+    display: flex;
+    justify-content: center;
+    gap: 0.65rem;
+    padding-top: 1.2rem;
+    margin-top: 1.2rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.profile-social-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #0f4c5c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.profile-social-btn:hover {
+    background: #0f4c5c;
+    color: white;
+    border-color: #0f4c5c;
+}
+
+
+/* Mentorship */
+
+.profile-mentorship-area {
+    margin-top: 1.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.profile-mentorship-btn,
+.profile-status-btn {
+    width: 100%;
+    border-radius: 10px;
+    padding: 0.72rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.profile-mentorship-btn {
+    background: #0f4c5c;
+    border: 1px solid #0f4c5c;
+    color: white;
+}
+
+.profile-mentorship-btn:hover {
+    background: #0b3540;
+    border-color: #0b3540;
+    color: white;
+}
+
+.profile-status-btn.pending {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #c2410c;
+}
+
+.profile-status-btn.connected {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #047857;
+}
+
+.profile-status-btn.unavailable {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+}
+
+
+/* Right profile content */
+
+.profile-content-card {
+    padding: 2rem;
+}
+
+.profile-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.profile-eyebrow {
+    color: #0f766e;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.profile-content-header h1 {
+    color: #172033;
+    font-size: 1.55rem;
+    font-weight: 800;
+    margin: 0.3rem 0;
+}
+
+.profile-content-header p {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.profile-available-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.7rem;
+    border-radius: 999px;
+    background: #ecfdf5;
+    border: 1px solid #bbf7d0;
+    color: #047857;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.availability-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+
+/* Sections */
+
+.profile-info-section {
+    padding: 1.7rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.profile-info-section.last-section {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.profile-info-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.profile-heading-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #f0fdfa;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.profile-info-heading h3 {
+    color: #172033;
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.profile-info-heading span {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.72rem;
+    margin-top: 0.15rem;
+}
+
+.profile-text-box,
+.profile-detail-box {
+    color: #475569;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    font-size: 0.86rem;
+    line-height: 1.75;
+}
+
+.profile-text-box {
+    background: #ffffff;
+}
+
+.profile-detail-box p {
+    margin: 0;
+    white-space: pre-line;
+}
+
+.profile-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.profile-skill-tag {
+    background: #f0fdfa;
+    border: 1px solid #99f6e4;
+    color: #0f766e;
+    border-radius: 999px;
+    padding: 0.42rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+
+/* Modal */
+
+.alumni-profile-modal {
+    border: 0;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.alumni-profile-modal .modal-header {
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-eyebrow {
+    display: block;
+    color: #0f766e;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.alumni-profile-modal .modal-title {
+    color: #172033;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-top: 0.2rem;
+}
+
+.modal-profile-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.9rem;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 1.2rem;
+}
+
+.modal-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #0f4c5c;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.modal-profile-preview strong {
+    display: block;
+    color: #172033;
+    font-size: 0.85rem;
+}
+
+.modal-profile-preview span {
+    display: block;
+    color: #64748b;
+    font-size: 0.72rem;
+    margin-top: 0.15rem;
+}
+
+.profile-form-label {
+    color: #334155;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.profile-message-input {
+    border: 1px solid #dbe2ea;
+    border-radius: 10px;
+    resize: vertical;
+    font-size: 0.84rem;
+}
+
+.profile-message-input:focus {
+    border-color: #14b8a6;
+    box-shadow: 0 0 0 0.2rem rgba(20,184,166,0.12);
+}
+
+.profile-form-help {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.7rem;
+    margin-top: 0.4rem;
+}
+
+.alumni-profile-modal .modal-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 1.2rem;
+}
+
+.profile-modal-submit {
+    background: #0f4c5c;
+    border-color: #0f4c5c;
+    color: white;
+    border-radius: 9px;
+    font-weight: 700;
+}
+
+.profile-modal-submit:hover {
+    background: #0b3540;
+    border-color: #0b3540;
+    color: white;
+}
+
+
+/* =========================================================
+   ALUMNI EDIT PROFILE
+   ========================================================= */
+
+.alumni-edit-profile-page {
+    padding-bottom: 3rem;
+}
+
+.alumni-edit-card {
+    padding: 1.5rem;
+}
+
+.edit-photo-wrap {
+    width: 135px;
+    height: 135px;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.edit-profile-photo,
+.edit-profile-placeholder {
+    width: 135px;
+    height: 135px;
+    border-radius: 50%;
+}
+
+.edit-profile-photo {
+    object-fit: cover;
+    border: 5px solid #f0fdfa;
+}
+
+.edit-profile-placeholder {
+    background: #ecfdf5;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid #f0fdfa;
+}
+
+.edit-profile-placeholder i {
+    font-size: 3.3rem;
+}
+
+.edit-profile-name {
+    color: #172033;
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 0.2rem;
+}
+
+.edit-profile-email {
+    color: #94a3b8;
+    font-size: 0.72rem;
+    overflow-wrap: anywhere;
+}
+
+.edit-upload-btn {
+    background: #0f4c5c;
+    color: white;
+    border: 0;
+    border-radius: 9px;
+    padding: 0.65rem 1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.edit-upload-btn:hover {
+    background: #0b3540;
+    color: white;
+}
+
+
+/* Status */
+
+.status-panel {
+    text-align: center;
+    border-radius: 12px;
+    padding: 1.2rem 0.8rem;
+}
+
+.status-panel.active {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+.status-panel.inactive {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+}
+
+.status-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.45rem;
+}
+
+.status-panel.active .status-icon {
+    color: #059669;
+}
+
+.status-panel.inactive .status-icon {
+    color: #d97706;
+}
+
+.status-panel h6 {
+    color: #172033;
+    font-size: 0.82rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+}
+
+.status-panel p {
+    color: #64748b;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    margin-bottom: 0.7rem;
+}
+
+.status-badge {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-badge.inactive {
+    background: #fef3c7;
+    color: #a16207;
+}
+
+
+/* Edit header */
+
+.edit-main-card {
+    padding: 2rem;
+}
+
+.edit-main-header {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+}
+
+.edit-main-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #ecfdf5;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.edit-main-header h1 {
+    color: #172033;
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin: 0.2rem 0;
+}
+
+.edit-main-header p {
+    color: #64748b;
+    font-size: 0.78rem;
+    margin: 0;
+}
+
+
+/* Edit sections */
+
+.edit-section {
+    padding: 1.7rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.edit-section-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+
+.section-number {
+    color: #0f766e;
+    background: #f0fdfa;
+    border: 1px solid #99f6e4;
+    border-radius: 8px;
+    padding: 0.3rem 0.45rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+}
+
+.edit-section-title h3 {
+    color: #172033;
+    font-size: 0.92rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.edit-section-title p {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    margin: 0.2rem 0 0;
+}
+
+
+/* Forms */
+
+.edit-form-label {
+    display: block;
+    color: #475569;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-bottom: 0.45rem;
+}
+
+.edit-form-control {
+    border: 1px solid #dbe2ea !important;
+    border-radius: 9px !important;
+    color: #172033 !important;
+    background: #ffffff !important;
+    font-size: 0.82rem !important;
+    padding: 0.65rem 0.75rem !important;
+}
+
+.edit-form-control:focus {
+    border-color: #14b8a6 !important;
+    box-shadow: 0 0 0 0.2rem rgba(20,184,166,0.12) !important;
+}
+
+.edit-form-control::placeholder {
+    color: #a0aec0;
+}
+
+.disabled-field {
+    background: #f8fafc !important;
+    color: #64748b !important;
+}
+
+.edit-help-text {
+    color: #94a3b8;
+    font-size: 0.68rem;
+    margin-top: 0.4rem;
+}
+
+.edit-input-group .input-group-text {
+    background: #f8fafc;
+    border: 1px solid #dbe2ea;
+    color: #0f4c5c;
+}
+
+
+/* Privacy */
+
+.privacy-section {
+    border-bottom: 0;
+}
+
+.privacy-settings {
+    border: 1px solid #e5e7eb;
+    border-radius: 13px;
+    overflow: hidden;
+}
+
+.privacy-setting {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.privacy-setting:last-child {
+    border-bottom: 0;
+}
+
+.privacy-setting-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background: #f0fdfa;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.privacy-setting-content {
+    flex: 1;
+}
+
+.privacy-setting-content strong {
+    display: block;
+    color: #172033;
+    font-size: 0.78rem;
+    margin-bottom: 0.15rem;
+}
+
+.privacy-setting-content span {
+    display: block;
+    color: #64748b;
+    font-size: 0.68rem;
+    line-height: 1.4;
+}
+
+.privacy-setting .form-check {
+    margin: 0;
+}
+
+.privacy-setting .form-check-input {
+    width: 2.3em;
+    height: 1.25em;
+    cursor: pointer;
+}
+
+.privacy-setting .form-check-input:checked {
+    background-color: #0f4c5c;
+    border-color: #0f4c5c;
+}
+
+.privacy-setting .form-check-input:focus {
+    border-color: #14b8a6;
+    box-shadow: 0 0 0 0.2rem rgba(20,184,166,0.12);
+}
+
+
+/* Save buttons */
+
+.edit-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.7rem;
+    padding-top: 1.5rem;
+}
+
+.edit-cancel-btn {
+    border: 1px solid #dbe2ea;
+    background: white;
+    color: #475569;
+    border-radius: 9px;
+    padding: 0.65rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.edit-cancel-btn:hover {
+    background: #f8fafc;
+    color: #172033;
+}
+
+.edit-save-btn {
+    background: #0f4c5c;
+    border: 1px solid #0f4c5c;
+    color: white;
+    border-radius: 9px;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.edit-save-btn:hover {
+    background: #0b3540;
+    border-color: #0b3540;
+    color: white;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 991.98px) {
+
+    .profile-sidebar-card {
+        padding: 1.5rem;
+    }
+
+    .profile-content-card,
+    .edit-main-card {
+        padding: 1.5rem;
+    }
+
+    .profile-content-header {
+        flex-direction: column;
+    }
+
+    .profile-available-badge {
+        align-self: flex-start;
+    }
+}
+
+
+@media (max-width: 767.98px) {
+
+    .alumni-profile-view-page,
+    .alumni-edit-profile-page {
+        min-height: 100vh;
+    }
+
+    .profile-content-card,
+    .edit-main-card {
+        padding: 1.1rem;
+        border-radius: 14px !important;
+    }
+
+    .profile-sidebar-card {
+        border-radius: 14px !important;
+    }
+
+    .profile-content-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .profile-info-section {
+        padding: 1.35rem 0;
+    }
+
+    .edit-main-header {
+        align-items: flex-start;
+    }
+
+    .edit-main-header h1 {
+        font-size: 1.1rem;
+    }
+
+    .privacy-setting {
+        align-items: flex-start;
+    }
+
+    .privacy-setting .form-check {
+        margin-top: 0.25rem;
+    }
+
+    .edit-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .edit-form-actions .btn {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .alumni-profile-photo-wrap,
+    .alumni-profile-photo,
+    .alumni-profile-photo-placeholder {
+        width: 110px;
+        height: 110px;
+    }
+
+    .alumni-profile-photo-placeholder {
+        font-size: 2.8rem;
+    }
+
+    .alumni-profile-name {
+        font-size: 1.15rem;
+    }
+
+    .profile-summary-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2rem;
+    }
+
+    .profile-summary-row strong {
+        max-width: 100%;
+        text-align: left;
+        padding-left: 1.4rem;
+    }
+
+    .profile-info-heading h3 {
+        font-size: 0.85rem;
+    }
+
+    .privacy-setting {
+        gap: 0.6rem;
+        padding: 0.85rem;
+    }
+
+    .privacy-setting-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .privacy-setting-content strong {
+        font-size: 0.72rem;
+    }
+
+    .privacy-setting-content span {
+        font-size: 0.63rem;
+    }
+}

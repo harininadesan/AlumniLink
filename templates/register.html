@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Register | AlumniLink – Join the IT Network{% endblock %}
+
+{% block content %}
+<section class="auth-page-section position-relative overflow-hidden py-5 d-flex align-items-center" style="min-height: 85vh;">
+    <!-- Background atmospheric glows matching our landing design -->
+    <div class="hero-bg-glow-1"></div>
+    <div class="hero-bg-glow-2"></div>
+    
+    <div class="container position-relative z-index-2">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                
+                <!-- Premium Glassmorphic Registration Card -->
+                <div class="card border-0 glass-card p-4 p-sm-5 shadow-premium text-white animate-fade-in">
+                    
+                    <!-- Card Header -->
+                    <div class="text-center mb-4">
+                        <div class="brand-logo-container mx-auto mb-3 footer-logo-container" style="width: 50px; height: 50px;">
+                            <i class="fa-solid fa-graduation-cap brand-icon" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h2 class="font-weight-extrabold text-white mb-1">Create Account</h2>
+                        <p class="text-muted-custom">Join the IT Department verified network</p>
+                    </div>
+
+                    <!-- Local Flash Messages (within the register card for direct user feedback) -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <div class="mb-3">
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show border-0 text-sm py-2 px-3 premium-alert" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            {% if category == 'success' %}
+                                                <i class="fa-solid fa-circle-check me-2"></i>
+                                            {% elif category == 'info' %}
+                                                <i class="fa-solid fa-circle-info me-2"></i>
+                                            {% else %}
+                                                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                                            {% endif %}
+                                            <div>{{ message }}</div>
+                                        </div>
+                                        <button type="button" class="btn-close py-2.5 px-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Registration Form -->
+                    <form action="{{ url_for('auth.register') }}" method="POST" id="registerForm" class="needs-validation">
+                        
+                        <!-- Full Name Input Group -->
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label text-sm font-weight-semibold text-white-50">Full Name</label>
+                            <div class="input-group-custom">
+                                <span class="input-icon-wrapper"><i class="fa-solid fa-user"></i></span>
+                                <input type="text" class="form-control-custom" id="full_name" name="full_name" placeholder="John Doe" required autocomplete="name">
+                            </div>
+                        </div>
+
+                        <!-- Email Input Group -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label text-sm font-weight-semibold text-white-50">Email Address</label>
+                            <div class="input-group-custom">
+                                <span class="input-icon-wrapper"><i class="fa-solid fa-envelope"></i></span>
+                                <input type="email" class="form-control-custom" id="email" name="email" placeholder="name@university.edu" required autocomplete="email">
+                            </div>
+                        </div>
+
+                        <!-- Role Selection Dropdown Group -->
+                        <div class="mb-3">
+                            <label for="role" class="form-label text-sm font-weight-semibold text-white-50">Portal Role</label>
+                            <div class="input-group-custom">
+                                <span class="input-icon-wrapper"><i class="fa-solid fa-user-tag"></i></span>
+                                <select class="form-control-custom form-select-custom" id="role" name="role" required>
+                                    <option value="" disabled selected hidden>Select your role...</option>
+                                    <option value="student">Student</option>
+                                    <option value="alumni">Alumni</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Student Specific Fields (Hidden by default) -->
+                        <div id="student-fields" style="display: none;">
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label for="graduation_year" class="form-label text-sm font-weight-semibold text-white-50">Graduation Year</label>
+                                    <div class="input-group-custom">
+                                        <span class="input-icon-wrapper"><i class="fa-solid fa-calendar-days"></i></span>
+                                        <input type="number" class="form-control-custom" id="graduation_year" name="graduation_year" placeholder="2026" min="1990" max="2100">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="register_number" class="form-label text-sm font-weight-semibold text-white-50">Register Number</label>
+                                    <div class="input-group-custom">
+                                        <span class="input-icon-wrapper"><i class="fa-solid fa-id-card"></i></span>
+                                        <input type="text" class="form-control-custom" id="register_number" name="register_number" placeholder="IT2026001">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alumni Specific Fields (Hidden by default) -->
+                        <div id="alumni-fields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="company" class="form-label text-sm font-weight-semibold text-white-50">Current Company (Optional)</label>
+                                <div class="input-group-custom">
+                                    <span class="input-icon-wrapper"><i class="fa-solid fa-building"></i></span>
+                                    <input type="text" class="form-control-custom" id="company" name="company" placeholder="e.g. Google">
+                                </div>
+                            </div>
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label for="designation" class="form-label text-sm font-weight-semibold text-white-50">Designation (Optional)</label>
+                                    <div class="input-group-custom">
+                                        <span class="input-icon-wrapper"><i class="fa-solid fa-briefcase"></i></span>
+                                        <input type="text" class="form-control-custom" id="designation" name="designation" placeholder="e.g. Software Engineer">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="location" class="form-label text-sm font-weight-semibold text-white-50">Location (Optional)</label>
+                                    <div class="input-group-custom">
+                                        <span class="input-icon-wrapper"><i class="fa-solid fa-location-dot"></i></span>
+                                        <input type="text" class="form-control-custom" id="location" name="location" placeholder="e.g. Mountain View, CA">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mb-4">
+                            <!-- Password Input Group -->
+                            <div class="col-sm-6">
+                                <label for="password" class="form-label text-sm font-weight-semibold text-white-50">Password</label>
+                                <div class="input-group-custom">
+                                    <span class="input-icon-wrapper"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" class="form-control-custom" id="password" name="password" placeholder="••••••••" required autocomplete="new-password">
+                                </div>
+                            </div>
+                            
+                            <!-- Confirm Password Input Group -->
+                            <div class="col-sm-6">
+                                <label for="confirm_password" class="form-label text-sm font-weight-semibold text-white-50">Confirm Password</label>
+                                <div class="input-group-custom">
+                                    <span class="input-icon-wrapper"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" class="form-control-custom" id="confirm_password" name="confirm_password" placeholder="••••••••" required autocomplete="new-password">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms Checkbox -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                                <label class="form-check-label text-xs text-muted-custom font-weight-medium" for="terms">
+                                    I agree to secure departmental processing of credentials
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Register Button -->
+                        <div class="mb-4">
+                            <button type="submit" class="btn btn-primary btn-premium w-100 py-2.5" id="registerSubmitBtn">
+                                Register Account <i class="fa-solid fa-user-plus ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Switch to Login Link -->
+                    <div class="text-center mt-3 border-top border-secondary-subtle border-opacity-10 pt-3">
+                        <span class="text-muted-custom text-sm">Already have an account?</span>
+                        <a href="{{ url_for('auth.login') }}" class="text-highlight-color font-weight-bold text-sm text-decoration-none ms-1 hover-highlight" id="loginRedirectLink">
+                            Sign in here
+                        </a>
+                    </div>
+
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Additional page-specific styles for registration components -->
+<style>
+    /* Styling overrides for authentication input groups */
+    .input-group-custom {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .input-icon-wrapper {
+        position: absolute;
+        left: 14px;
+        color: var(--text-muted-dark);
+        z-index: 10;
+        font-size: 0.95rem;
+    }
+    
+    .form-control-custom {
+        display: block;
+        width: 100%;
+        padding: 12px 16px 12px 42px;
+        font-size: 0.95rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.05);
+        background-clip: padding-box;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        transition: var(--transition-smooth);
+    }
+    
+    /* Support dropdown styles */
+    .form-select-custom {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        background-size: 12px 10px;
+    }
+
+    .form-select-custom option {
+        background-color: var(--color-dark-surface);
+        color: #ffffff;
+    }
+    
+    .form-control-custom::placeholder {
+        color: rgba(255, 255, 255, 0.35);
+    }
+    
+    .form-control-custom:focus {
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: var(--color-primary-light);
+        outline: 0;
+        box-shadow: 0 0 0 4px rgba(76, 201, 240, 0.15);
+    }
+    
+    .text-xs {
+        font-size: 0.8rem;
+    }
+    
+    /* Checkbox theme overrides */
+    .form-check-input {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+    
+    .form-check-input:focus {
+        box-shadow: none;
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('role');
+        const studentFields = document.getElementById('student-fields');
+        const alumniFields = document.getElementById('alumni-fields');
+        
+        const gradYearInput = document.getElementById('graduation_year');
+        const regNumInput = document.getElementById('register_number');
+
+        function toggleRoleFields() {
+            if (roleSelect.value === 'student') {
+                studentFields.style.display = 'block';
+                alumniFields.style.display = 'none';
+                gradYearInput.required = true;
+                regNumInput.required = true;
+            } else if (roleSelect.value === 'alumni') {
+                studentFields.style.display = 'none';
+                alumniFields.style.display = 'block';
+                gradYearInput.required = false;
+                regNumInput.required = false;
+                gradYearInput.value = '';
+                regNumInput.value = '';
+            } else {
+                studentFields.style.display = 'none';
+                alumniFields.style.display = 'none';
+                gradYearInput.required = false;
+                regNumInput.required = false;
+            }
+        }
+
+        roleSelect.addEventListener('change', toggleRoleFields);
+        // Run once on load in case browser pre-filled value
+        toggleRoleFields();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,310 @@
+{% extends "student_base.html" %}
+
+{% block title %}Search Alumni Directory | AlumniLink{% endblock %}
+
+{% block student_content %}
+<div class="container-fluid p-0">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h3 font-weight-extrabold text-white mb-1">
+                <i class="fa-solid fa-users text-primary-light me-2"></i>Search Alumni Directory
+            </h1>
+            <p class="text-muted-custom text-sm mb-0">
+                Connect with verified IT department alumni, view career histories, and request professional 1-on-1 mentorship.
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('student.view_requests') }}" class="btn btn-outline-light btn-premium-outline btn-sm px-3 rounded-pill">
+                <i class="fa-solid fa-clock-rotate-left me-1.5"></i>My Sent Requests
+            </a>
+        </div>
+    </div>
+
+    <!-- Search & Filter Card (Premium Glassmorphism) -->
+    <div class="card border-0 glass-card p-4 mb-4 shadow-premium">
+        <h5 class="h6 text-uppercase font-weight-bold text-primary-light small-tracking mb-3">
+            <i class="fa-solid fa-filter me-2"></i>Filter Alumni Directory
+        </h5>
+        
+        <form action="{{ url_for('student.search_alumni') }}" method="GET" id="searchAlumniForm">
+            <!-- Row 1: Primary Search Input & Category Dropdown -->
+            <div class="row g-3 mb-4">
+                <div class="col-12">
+                    <div class="input-group search-bar-premium shadow-sm">
+                        <!-- Dropdown Select Category -->
+                        <span class="input-group-text bg-dark-glass-input text-white border-end-0 px-3">
+                            <i class="fa-solid fa-magnifying-glass me-2 text-primary-light"></i> Search By:
+                        </span>
+                        <select class="form-select bg-dark-glass-input text-white border-start-0 border-end-0 py-2.5 text-sm" name="type" style="max-width: 140px; border-color: rgba(255, 255, 255, 0.1);" id="searchType">
+                            <option value="all" {% if search_type == 'all' %}selected{% endif %}>All Fields</option>
+                            <option value="name" {% if search_type == 'name' %}selected{% endif %}>Name</option>
+                            <option value="company" {% if search_type == 'company' %}selected{% endif %}>Company</option>
+                            <option value="skills" {% if search_type == 'skills' %}selected{% endif %}>Skills</option>
+                            <option value="batch" {% if search_type == 'batch' %}selected{% endif %}>Batch</option>
+                        </select>
+                        <!-- Query Input -->
+                        <input type="text" class="form-control bg-dark-glass-input text-white border-start-0 py-2.5 text-sm" name="query" placeholder="Type search keywords here..." value="{{ search_query or '' }}" id="searchQueryInput">
+                        <!-- Submit Button -->
+                        <button class="btn btn-premium px-4" type="submit" id="searchSubmitBtn">
+                            Search Mentors
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Advanced Dropdown Filters -->
+            <div class="row g-3">
+                <!-- Batch Filter -->
+                <div class="col-md-3 col-sm-6">
+                    <label for="filterBatch" class="form-label text-xs font-weight-semibold text-muted-custom text-uppercase">Batch (Passing Year)</label>
+                    <select class="form-select bg-dark-glass-input text-white border border-secondary border-opacity-25 text-sm py-2" id="filterBatch" name="filter_batch">
+                        <option value="">All Batches</option>
+                        {% for b in filter_batches %}
+                            <option value="{{ b }}" {% if filter_batch == b|string %}selected{% endif %}>Class of {{ b }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Company Filter -->
+                <div class="col-md-3 col-sm-6">
+                    <label for="filterCompany" class="form-label text-xs font-weight-semibold text-muted-custom text-uppercase">Company</label>
+                    <select class="form-select bg-dark-glass-input text-white border border-secondary border-opacity-25 text-sm py-2" id="filterCompany" name="filter_company">
+                        <option value="">All Companies</option>
+                        {% for c in filter_companies %}
+                            <option value="{{ c }}" {% if filter_company == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Skills Filter -->
+                <div class="col-md-3 col-sm-6">
+                    <label for="filterSkills" class="form-label text-xs font-weight-semibold text-muted-custom text-uppercase">Skills & Tech Stack</label>
+                    <select class="form-select bg-dark-glass-input text-white border border-secondary border-opacity-25 text-sm py-2" id="filterSkills" name="filter_skills">
+                        <option value="">All Skills</option>
+                        {% for s in filter_skills_list %}
+                            <option value="{{ s }}" {% if filter_skills == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Location Filter -->
+                <div class="col-md-3 col-sm-6">
+                    <label for="filterLocation" class="form-label text-xs font-weight-semibold text-muted-custom text-uppercase">Location</label>
+                    <select class="form-select bg-dark-glass-input text-white border border-secondary border-opacity-25 text-sm py-2" id="filterLocation" name="filter_location">
+                        <option value="">All Locations</option>
+                        {% for l in filter_locations %}
+                            <option value="{{ l }}" {% if filter_location == l %}selected{% endif %}>{{ l }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Row 3: Action Buttons for Filters -->
+            <div class="d-flex justify-content-end gap-2 mt-3 pt-2">
+                <a href="{{ url_for('student.search_alumni') }}" class="btn btn-dark-glass btn-sm px-3 text-xs" id="clearFiltersBtn">
+                    Reset All Filters
+                </a>
+                <button type="submit" class="btn btn-premium btn-sm px-4 text-xs" id="applyFiltersBtn">
+                    <i class="fa-solid fa-sliders me-1.5"></i>Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Alumni Cards Grid -->
+    <div class="row g-4" id="alumniGrid">
+        {% if alumni_list %}
+            {% for alumnus in alumni_list %}
+                <div class="col-md-6 col-xl-4 alumni-card-item">
+                    <div class="card h-100 border-0 glass-card p-4 hover-shadow transition-smooth position-relative overflow-hidden premium-mockup-card">
+                        
+                        <!-- Header Details: Profile Photo & Basic Identity -->
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            {% if alumnus.profile_photo %}
+                                <img src="{{ url_for('static', filename=alumnus.profile_photo) }}" class="alumni-card-avatar" alt="Photo">
+                            {% else %}
+                                <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-extrabold fs-4 shadow-sm" style="width: 72px; height: 72px; border: 3px solid rgba(67, 97, 238, 0.25);">
+                                    {{ (alumnus.full_name or 'A')[0] | upper }}
+                                </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h5 class="h6 font-weight-bold mb-0 text-white">{{ alumnus.full_name }}</h5>
+                                    {% if alumnus.verified %}
+                                        <span class="badge bg-success-soft" title="Verified Alumni">
+                                            <i class="fa-solid fa-circle-check"></i> Verified
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <span class="text-xs font-weight-semibold text-primary-light d-block mt-0.5">{{ alumnus.designation or 'IT Professional' }}</span>
+                                <small class="text-muted-custom text-xs d-block mt-1">
+                                    <i class="fa-solid fa-building me-1.5"></i>{{ alumnus.company or 'Tech Industry' }}
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Card Body: Metadata Info -->
+                        <div class="bg-dark-glass-input p-3 rounded-3 mb-3 text-xs text-muted-custom">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="fa-solid fa-graduation-cap me-1.5 text-primary-light"></i>Batch:</span>
+                                <strong class="text-white">Class of {{ alumnus.graduation_year or '2021' }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span><i class="fa-solid fa-location-dot me-1.5 text-primary-light"></i>Location:</span>
+                                <strong class="text-white">{{ alumnus.location or 'Global / Remote' }}</strong>
+                            </div>
+                        </div>
+
+                        <!-- Short Biography -->
+                        <div class="mb-3">
+                            <span class="text-2xs font-weight-bold text-muted-custom text-uppercase small-tracking d-block mb-1">About</span>
+                            <p class="text-xs text-white-50 mb-0 line-clamp-2">
+                                {{ alumnus.bio or 'No bio provided.' }}
+                            </p>
+                        </div>
+
+                        <!-- Key Skills Tags -->
+                        <div class="mb-4">
+                            <span class="text-2xs font-weight-bold text-muted-custom text-uppercase small-tracking d-block mb-2">Skills & Expertise</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% if alumnus.skills %}
+                                    {% for skill in alumnus.skills.split(',') %}
+                                        <span class="skill-tag text-xs">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="skill-tag text-xs">Software Engineering</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Footer Actions: View and Request Mentorship -->
+                        <div class="mt-auto border-top border-white border-opacity-10 pt-3 d-flex align-items-center justify-content-between gap-2">
+                            <div>
+                                {% if alumnus.mentor_status %}
+                                    <span class="badge badge-mentor">
+                                        <i class="fa-solid fa-circle text-success me-1.5 pulse-dot" style="font-size:0.5rem;"></i>Accepting Mentees
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-mentor-busy">
+                                        <i class="fa-solid fa-circle text-danger me-1.5" style="font-size:0.5rem;"></i>Busy
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex gap-1.5">
+                                <a href="{{ url_for('student.view_alumni_profile', alumni_id=alumnus.alumni_id) }}" class="btn btn-outline-light btn-premium-outline btn-xs px-3 rounded-pill" id="viewProfileBtn-{{ alumnus.alumni_id }}">
+                                    View Profile
+                                </a>
+                                {% if alumnus.mentor_status %}
+                                    {% if alumnus.alumni_id in requested_alumni_ids %}
+                                        {% if requested_alumni_ids[alumnus.alumni_id] == 'pending' %}
+                                            <button type="button" class="btn btn-outline-warning btn-xs px-3 rounded-pill" disabled style="opacity: 0.85;">
+                                                <i class="fa-solid fa-clock me-1"></i>Pending
+                                            </button>
+                                        {% elif requested_alumni_ids[alumnus.alumni_id] == 'approved' %}
+                                            <button type="button" class="btn btn-outline-success btn-xs px-3 rounded-pill" disabled style="opacity: 0.85;">
+                                                <i class="fa-solid fa-circle-check me-1"></i>Connected
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-premium btn-xs px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#requestModal-{{ alumnus.alumni_id }}" id="requestMentorshipBtn-{{ alumnus.alumni_id }}">
+                                                Request Mentorship
+                                            </button>
+                                        {% endif %}
+                                    {% else %}
+                                        <button type="button" class="btn btn-premium btn-xs px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#requestModal-{{ alumnus.alumni_id }}" id="requestMentorshipBtn-{{ alumnus.alumni_id }}">
+                                            Request Mentorship
+                                        </button>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mentorship Request Modal -->
+                {% if alumnus.mentor_status %}
+                    <div class="modal fade" id="requestModal-{{ alumnus.alumni_id }}" tabindex="-1" aria-labelledby="requestModalLabel-{{ alumnus.alumni_id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content glass-card border border-white border-opacity-10 shadow-premium">
+                                <div class="modal-header border-bottom border-white border-opacity-10 py-3">
+                                    <h5 class="modal-title font-weight-bold text-white h6" id="requestModalLabel-{{ alumnus.alumni_id }}">
+                                        <i class="fa-solid fa-paper-plane text-primary-light me-2"></i>Mentorship Request
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{{ url_for('student.request_mentorship') }}" method="POST">
+                                    <input type="hidden" name="alumni_id" value="{{ alumnus.alumni_id }}">
+                                    <div class="modal-body p-4">
+                                        <div class="d-flex align-items-center gap-3 p-3 bg-dark-glass-input rounded-3 mb-3 border border-white border-opacity-5">
+                                            <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold text-sm" style="width: 44px; height: 44px;">
+                                                {{ (alumnus.full_name or 'A')[0] | upper }}
+                                            </div>
+                                            <div>
+                                                <h6 class="font-weight-bold text-white mb-0 text-sm">{{ alumnus.full_name }}</h6>
+                                                <small class="text-muted-custom text-xs">{{ alumnus.designation }} • {{ alumnus.company }}</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="message-{{ alumnus.alumni_id }}" class="form-label font-weight-semibold text-xs text-muted-custom text-uppercase small-tracking">Personalized Message</label>
+                                            <textarea class="form-control bg-dark-glass-input text-white border border-secondary border-opacity-25 text-sm" id="message-{{ alumnus.alumni_id }}" name="message" rows="4" placeholder="Hello {{ alumnus.full_name }}, I am looking for guidance on..." required></textarea>
+                                            <small class="text-muted-custom text-xs mt-1.5 d-block">Introduce yourself and outline your career goals or specific questions.</small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-top border-white border-opacity-10 p-3 bg-dark-glass-input justify-content-end gap-2">
+                                        <button type="button" class="btn btn-dark-glass btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-premium btn-sm px-4 rounded-pill font-weight-semibold">
+                                            Send Request
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5 glass-card p-5 border border-white border-opacity-10">
+                    <i class="fa-solid fa-users-slash text-muted-custom mb-3" style="font-size: 3.5rem;"></i>
+                    <h5 class="h6 font-weight-bold text-white mb-1">No Alumni Found</h5>
+                    <p class="text-muted-custom text-sm mb-3">No verified alumni match your specific search or filter criteria.</p>
+                    <a href="{{ url_for('student.search_alumni') }}" class="btn btn-premium btn-sm px-4">Clear All Filters</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Additional Inline styles helper for inputs -->
+<style>
+    .bg-dark-glass-input {
+        background: rgba(15, 23, 42, 0.45) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+    }
+    .bg-dark-glass-input:focus {
+        background: rgba(15, 23, 42, 0.7) !important;
+        border-color: var(--color-primary-light) !important;
+        box-shadow: 0 0 8px rgba(76, 201, 240, 0.25) !important;
+    }
+    .search-bar-premium {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-xs {
+        padding: 5px 12px;
+        font-size: 0.75rem;
+    }
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

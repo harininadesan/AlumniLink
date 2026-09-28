@@ -1,0 +1,1269 @@
+{% extends "base.html" %}
+
+{% block title %}Mentorship Requests | Alumni Dashboard | AlumniLink{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+
+<div class="alumni-mentorship-page">
+
+```
+<!-- Main Layout -->
+<div class="d-flex alumni-mentorship-layout">
+
+    <!-- Sidebar -->
+    <nav class="alumni-mentorship-sidebar d-flex flex-column py-4 px-3">
+
+        <!-- Brand -->
+        <div class="brand d-flex align-items-center mb-5 px-2">
+
+            <div class="alumni-sidebar-logo me-2">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+
+            <span class="fs-5 fw-bold">
+                Alumni<span>Link</span>
+            </span>
+
+        </div>
+
+
+        <!-- Navigation -->
+        <ul class="nav flex-column gap-1">
+
+            <!-- Dashboard -->
+            <li class="nav-item">
+
+                <a href="{{ url_for('alumni.dashboard') }}"
+                   class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3">
+
+                    <i class="fa-solid fa-gauge-high fa-fw"></i>
+
+                    Dashboard
+
+                </a>
+
+            </li>
+
+
+            <!-- Profile -->
+            <li class="nav-item">
+
+                <a href="{{ url_for('alumni.view_profile') }}"
+                   class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3">
+
+                    <i class="fa-solid fa-user-circle fa-fw"></i>
+
+                    My Profile
+
+                </a>
+
+            </li>
+
+
+            <!-- Mentorship -->
+            <li class="nav-item">
+
+                <a href="{{ url_for('alumni.mentorship_page') }}"
+                   class="nav-link active d-flex align-items-center gap-2 px-3 py-2 rounded-3">
+
+                    <i class="fa-solid fa-handshake fa-fw"></i>
+
+                    Mentorship
+
+                    {% if stats.pending > 0 %}
+
+                        <span class="badge ms-auto mentorship-pending-badge">
+                            {{ stats.pending }}
+                        </span>
+
+                    {% endif %}
+
+                </a>
+
+            </li>
+
+
+            <!-- Jobs -->
+            <li class="nav-item">
+
+                <a href="{{ url_for('alumni.manage_jobs') }}"
+                   class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3">
+
+                    <i class="fa-solid fa-briefcase fa-fw"></i>
+
+                    Job Posts
+
+                </a>
+
+            </li>
+
+        </ul>
+
+
+        <!-- Logout -->
+        <div class="mt-auto pt-4 alumni-sidebar-footer">
+
+            <a href="{{ url_for('auth.logout') }}"
+               class="nav-link logout-link d-flex align-items-center gap-2 px-3 py-2 rounded-3">
+
+                <i class="fa-solid fa-right-from-bracket fa-fw"></i>
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="flex-fill alumni-mentorship-main">
+
+
+        <!-- Flash Messages -->
+        <div id="flashContainer">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show border-0 mb-3 mentorship-alert"
+                             role="alert">
+
+                            <i class="fa-solid fa-circle-{{
+                                'check' if category == 'success'
+                                else 'info' if category == 'info'
+                                else 'exclamation'
+                            }} me-2"></i>
+
+                            {{ message }}
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert">
+                            </button>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+        </div>
+
+
+        <!-- Page Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4 mentorship-page-header">
+
+            <div>
+
+                <div class="d-flex align-items-center mb-2">
+
+                    <div class="mentorship-title-icon me-3">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+
+                    <div>
+
+                        <h1 class="h4 fw-bold mb-1">
+                            Mentorship Requests
+                        </h1>
+
+                        <p class="mb-0">
+                            Review and respond to student mentorship requests
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% if profile %}
+
+                <div>
+
+                    {% if profile.verification_status != 'approved' %}
+
+                        <span class="badge px-3 py-2 mentorship-status pending">
+
+                            <i class="fa-solid fa-clock me-1"></i>
+
+                            Pending Verification
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge px-3 py-2 mentorship-status verified">
+
+                            <i class="fa-solid fa-circle-check me-1"></i>
+
+                            Verified Alumni
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Stats Row -->
+        <div class="row g-3 mb-4">
+
+            <!-- Total -->
+            <div class="col-6 col-lg-3">
+
+                <div class="mentorship-stat-card">
+
+                    <div class="mentorship-stat-icon total">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="mentorship-stat-value">
+                            {{ stats.total }}
+                        </div>
+
+                        <div class="mentorship-stat-label">
+                            Total Requests
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Pending -->
+            <div class="col-6 col-lg-3">
+
+                <div class="mentorship-stat-card">
+
+                    <div class="mentorship-stat-icon pending">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="mentorship-stat-value">
+                            {{ stats.pending }}
+                        </div>
+
+                        <div class="mentorship-stat-label">
+                            Pending
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Accepted -->
+            <div class="col-6 col-lg-3">
+
+                <div class="mentorship-stat-card">
+
+                    <div class="mentorship-stat-icon accepted">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="mentorship-stat-value">
+                            {{ stats.accepted }}
+                        </div>
+
+                        <div class="mentorship-stat-label">
+                            Accepted
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Rejected -->
+            <div class="col-6 col-lg-3">
+
+                <div class="mentorship-stat-card">
+
+                    <div class="mentorship-stat-icon rejected">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="mentorship-stat-value">
+                            {{ stats.rejected }}
+                        </div>
+
+                        <div class="mentorship-stat-label">
+                            Rejected
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Requests List -->
+
+        {% if requests %}
+
+            <div class="mentorship-request-list">
+
+                {% for req in requests %}
+
+                    <div class="mentorship-request-card">
+
+
+                        <!-- Student Avatar -->
+                        <div class="mentorship-student-avatar">
+
+                            {% if req.student_photo %}
+
+                                <img src="{{ url_for('static', filename=req.student_photo) }}"
+                                     alt="Student">
+
+                            {% else %}
+
+                                <i class="fa-solid fa-user"></i>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- Request Information -->
+                        <div class="mentorship-request-content">
+
+                            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+
+                                <h6 class="mentorship-student-name mb-0">
+                                    {{ req.student_name }}
+                                </h6>
+
+
+                                {% if req.status == 'pending' %}
+
+                                    <span class="mentorship-request-status pending">
+                                        Pending
+                                    </span>
+
+                                {% elif req.status in ['accepted', 'approved'] %}
+
+                                    <span class="mentorship-request-status accepted">
+                                        Accepted
+                                    </span>
+
+                                {% elif req.status == 'rejected' %}
+
+                                    <span class="mentorship-request-status rejected">
+                                        Rejected
+                                    </span>
+
+                                {% elif req.status == 'cancelled' %}
+
+                                    <span class="mentorship-request-status cancelled">
+                                        Cancelled
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- Student Details -->
+                            <div class="mentorship-student-details mb-2">
+
+                                <span>
+
+                                    <i class="fa-solid fa-graduation-cap me-1"></i>
+
+                                    {{ req.department or 'IT Department' }}
+
+                                </span>
+
+                                <span class="detail-separator">•</span>
+
+                                <span>
+                                    Batch {{ req.graduation_year or 'N/A' }}
+                                </span>
+
+
+                                {% if req.skills %}
+
+                                    <span class="detail-separator">•</span>
+
+                                    <span>
+
+                                        {{ req.skills[:50] }}
+
+                                        {% if req.skills|length > 50 %}
+                                            ...
+                                        {% endif %}
+
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- Student Message -->
+                            {% if req.message %}
+
+                                <div class="mentorship-message-box">
+
+                                    <div class="mentorship-message-icon">
+                                        <i class="fa-solid fa-quote-left"></i>
+                                    </div>
+
+                                    <p>
+                                        "{{ req.message }}"
+                                    </p>
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <!-- Request Date -->
+                            <div class="mentorship-request-date">
+
+                                <i class="fa-regular fa-clock me-1"></i>
+
+                                Requested:
+
+                                {{ req.request_date or
+                                   (req.created_at.strftime('%Y-%m-%d')
+                                   if req.created_at else 'N/A') }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Actions -->
+
+                        {% if req.status == 'pending' %}
+
+                            <div class="mentorship-actions">
+
+
+                                <!-- Accept -->
+                                <form action="{{ url_for('alumni.respond_request') }}"
+                                      method="POST">
+
+                                    <input type="hidden"
+                                           name="request_id"
+                                           value="{{ req.request_id }}">
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="accept">
+
+                                    <button type="submit"
+                                            class="mentorship-action-btn accept"
+                                            id="acceptBtn-{{ req.request_id }}">
+
+                                        <i class="fa-solid fa-check me-1"></i>
+
+                                        Accept
+
+                                    </button>
+
+                                </form>
+
+
+                                <!-- Reject -->
+                                <form action="{{ url_for('alumni.respond_request') }}"
+                                      method="POST">
+
+                                    <input type="hidden"
+                                           name="request_id"
+                                           value="{{ req.request_id }}">
+
+                                    <input type="hidden"
+                                           name="action"
+                                           value="reject">
+
+                                    <button type="submit"
+                                            class="mentorship-action-btn reject"
+                                            id="rejectBtn-{{ req.request_id }}">
+
+                                        <i class="fa-solid fa-xmark me-1"></i>
+
+                                        Reject
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+
+                        {% elif req.status in ['accepted', 'approved'] %}
+
+                            <div class="mentorship-actions">
+
+                                <a href="{{ url_for('alumni.alumni_chat', mentorship_id=req.request_id) }}"
+                                   class="mentorship-action-btn chat"
+                                   id="chatBtn-{{ req.request_id }}">
+
+                                    <i class="fa-solid fa-comments me-1"></i>
+
+                                    Open Chat
+
+                                </a>
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <!-- Empty State -->
+
+            <div class="mentorship-empty-state">
+
+                <div class="mentorship-empty-icon">
+
+                    <i class="fa-solid fa-handshake"></i>
+
+                </div>
+
+                <h5>
+                    No Mentorship Requests Yet
+                </h5>
+
+                <p>
+                    When students send you mentorship requests,
+                    they will appear here.
+                </p>
+
+                <a href="{{ url_for('alumni.dashboard') }}"
+                   class="mentorship-back-btn">
+
+                    <i class="fa-solid fa-gauge-high me-2"></i>
+
+                    Back to Dashboard
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+</div>
+```
+
+</div>
+
+<!-- =========================================================
+     Alumni Mentorship Page Styling
+     ========================================================= -->
+
+<style>
+
+    .alumni-mentorship-page {
+        min-height: 100vh;
+        background: #f5f7fa;
+        color: #172033;
+    }
+
+
+    .alumni-mentorship-layout {
+        min-height: 100vh;
+    }
+
+
+    /* =========================
+       Sidebar
+       ========================= */
+
+    .alumni-mentorship-sidebar {
+        width: 250px;
+        min-width: 250px;
+        background: #ffffff;
+        border-right: 1px solid #e5e7eb;
+        box-shadow: 4px 0 15px rgba(15, 23, 42, 0.03);
+    }
+
+
+    .alumni-mentorship-sidebar .brand {
+        color: #172033;
+    }
+
+
+    .alumni-sidebar-logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #ccfbf1;
+        color: #0f4c5c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    .alumni-mentorship-sidebar .brand span span {
+        color: #14b8a6;
+    }
+
+
+    .alumni-mentorship-sidebar .nav-link {
+        color: #64748b !important;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+
+    .alumni-mentorship-sidebar .nav-link:hover {
+        color: #0f4c5c !important;
+        background: #f0fdfa;
+    }
+
+
+    .alumni-mentorship-sidebar .nav-link.active {
+        color: #0f4c5c !important;
+        background: #ccfbf1;
+    }
+
+
+    .alumni-mentorship-sidebar .nav-link.active i {
+        color: #0f4c5c;
+    }
+
+
+    .mentorship-pending-badge {
+        background: #ef4444 !important;
+        color: #ffffff !important;
+    }
+
+
+    .alumni-sidebar-footer {
+        border-color: #e5e7eb !important;
+    }
+
+
+    .alumni-mentorship-sidebar .logout-link {
+        color: #dc2626 !important;
+    }
+
+
+    .alumni-mentorship-sidebar .logout-link:hover {
+        background: #fef2f2;
+    }
+
+
+    /* =========================
+       Main Content
+       ========================= */
+
+    .alumni-mentorship-main {
+        padding: 2rem;
+        overflow-y: auto;
+        background: #f5f7fa;
+    }
+
+
+    /* =========================
+       Flash Messages
+       ========================= */
+
+    .mentorship-alert {
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+
+
+    /* =========================
+       Page Header
+       ========================= */
+
+    .mentorship-title-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        background: #ccfbf1;
+        color: #0f4c5c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+
+    .mentorship-page-header h1 {
+        color: #172033;
+    }
+
+
+    .mentorship-page-header p {
+        color: #64748b;
+    }
+
+
+    .mentorship-status {
+        font-size: 0.78rem;
+        font-weight: 600;
+        border-radius: 999px;
+    }
+
+
+    .mentorship-status.pending {
+        background: #fffbeb;
+        color: #b45309;
+        border: 1px solid #fde68a;
+    }
+
+
+    .mentorship-status.verified {
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
+    }
+
+
+    /* =========================
+       Statistics
+       ========================= */
+
+    .mentorship-stat-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        min-height: 90px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        transition: all 0.2s ease;
+    }
+
+
+    .mentorship-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(15, 23, 42, 0.07);
+    }
+
+
+    .mentorship-stat-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    .mentorship-stat-icon.total {
+        background: #ecfeff;
+        color: #0f766e;
+    }
+
+
+    .mentorship-stat-icon.pending {
+        background: #fffbeb;
+        color: #b45309;
+    }
+
+
+    .mentorship-stat-icon.accepted {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+
+    .mentorship-stat-icon.rejected {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+
+    .mentorship-stat-value {
+        color: #172033;
+        font-size: 1.45rem;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+
+    .mentorship-stat-label {
+        color: #64748b;
+        font-size: 0.78rem;
+        margin-top: 3px;
+    }
+
+
+    /* =========================
+       Request Cards
+       ========================= */
+
+    .mentorship-request-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+
+    .mentorship-request-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 1.25rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        transition: all 0.2s ease;
+    }
+
+
+    .mentorship-request-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+        transform: translateY(-1px);
+    }
+
+
+    .mentorship-student-avatar {
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0f4c5c, #14b8a6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: #ffffff;
+    }
+
+
+    .mentorship-student-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+
+    .mentorship-request-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+
+    .mentorship-student-name {
+        color: #172033;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+
+    .mentorship-request-status {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.25rem 0.55rem;
+        border-radius: 999px;
+    }
+
+
+    .mentorship-request-status.pending {
+        background: #fffbeb;
+        color: #b45309;
+    }
+
+
+    .mentorship-request-status.accepted {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+
+    .mentorship-request-status.rejected {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+
+    .mentorship-request-status.cancelled {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+
+    .mentorship-student-details {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+
+    .mentorship-student-details i {
+        color: #0f4c5c;
+    }
+
+
+    .detail-separator {
+        color: #cbd5e1;
+    }
+
+
+    /* =========================
+       Student Message
+       ========================= */
+
+    .mentorship-message-box {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-left: 3px solid #14b8a6;
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        margin: 0.75rem 0;
+        display: flex;
+        gap: 0.65rem;
+    }
+
+
+    .mentorship-message-icon {
+        color: #14b8a6;
+        padding-top: 2px;
+    }
+
+
+    .mentorship-message-box p {
+        color: #475569;
+        font-size: 0.84rem;
+        font-style: italic;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+
+    .mentorship-request-date {
+        color: #94a3b8;
+        font-size: 0.75rem;
+    }
+
+
+    /* =========================
+       Action Buttons
+       ========================= */
+
+    .mentorship-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+
+
+    .mentorship-action-btn {
+        border-radius: 8px;
+        padding: 0.55rem 0.85rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+
+    .mentorship-action-btn.accept {
+        background: #ecfdf5;
+        color: #047857;
+        border-color: #a7f3d0;
+    }
+
+
+    .mentorship-action-btn.accept:hover {
+        background: #047857;
+        color: #ffffff;
+    }
+
+
+    .mentorship-action-btn.reject {
+        background: #fef2f2;
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+
+
+    .mentorship-action-btn.reject:hover {
+        background: #dc2626;
+        color: #ffffff;
+    }
+
+
+    .mentorship-action-btn.chat {
+        background: #0f4c5c;
+        color: #ffffff;
+        border-color: #0f4c5c;
+    }
+
+
+    .mentorship-action-btn.chat:hover {
+        background: #0b3540;
+        color: #ffffff;
+    }
+
+
+    /* =========================
+       Empty State
+       ========================= */
+
+    .mentorship-empty-state {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 4rem 2rem;
+        text-align: center;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    }
+
+
+    .mentorship-empty-icon {
+        width: 75px;
+        height: 75px;
+        margin: 0 auto 1.25rem;
+        border-radius: 20px;
+        background: #f0fdfa;
+        color: #0f4c5c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+    }
+
+
+    .mentorship-empty-state h5 {
+        color: #172033;
+        font-weight: 700;
+    }
+
+
+    .mentorship-empty-state p {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+
+    .mentorship-back-btn {
+        display: inline-flex;
+        align-items: center;
+        background: #0f4c5c;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 8px;
+        padding: 0.65rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+
+    .mentorship-back-btn:hover {
+        background: #0b3540;
+        color: #ffffff;
+    }
+
+
+    /* =========================
+       Mobile
+       ========================= */
+
+    @media (max-width: 991.98px) {
+
+        .alumni-mentorship-sidebar {
+            width: 210px;
+            min-width: 210px;
+        }
+
+        .alumni-mentorship-main {
+            padding: 1.25rem;
+        }
+
+    }
+
+
+    @media (max-width: 767.98px) {
+
+        .alumni-mentorship-layout {
+            display: block !important;
+        }
+
+
+        .alumni-mentorship-sidebar {
+            width: 100%;
+            min-width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem !important;
+        }
+
+
+        .alumni-mentorship-sidebar .brand {
+            margin-bottom: 1rem !important;
+        }
+
+
+        .alumni-mentorship-sidebar .nav {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+
+        .alumni-sidebar-footer {
+            margin-top: 1rem !important;
+            padding-top: 0.75rem !important;
+        }
+
+
+        .alumni-mentorship-main {
+            padding: 1rem;
+        }
+
+
+        .mentorship-page-header {
+            align-items: flex-start !important;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+
+        .mentorship-page-header > div:last-child {
+            width: 100%;
+        }
+
+
+        .mentorship-status {
+            display: inline-block;
+        }
+
+
+        .mentorship-request-card {
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+
+        .mentorship-student-avatar {
+            width: 46px;
+            height: 46px;
+            min-width: 46px;
+        }
+
+
+        .mentorship-actions {
+            width: 100%;
+        }
+
+
+        .mentorship-actions form,
+        .mentorship-actions .mentorship-action-btn {
+            flex: 1;
+        }
+
+
+        .mentorship-actions button,
+        .mentorship-actions a {
+            width: 100%;
+            text-align: center;
+            display: block;
+        }
+
+
+        .mentorship-student-details {
+            line-height: 1.6;
+        }
+
+    }
+
+
+    @media (max-width: 480px) {
+
+        .mentorship-title-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+        }
+
+
+        .mentorship-page-header h1 {
+            font-size: 1.15rem;
+        }
+
+
+        .mentorship-stat-card {
+            padding: 0.8rem;
+        }
+
+
+        .mentorship-stat-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+        }
+
+
+        .mentorship-stat-value {
+            font-size: 1.2rem;
+        }
+
+
+        .mentorship-stat-label {
+            font-size: 0.7rem;
+        }
+
+
+        .mentorship-request-card {
+            border-radius: 13px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}

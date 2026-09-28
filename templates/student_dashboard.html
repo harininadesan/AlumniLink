@@ -1,0 +1,276 @@
+{% extends "student_base.html" %}
+
+{% block title %}Student Dashboard | AlumniLink{% endblock %}
+
+{% block student_content %}
+<div class="container-fluid p-0">
+    
+    <!-- Welcome Header Banner -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 glass-card p-4 p-md-5 text-white position-relative overflow-hidden shadow-premium" style="background: var(--gradient-hero);">
+                <div class="hero-bg-glow-1" style="width: 300px; height: 300px; right: -50px; top: -50px;"></div>
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center position-relative z-index-2 gap-3">
+                    <div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-primary-soft-badge me-2 text-uppercase text-xs font-weight-bold">
+                                <i class="fa-solid fa-graduation-cap me-1"></i> Student Portal
+                            </span>
+                            <span class="text-xs text-muted-custom">IT Department • Class of {{ profile.graduation_year or '2026' }}</span>
+                        </div>
+                        <h1 class="h2 font-weight-extrabold text-white mb-1">
+                            Welcome back, {{ profile.full_name or current_user.full_name }}! 👋
+                        </h1>
+                        <p class="text-muted-custom mb-0 text-sm">
+                            Connect with verified alumni, request 1-on-1 mentorship, explore exclusive job referrals, and track your career growth.
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('student.search_alumni') }}" class="btn btn-primary btn-premium px-4 py-2.5" id="dashHeaderSearchBtn">
+                            <i class="fa-solid fa-magnifying-glass me-2"></i>Find Mentors
+                        </a>
+                        <a href="{{ url_for('student.view_profile') }}" class="btn btn-outline-light btn-premium-outline px-3 py-2.5" id="dashHeaderProfileBtn">
+                            <i class="fa-solid fa-user-gear me-2"></i>My Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4 Premium Gradient Dashboard Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Card 1: Verified Alumni -->
+        <div class="col-6 col-lg-3">
+            <div class="card dash-card-gradient gradient-card-1 p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="text-xs text-uppercase font-weight-bold small-tracking opacity-75 d-block">Verified Alumni</span>
+                        <h2 class="display-6 font-weight-extrabold mb-0 mt-1">{{ verified_alumni_count }}</h2>
+                    </div>
+                    <div class="dash-card-icon-wrapper">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                </div>
+                <div class="mt-auto d-flex align-items-center justify-content-between text-xs opacity-90 border-top border-white border-opacity-10 pt-2.5">
+                    <span>Active Mentors in Network</span>
+                    <a href="{{ url_for('student.search_alumni') }}" class="text-white font-weight-bold text-decoration-none hover-underline">View <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                </div>
+                <i class="fa-solid fa-graduation-cap card-bg-decoration"></i>
+            </div>
+        </div>
+
+        <!-- Card 2: Mentorship Requests -->
+        <div class="col-6 col-lg-3">
+            <div class="card dash-card-gradient gradient-card-2 p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="text-xs text-uppercase font-weight-bold small-tracking opacity-75 d-block">Mentorship Requests</span>
+                        <h2 class="display-6 font-weight-extrabold mb-0 mt-1">{{ mentorship_requests_count }}</h2>
+                    </div>
+                    <div class="dash-card-icon-wrapper">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                </div>
+                <div class="mt-auto d-flex align-items-center justify-content-between text-xs opacity-90 border-top border-white border-opacity-10 pt-2.5">
+                    <span>Requests Sent</span>
+                    <a href="{{ url_for('student.view_requests') }}" class="text-white font-weight-bold text-decoration-none hover-underline">Track <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                </div>
+                <i class="fa-solid fa-paper-plane card-bg-decoration"></i>
+            </div>
+        </div>
+
+        <!-- Card 3: Job Opportunities -->
+        <div class="col-6 col-lg-3">
+            <div class="card dash-card-gradient gradient-card-3 p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="text-xs text-uppercase font-weight-bold small-tracking opacity-75 d-block">Job Opportunities</span>
+                        <h2 class="display-6 font-weight-extrabold mb-0 mt-1">{{ job_opportunities_count }}</h2>
+                    </div>
+                    <div class="dash-card-icon-wrapper">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                </div>
+                <div class="mt-auto d-flex align-items-center justify-content-between text-xs opacity-90 border-top border-white border-opacity-10 pt-2.5">
+                    <span>Available Referrals</span>
+                    <a href="{{ url_for('student.view_jobs') }}" class="text-white font-weight-bold text-decoration-none hover-underline">Explore <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                </div>
+                <i class="fa-solid fa-building card-bg-decoration"></i>
+            </div>
+        </div>
+
+        <!-- Card 4: Unread Notifications -->
+        <div class="col-6 col-lg-3">
+            <div class="card dash-card-gradient gradient-card-4 p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="text-xs text-uppercase font-weight-bold small-tracking opacity-75 d-block">Notifications</span>
+                        <h2 class="display-6 font-weight-extrabold mb-0 mt-1">{{ unread_notifications_count }}</h2>
+                    </div>
+                    <div class="dash-card-icon-wrapper">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                </div>
+                <div class="mt-auto d-flex align-items-center justify-content-between text-xs opacity-90 border-top border-white border-opacity-10 pt-2.5">
+                    <span>Unread Alerts</span>
+                    <a href="{{ url_for('student.view_notifications') }}" class="text-white font-weight-bold text-decoration-none hover-underline">Read <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                </div>
+                <i class="fa-solid fa-circle-exclamation card-bg-decoration"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-4">
+                <h5 class="h6 text-uppercase font-weight-bold text-muted-custom small-tracking mb-3">
+                    <i class="fa-solid fa-bolt text-warning me-2"></i>Quick Actions
+                </h5>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('student.search_alumni') }}" class="quick-action-card h-100" id="quickActionSearch">
+                            <div class="quick-action-icon bg-primary-soft text-primary">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </div>
+                            <div>
+                                <h6 class="font-weight-bold mb-0 text-sm text-dark-theme">Search Alumni</h6>
+                                <small class="text-muted text-xs">Filter mentors by skill</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('student.search_alumni') }}" class="quick-action-card h-100" id="quickActionRequest">
+                            <div class="quick-action-icon bg-success-soft text-success">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </div>
+                            <div>
+                                <h6 class="font-weight-bold mb-0 text-sm text-dark-theme">Send Request</h6>
+                                <small class="text-muted text-xs">Connect for advice</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('student.view_jobs') }}" class="quick-action-card h-100" id="quickActionJobs">
+                            <div class="quick-action-icon bg-info-soft text-info">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+                            <div>
+                                <h6 class="font-weight-bold mb-0 text-sm text-dark-theme">View Jobs</h6>
+                                <small class="text-muted text-xs">Alumni job postings</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('student.view_profile') }}" class="quick-action-card h-100" id="quickActionEditProfile">
+                            <div class="quick-action-icon bg-warning-soft text-warning">
+                                <i class="fa-solid fa-user-pen"></i>
+                            </div>
+                            <div>
+                                <h6 class="font-weight-bold mb-0 text-sm text-dark-theme">Edit Profile</h6>
+                                <small class="text-muted text-xs">Update your resume</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workspace Grid: Recent Activity & Previews -->
+    <div class="row g-4">
+        <!-- Left Side: Recent Activity Section -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="h6 text-uppercase font-weight-bold text-dark mb-0 small-tracking">
+                        <i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Recent Activity
+                    </h5>
+                    <span class="badge bg-secondary-custom text-dark-theme font-weight-semibold text-xs">Live Feed</span>
+                </div>
+
+                <div class="activity-timeline">
+                    {% for activity in recent_activities %}
+                        <div class="activity-item">
+                            <div class="activity-badge {{ activity.badge_class }}">
+                                <i class="fa-solid {{ activity.icon }}"></i>
+                            </div>
+                            <div class="bg-light-theme p-3 rounded-3 border">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="font-weight-bold text-dark-theme mb-0 text-sm">{{ activity.title }}</h6>
+                                    <small class="text-muted-custom text-xs">{{ activity.time }}</small>
+                                </div>
+                                <p class="text-muted text-xs mb-0">{{ activity.description }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Top Verified Alumni & Job Previews -->
+        <div class="col-lg-5">
+            <!-- Featured Alumni Quick Grid -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="h6 text-uppercase font-weight-bold text-dark mb-0 small-tracking">
+                        <i class="fa-solid fa-star me-2 text-warning"></i>Featured Mentors
+                    </h5>
+                    <a href="{{ url_for('student.search_alumni') }}" class="text-primary font-weight-semibold text-xs text-decoration-none">View All</a>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    {% for alumnus in alumni_list[:3] %}
+                        <div class="p-3 border rounded-3 bg-light-theme d-flex align-items-center justify-content-between hover-shadow transition-smooth">
+                            <div class="d-flex align-items-center gap-3">
+                                {% if alumnus.profile_photo %}
+                                    <img src="{{ url_for('static', filename=alumnus.profile_photo) }}" class="rounded-circle" style="width: 42px; height: 42px; object-fit: cover;" alt="Alumni">
+                                {% else %}
+                                    <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold text-xs" style="width: 42px; height: 42px;">
+                                        {{ (alumnus.full_name or 'A')[0] | upper }}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="font-weight-bold text-dark-theme mb-0 text-sm">{{ alumnus.full_name }}</h6>
+                                    <small class="text-muted d-block text-xs">{{ alumnus.designation }} at <strong>{{ alumnus.company or 'Tech Co' }}</strong></small>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('student.search_alumni') }}" class="btn btn-outline-primary btn-xs font-weight-semibold">
+                                Request
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Latest Jobs Preview -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="h6 text-uppercase font-weight-bold text-dark mb-0 small-tracking">
+                        <i class="fa-solid fa-fire me-2 text-danger"></i>Latest Job Posts
+                    </h5>
+                    <a href="{{ url_for('student.view_jobs') }}" class="text-primary font-weight-semibold text-xs text-decoration-none">View Board</a>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    {% for job in jobs[:2] %}
+                        <div class="p-3 border rounded-3 bg-light-theme">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="font-weight-bold text-dark-theme mb-0 text-sm">{{ job.title }}</h6>
+                                <span class="badge bg-secondary text-dark text-xs">{{ job.company }}</span>
+                            </div>
+                            <p class="text-muted text-xs mb-2 line-clamp-2">{{ job.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center text-xs text-muted-custom">
+                                <span><i class="fa-solid fa-location-dot me-1"></i>{{ job.location or 'Remote' }}</span>
+                                <a href="{{ url_for('student.view_jobs') }}" class="text-primary font-weight-bold text-decoration-none">Apply Now</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,1074 @@
+{% extends "base.html" %}
+
+{% block title %}Alumni Dashboard | AlumniLink{% endblock %}
+
+{% block content %}
+
+<div class="container py-5 alumni-dashboard-page">
+
+
+<!-- Welcome Header Card -->
+<div class="row mb-4">
+    <div class="col-12">
+
+        <div class="card border-0 glass-card alumni-welcome-card p-4 text-white position-relative overflow-hidden shadow-premium"
+             style="background: var(--gradient-hero);">
+
+            <div class="hero-bg-glow-1"
+                 style="width: 250px; height: 250px; right: -50px; top: -50px;">
+            </div>
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center position-relative z-index-2">
+
+                <div>
+
+                    <div class="d-flex align-items-center mb-2">
+
+                        <span class="badge bg-success-soft-badge me-2 text-uppercase text-xs font-weight-bold">
+                            Alumni Account
+                        </span>
+
+                        {% if data.profile.mentor_status %}
+
+                            <span class="badge bg-success text-white text-xs">
+                                <i class="fa-solid fa-circle-check me-1"></i>
+                                Active Matchmaker
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-warning text-dark text-xs">
+                                <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                Busy Mode
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <h1 class="h3 font-weight-extrabold text-white mb-1">
+                        Welcome, {{ data.profile.full_name }}!
+                    </h1>
+
+                    <p class="text-muted-custom mb-0 text-sm">
+                        {{ data.profile.designation or 'Industry Professional' }}
+                        at
+                        <strong>
+                            {{ data.profile.company or 'Unconfigured Company' }}
+                        </strong>
+                    </p>
+
+                </div>
+
+                <div class="mt-3 mt-md-0 d-flex gap-2 flex-wrap">
+
+                    <a href="{{ url_for('alumni.manage_jobs') }}"
+                       class="btn btn-info btn-premium px-4 py-2.5"
+                       id="alumniManageJobsBtn">
+
+                        <i class="fa-solid fa-briefcase me-2"></i>
+                        Manage Jobs
+
+                    </a>
+
+                    <button class="btn btn-primary btn-premium px-4 py-2.5"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editAlumniProfileModal"
+                            id="alumniEditProfileBtn">
+
+                        <i class="fa-solid fa-user-pen me-2"></i>
+                        Edit Profile
+
+                    </button>
+
+                    <a href="{{ url_for('auth.logout') }}"
+                       class="btn btn-outline-light btn-premium-outline px-3 py-2.5"
+                       id="alumniLogoutBtn">
+
+                        <i class="fa-solid fa-right-from-bracket me-2"></i>
+                        Logout
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Main Workspace Grid -->
+<div class="row g-4">
+
+    <!-- LEFT SIDE -->
+    <div class="col-lg-8">
+
+        <!-- Navigation -->
+        <div class="mb-4 p-1 bg-white rounded-3 shadow-sm border alumni-dashboard-nav">
+
+            <div class="row g-1">
+
+                <!-- MENTORSHIP INBOX -->
+                <div class="col-md-4">
+
+                    <a href="{{ url_for('alumni.mentorship_page') }}"
+                       class="nav-link active font-weight-semibold py-3 text-center rounded-3"
+                       id="inbox-tab">
+
+                        <i class="fa-solid fa-envelope-open-text me-2"></i>
+
+                        Mentorship Inbox
+
+                        {% if data.requests %}
+
+                            <span class="badge bg-danger ms-1 text-2xs">
+
+                                {{ data.requests
+                                   | selectattr('status', 'equalto', 'pending')
+                                   | list
+                                   | length }}
+
+                            </span>
+
+                        {% endif %}
+
+                    </a>
+
+                </div>
+
+
+                <!-- MANAGE CAREER OPENINGS -->
+                <div class="col-md-4">
+
+                    <a href="{{ url_for('alumni.manage_jobs') }}"
+                       class="nav-link font-weight-semibold py-3 text-center rounded-3"
+                       id="postings-tab">
+
+                        <i class="fa-solid fa-folder-plus me-2"></i>
+
+                        Manage Career Openings
+
+                    </a>
+
+                </div>
+
+
+                <!-- THANK YOU MESSAGES -->
+                <div class="col-md-4">
+
+                    <a href="#testimonials-section"
+                       class="nav-link font-weight-semibold py-3 text-center rounded-3"
+                       id="testimonials-tab">
+
+                        <i class="fa-solid fa-heart me-2"></i>
+
+                        Thank-You Messages
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Mentorship Preview -->
+        <div class="card border-0 shadow-premium p-4 bg-white mb-4 alumni-section-card">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <div>
+
+                    <h4 class="h5 font-weight-bold text-dark-theme mb-1">
+                        Mentorship
+                    </h4>
+
+                    <p class="text-muted text-sm mb-0">
+                        Manage student connection requests and continue your conversations.
+                    </p>
+
+                </div>
+
+                <a href="{{ url_for('alumni.mentorship_page') }}"
+                   class="btn btn-primary btn-sm px-3">
+
+                    <i class="fa-solid fa-arrow-right me-1"></i>
+                    Open Mentorship
+
+                </a>
+
+            </div>
+
+
+            <!-- Request Preview -->
+            <div class="d-flex flex-column gap-3">
+
+                {% if data.requests %}
+
+                    {% for req in data.requests[:3] %}
+
+                        <div class="p-3 border rounded-3 bg-light-theme alumni-item">
+
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+
+                                <div>
+
+                                    <h5 class="h6 font-weight-bold text-dark-theme mb-1">
+                                        {{ req.student_name }}
+                                    </h5>
+
+                                    <small class="text-muted text-xs">
+                                        {{ req.department }}
+                                        •
+                                        Class of {{ req.graduation_year }}
+                                    </small>
+
+                                </div>
+
+
+                                <div class="mt-2 mt-sm-0">
+
+                                    {% if req.status == 'pending' %}
+
+                                        <span class="badge bg-warning text-dark text-2xs">
+                                            <i class="fa-solid fa-circle-question me-1"></i>
+                                            Awaiting Decision
+                                        </span>
+
+                                    {% elif req.status in ['accepted', 'approved'] %}
+
+                                        <span class="badge bg-success text-white text-2xs">
+                                            <i class="fa-solid fa-circle-check me-1"></i>
+                                            Accepted
+                                        </span>
+
+                                    {% elif req.status == 'cancelled' %}
+
+                                        <span class="badge bg-secondary text-white text-2xs">
+                                            <i class="fa-solid fa-ban me-1"></i>
+                                            Cancelled
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-danger text-white text-2xs">
+                                            <i class="fa-solid fa-circle-xmark me-1"></i>
+                                            Declined
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="text-center py-5">
+
+                        <i class="fa-solid fa-inbox text-muted mb-3"
+                           style="font-size: 2.5rem;">
+                        </i>
+
+                        <p class="text-muted mb-0">
+                            Your mentorship inbox is empty.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- Job & Internship Portal -->
+        <div class="card border-0 shadow-premium p-4 bg-white mb-4 alumni-section-card">
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+
+                <div>
+
+                    <h4 class="h5 font-weight-bold text-dark-theme mb-1">
+                        Job &amp; Internship Portal
+                    </h4>
+
+                    <p class="text-muted text-sm mb-0">
+                        Create, manage, and track all your job listings.
+                        View student applicants from the portal.
+                    </p>
+
+                </div>
+
+                <a href="{{ url_for('alumni.manage_jobs') }}"
+                   class="btn btn-primary btn-sm px-4 py-2.5 font-weight-semibold rounded-pill"
+                   id="btnGoToJobPortal">
+
+                    <i class="fa-solid fa-arrow-right me-2"></i>
+                    Go to Job Portal
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Recent Job Posts Preview -->
+        <div class="card border-0 shadow-premium p-4 bg-white mb-4 alumni-section-card">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <h4 class="h6 text-uppercase font-weight-bold small-tracking text-dark mb-0">
+                    Recent Listings
+                </h4>
+
+                <a href="{{ url_for('alumni.manage_jobs') }}"
+                   class="text-xs text-primary text-decoration-none font-weight-semibold">
+
+                    View All
+                    <i class="fa-solid fa-arrow-right ms-1"></i>
+
+                </a>
+
+            </div>
+
+
+            <div class="d-flex flex-column gap-3">
+
+                {% if data.jobs %}
+
+                    {% for job in data.jobs[:3] %}
+
+                        <div class="p-3 border rounded-3 bg-light-theme alumni-item">
+
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+
+                                <div>
+
+                                    <h5 class="h6 font-weight-bold text-dark-theme mb-0">
+                                        {{ job.title }}
+                                    </h5>
+
+                                    <small class="text-muted text-xs">
+
+                                        <i class="fa-solid fa-building me-1 text-primary"></i>
+
+                                        {{ job.company }}
+
+                                        &nbsp;·&nbsp;
+
+                                        <span class="badge rounded-pill text-2xs
+                                            {% if job.status == 'Active' %}
+                                                bg-success text-white
+                                            {% else %}
+                                                bg-danger text-white
+                                            {% endif %}">
+
+                                            {{ job.status or 'Active' }}
+
+                                        </span>
+
+                                    </small>
+
+                                </div>
+
+
+                                <div class="d-flex gap-1">
+
+                                    <a href="{{ url_for('alumni.edit_job_form', job_id=job.job_id) }}"
+                                       class="btn btn-outline-primary btn-xs px-2 py-1 rounded"
+                                       title="Edit">
+
+                                        <i class="fa-solid fa-pen-to-square"></i>
+
+                                    </a>
+
+
+                                    <a href="{{ url_for('alumni.view_applicants', job_id=job.job_id) }}"
+                                       class="btn btn-outline-info btn-xs px-2 py-1 rounded"
+                                       title="Applicants">
+
+                                        <i class="fa-solid fa-users"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="text-2xs text-muted border-top pt-2 mt-1">
+
+                                <span>
+
+                                    Posted:
+
+                                    <strong>
+
+                                        {{ job.created_at.strftime('%Y-%m-%d')
+                                           if job.created_at else '' }}
+
+                                    </strong>
+
+                                </span>
+
+
+                                <span class="ms-3">
+
+                                    Deadline:
+
+                                    <strong>
+
+                                        {{ job.deadline or 'Open' }}
+
+                                    </strong>
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="text-center py-4 text-muted text-sm">
+
+                        <i class="fa-solid fa-briefcase mb-2 d-block"
+                           style="font-size:1.5rem;opacity:0.3;">
+                        </i>
+
+                        No published openings yet.
+
+                        <a href="{{ url_for('alumni.create_job_form') }}"
+                           class="text-primary">
+
+                            Create your first post
+
+                        </a>.
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- Testimonials / Thank You Messages -->
+        <div class="card border-0 shadow-premium p-4 bg-white alumni-section-card"
+             id="testimonials-section">
+
+            <h4 class="h5 font-weight-bold text-dark-theme mb-3">
+                Student Appreciation Feed
+            </h4>
+
+            <p class="text-muted text-sm mb-4">
+                View notes and appreciation messages from students you connected with.
+            </p>
+
+
+            <div class="d-flex flex-column gap-3"
+                 id="testimonialsList">
+
+                {% if data.feedback %}
+
+                    {% for feed in data.feedback %}
+
+                        <div class="p-3 border rounded-3 bg-light-theme alumni-item border-start border-success border-3">
+
+                            <p class="text-sm mb-2 text-dark-theme font-weight-medium italic-style">
+
+                                "{{ feed.feedback_text }}"
+
+                            </p>
+
+                            <div class="text-xs text-muted d-flex justify-content-between">
+
+                                <span>
+
+                                    From student:
+
+                                    <strong>
+                                        {{ feed.student_name }}
+                                    </strong>
+
+                                </span>
+
+                                <span>
+
+                                    {{ feed.request_date.strftime('%Y-%m-%d')
+                                       if feed.request_date else '' }}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="text-center py-5 text-muted">
+
+                        <i class="fa-solid fa-quote-right mb-3"
+                           style="font-size: 2.5rem; color: rgba(0,0,0,0.15);">
+                        </i>
+
+                        <p class="mb-0">
+                            No testimonials or connections on file yet.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT SIDE -->
+    <div class="col-lg-4">
+
+
+        <!-- Mentorship & Privacy Settings -->
+        <div class="card border-0 shadow-premium p-4 mb-4 bg-white rounded-3 alumni-info-card">
+
+            <h4 class="h6 text-uppercase font-weight-bold mb-3 small-tracking text-dark">
+                Availability Control
+            </h4>
+
+
+            <form action="{{ url_for('alumni.edit_privacy') }}"
+                  method="POST"
+                  id="privacySettingsForm">
+
+                <div class="form-check form-switch mb-3">
+
+                    <input class="form-check-input"
+                           type="checkbox"
+                           role="switch"
+                           id="mentor_status"
+                           name="mentor_status"
+                           value="1"
+                           {% if data.profile.mentor_status %}checked{% endif %}
+                           onchange="document.getElementById('privacySettingsForm').submit();">
+
+
+                    <label class="form-check-label font-weight-semibold text-sm text-dark-theme"
+                           for="mentor_status">
+
+                        Accept Mentorship Requests
+
+                    </label>
+
+                </div>
+
+
+                <p class="text-xs text-muted mb-0">
+
+                    Disabling this toggle hides your profile from the mentorship
+                    search catalog and prevents new requests.
+
+                </p>
+
+            </form>
+
+        </div>
+
+
+        <!-- Professional Profile Summary -->
+        <div class="card border-0 shadow-premium p-4 mb-4 bg-white rounded-3 alumni-info-card">
+
+            <h5 class="h6 text-uppercase font-weight-bold mb-3 small-tracking text-dark">
+                Professional Profile
+            </h5>
+
+
+            <div class="profile-details text-sm">
+
+                <div class="mb-2.5 d-flex justify-content-between">
+
+                    <span class="text-muted font-weight-medium">
+                        Company:
+                    </span>
+
+                    <strong class="text-dark-theme">
+                        {{ data.profile.company or 'Configure Company' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="mb-2.5 d-flex justify-content-between">
+
+                    <span class="text-muted font-weight-medium">
+                        Designation:
+                    </span>
+
+                    <strong class="text-dark-theme">
+                        {{ data.profile.designation or 'Configure Role' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="mb-2.5 d-flex justify-content-between">
+
+                    <span class="text-muted font-weight-medium">
+                        Experience:
+                    </span>
+
+                    <strong class="text-dark-theme">
+                        {{ data.profile.experience or 'Configure Experience' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="mb-2.5 d-flex justify-content-between">
+
+                    <span class="text-muted font-weight-medium">
+                        Location:
+                    </span>
+
+                    <strong class="text-dark-theme">
+                        {{ data.profile.location or 'Configure Location' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="mb-3 d-flex justify-content-between">
+
+                    <span class="text-muted font-weight-medium">
+                        LinkedIn:
+                    </span>
+
+                    <strong class="text-dark-theme">
+
+                        {% if data.profile.linkedin %}
+
+                            <a href="{{ data.profile.linkedin }}"
+                               target="_blank"
+                               class="text-highlight-color text-decoration-none">
+
+                                LinkedIn
+
+                            </a>
+
+                        {% else %}
+
+                            Not set
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Notifications -->
+        <div class="card border-0 shadow-premium p-4 bg-white rounded-3 alumni-info-card">
+
+            <h4 class="h6 text-uppercase font-weight-bold mb-3 small-tracking text-dark">
+                Notifications
+            </h4>
+
+
+            <div class="d-flex flex-column gap-2.5 max-h-350 overflow-y-auto">
+
+                {% if data.notifications %}
+
+                    {% for notice in data.notifications %}
+
+                        <div class="p-2.5 border rounded-3
+                            {% if not notice.is_read %}
+                                bg-light border-success
+                            {% else %}
+                                bg-white
+                            {% endif %}
+                            text-xs animate-fade-in alumni-item">
+
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+
+                                <strong class="text-dark-theme">
+                                    {{ notice.title }}
+                                </strong>
+
+                                <span class="text-muted-custom text-2xs">
+
+                                    {{ notice.created_at.strftime('%m-%d %H:%M')
+                                       if notice.created_at else '' }}
+
+                                </span>
+
+                            </div>
+
+
+                            <p class="text-muted mb-0 text-sm">
+                                {{ notice.message }}
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="text-center py-4 text-muted text-sm">
+
+                        <i class="fa-solid fa-bell-slash mb-2"
+                           style="font-size: 1.5rem;">
+                        </i>
+
+                        <p class="mb-0">
+                            No active alerts logged.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<!-- Profile Management Form Modal -->
+
+<div class="modal fade"
+     id="editAlumniProfileModal"
+     tabindex="-1"
+     aria-labelledby="editAlumniProfileModalLabel"
+     aria-hidden="true">
+
+```
+<div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content border-0 shadow-lg">
+
+
+        <div class="modal-header bg-dark text-white border-0 py-3">
+
+            <h5 class="modal-title font-weight-bold h6"
+                id="editAlumniProfileModalLabel">
+
+                Update Professional Background
+
+            </h5>
+
+
+            <button type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                    aria-label="Close">
+            </button>
+
+        </div>
+
+
+        <form action="{{ url_for('alumni.edit_profile') }}"
+              method="POST">
+
+            <div class="modal-body p-4">
+
+
+                <!-- Full Name -->
+                <div class="mb-3">
+
+                    <label for="full_name"
+                           class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+
+                        Full Name
+
+                    </label>
+
+
+                    <input type="text"
+                           class="form-control text-sm py-2 border shadow-none"
+                           id="full_name"
+                           name="full_name"
+                           value="{{ data.profile.full_name }}"
+                           required>
+
+                </div>
+
+
+                <!-- Company -->
+                <div class="mb-3">
+
+                    <label for="company"
+                           class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+
+                        Company Name
+
+                    </label>
+
+
+                    <input type="text"
+                           class="form-control text-sm py-2 border shadow-none"
+                           id="company"
+                           name="company"
+                           value="{{ data.profile.company or '' }}"
+                           required>
+
+                </div>
+
+
+                <!-- Designation -->
+                <div class="mb-3">
+
+                    <label for="designation"
+                           class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+
+                        Designation / Role
+
+                    </label>
+
+
+                    <input type="text"
+                           class="form-control text-sm py-2 border shadow-none"
+                           id="designation"
+                           name="designation"
+                           value="{{ data.profile.designation or '' }}"
+                           required>
+
+                </div>
+
+
+                <!-- Experience -->
+                <div class="mb-3">
+
+                    <label for="experience"
+                           class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+
+                        Industry Experience
+
+                    </label>
+
+
+                    <input type="text"
+                           class="form-control text-sm py-2 border shadow-none"
+                           id="experience"
+                           name="experience"
+                           value="{{ data.profile.experience or '' }}"
+                           placeholder="e.g. 5+ Years in Fullstack Design"
+                           required>
+
+                </div>
+
+
+                <!-- Location + LinkedIn -->
+                <div class="row g-2 mb-3">
+
+                    <div class="col-sm-6">
+
+                        <label for="location"
+                               class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+
+                            Location
+
+                        </label>
+
+
+                        <input type="text"
+                               class="form-control text-sm py-2 border shadow-none"
+                               id="location"
+                               name="location"
+                               value="{{ data.profile.location or '' }}">
+
+                    </div>
+
+
+                    <div class="col-sm-6">
+
+                        <label for="linkedin"
+                               class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+
+                            LinkedIn URL
+
+                        </label>
+
+
+                        <input type="url"
+                               class="form-control text-sm py-2 border shadow-none"
+                               id="linkedin"
+                               name="linkedin"
+                               value="{{ data.profile.linkedin or '' }}">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer border-0 p-3 bg-light-theme justify-content-end">
+
+                <button type="button"
+                        class="btn btn-light btn-sm border px-3"
+                        data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <button type="submit"
+                        class="btn btn-primary btn-sm px-4"
+                        id="alumniProfileSubmitBtn">
+
+                    Save Background
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<!-- Additional Inline Styles -->
+
+<style>
+
+    .bg-success-soft-badge {
+        background-color: rgba(16, 185, 129, 0.15);
+        color: var(--color-success);
+    }
+
+
+    .text-2xs {
+        font-size: 0.75rem;
+    }
+
+
+    .italic-style {
+        font-style: italic;
+    }
+
+
+    .hover-shadow:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+
+    .max-h-350 {
+        max-height: 350px;
+    }
+
+
+    /* Alumni Dashboard Navigation */
+
+    #inbox-tab {
+        color: #0f4c5c;
+        background-color: #ccfbf1;
+        text-decoration: none;
+    }
+
+
+    #inbox-tab:hover {
+        background-color: #b8f5eb;
+    }
+
+
+    #postings-tab,
+    #testimonials-tab {
+        color: #64748b;
+        text-decoration: none;
+    }
+
+
+    #postings-tab:hover,
+    #testimonials-tab:hover {
+        background-color: #f0fdfa;
+        color: #0f4c5c;
+    }
+
+
+    /* Alumni dashboard mobile improvements */
+
+    @media (max-width: 767.98px) {
+
+        .alumni-dashboard-page {
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+
+
+        .alumni-dashboard-page .alumni-welcome-card {
+            padding: 1.25rem !important;
+            border-radius: 14px !important;
+        }
+
+
+        .alumni-dashboard-page .alumni-welcome-card h1 {
+            font-size: 1.5rem !important;
+        }
+
+
+        .alumni-dashboard-page .alumni-welcome-card .btn {
+            width: 100%;
+            margin-top: 0.35rem;
+        }
+
+
+        .alumni-dashboard-page .alumni-dashboard-nav .nav-link {
+            font-size: 0.82rem;
+            padding-left: 0.35rem !important;
+            padding-right: 0.35rem !important;
+        }
+
+
+        .alumni-dashboard-page .alumni-section-card,
+        .alumni-dashboard-page .alumni-info-card {
+            border-radius: 14px !important;
+        }
+
+
+        .alumni-dashboard-page .alumni-item {
+            padding: 0.9rem !important;
+        }
+
+
+        .alumni-dashboard-page .profile-details > div {
+            gap: 0.75rem;
+        }
+
+    }
+
+</style>
+
+{% endblock %}

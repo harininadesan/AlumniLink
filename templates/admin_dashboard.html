@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | AlumniLink{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    
+    <!-- Admin Top Header Navigation -->
+    {% set active_page = 'dashboard' %}
+    {% include 'admin_nav.html' %}
+
+    <!-- 8 Statistics Cards Overview Grid (Real MySQL Data) -->
+    <div class="row g-3 mb-4" id="adminStatsGrid">
+        
+        <!-- Total Students -->
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 bg-white h-100 rounded-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="role-icon-wrapper bg-primary-soft text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.2rem; background: rgba(59,130,246,0.1);">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted text-xs text-uppercase font-weight-bold">Total Students</span>
+                        <h3 class="font-weight-extrabold text-dark mb-0 mt-0.5">{{ stats.students }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Alumni -->
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm p-3 bg-white h-100 rounded-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="role-icon-wrapper bg-success-soft text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.2rem; background: rgba(34,197,94,0.1);">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted text-xs text-uppercase font-weight-bold">Total Alumni</span>
+                        <h3 class="font-weight-extrabold text-dark mb-0 mt-0.5">{{ stats.alumni }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Alumni Verification -->
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_alumni', status='pending') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 bg-white h-100 rounded-3 border-start border-warning border-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="role-icon-wrapper text-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.2rem; background: rgba(245,158,11,0.1);">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted text-xs text-uppercase font-weight-bold">Pending Alumni</span>
+                            <h3 class="font-weight-extrabold text-warning mb-0 mt-0.5">{{ stats.pending_alumni }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Approved Alumni -->
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_alumni', status='approved') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 bg-white h-100 rounded-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="role-icon-wrapper text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.2rem; background: rgba(34,197,94,0.1);">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted text-xs text-uppercase font-weight-bold">Approved Alumni</span>
+                            <h3 class="font-weight-extrabold text-success mb-0 mt-0.5">{{ stats.approved_alumni }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Rejected Alumni -->
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_alumni', status='rejected') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 bg-white h-100 rounded-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="role-icon-wrapper text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.2rem; background: rgba(239,68,68,0.1);">
+                            <i class="fa-solid fa-user-xmark"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted text-xs text-uppercase font-weight-bold">Rejected Alumni</span>
+                            <h3 class="font-weight-extrabold text-danger mb-0 mt-0.5">{{ stats.rejected_alumni }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Total Job Posts -->
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_jobs') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 bg-white h-100 rounded-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="role-icon-wrapper text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.2rem; background: rgba(6,182,212,0.1);">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted text-xs text-uppercase font-weight-bold">Job Posts</span>
+                            <h3 class="font-weight-extrabold text-dark mb-0 mt-0.5">{{ stats.jobs }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Total Mentorship Requests -->
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_mentorship') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 bg-white h-100 rounded-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="role-icon-wrapper text-purple rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.2rem; background: rgba(168,85,247,0.1);">
+                            <i class="fa-solid fa-handshake"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted text-xs text-uppercase font-weight-bold">Total Requests</span>
+                            <h3 class="font-weight-extrabold text-dark mb-0 mt-0.5">{{ stats.requests }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Pending Mentorship Requests -->
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_mentorship', status='pending') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm p-3 bg-white h-100 rounded-3 border-start border-warning border-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="role-icon-wrapper text-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.2rem; background: rgba(245,158,11,0.1);">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <span class="text-muted text-xs text-uppercase font-weight-bold">Pending Requests</span>
+                            <h3 class="font-weight-extrabold text-warning mb-0 mt-0.5">{{ stats.pending_requests }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Main Admin Workspace Grid -->
+    <div class="row g-4">
+        
+        <!-- Left Column: Verification Queue & Recent Activity -->
+        <div class="col-lg-8">
+            
+            <!-- Pending Verification Queue Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 class="h6 text-uppercase font-weight-bold text-dark mb-0">
+                            <i class="fa-solid fa-user-shield text-warning me-2"></i>Pending Alumni Verification Queue
+                        </h2>
+                        <small class="text-muted">Review workplace credentials before enabling student search visibility.</small>
+                    </div>
+                    {% if lists.pending_alumni %}
+                        <span class="badge bg-warning text-dark font-weight-bold">{{ lists.pending_alumni | length }} Pending</span>
+                    {% endif %}
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Alumnus</th>
+                                <th>Designation & Company</th>
+                                <th>Grad Year</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if lists.pending_alumni %}
+                                {% for alum in lists.pending_alumni %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if alum.profile_photo %}
+                                                    <img src="{{ url_for('static', filename=alum.profile_photo) }}" alt="Avatar" class="rounded-circle" style="width:32px; height:32px; object-fit:cover;">
+                                                {% else %}
+                                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center text-xs font-weight-bold" style="width:32px; height:32px;">
+                                                        {{ (alum.full_name or 'A')[0] | upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <a href="{{ url_for('admin.view_alumni_profile', alumni_id=alum.alumni_id) }}" class="font-weight-semibold text-dark text-decoration-none hover-primary">
+                                                        {{ alum.full_name }}
+                                                    </a>
+                                                    <small class="d-block text-muted text-xs">{{ alum.email }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small class="d-block font-weight-medium text-dark">{{ alum.designation or '—' }}</small>
+                                            <small class="text-muted">{{ alum.company or '—' }}</small>
+                                        </td>
+                                        <td><small class="text-muted">{{ alum.graduation_year or '—' }}</small></td>
+                                        <td class="text-end">
+                                            <div class="d-flex justify-content-end gap-1.5">
+                                                <a href="{{ url_for('admin.view_alumni_profile', alumni_id=alum.alumni_id) }}" class="btn btn-outline-secondary btn-xs py-1 px-2" title="View Details">
+                                                    <i class="fa-solid fa-eye"></i> View
+                                                </a>
+                                                <form action="{{ url_for('admin.verify_alumni') }}" method="POST" class="d-inline" onsubmit="return confirm('Approve {{ alum.full_name }}\'s alumni account?');">
+                                                    <input type="hidden" name="alumni_id" value="{{ alum.alumni_id }}">
+                                                    <input type="hidden" name="action" value="approve">
+                                                    <button type="submit" class="btn btn-success btn-xs py-1 px-2.5 font-weight-semibold text-white" id="btnApproveDash-{{ alum.alumni_id }}">
+                                                        <i class="fa-solid fa-check me-1"></i>Approve
+                                                    </button>
+                                                </form>
+                                                <form action="{{ url_for('admin.verify_alumni') }}" method="POST" class="d-inline" onsubmit="return confirm('Reject {{ alum.full_name }}\'s verification request?');">
+                                                    <input type="hidden" name="alumni_id" value="{{ alum.alumni_id }}">
+                                                    <input type="hidden" name="action" value="reject">
+                                                    <button type="submit" class="btn btn-outline-danger btn-xs py-1 px-2 font-weight-semibold" id="btnRejectDash-{{ alum.alumni_id }}">
+                                                        <i class="fa-solid fa-xmark me-1"></i>Reject
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        <i class="fa-solid fa-circle-check text-success fs-4 mb-2 d-block"></i>
+                                        No alumni profiles are currently awaiting verification.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Activity Feed -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Recent Activity Feed
+                </h3>
+
+                <ul class="nav nav-tabs border-bottom mb-3" id="recentActivityTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active py-2 text-xs font-weight-bold" id="act-students-tab" data-bs-toggle="tab" data-bs-target="#act-students" type="button">New Students</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 text-xs font-weight-bold" id="act-alumni-tab" data-bs-toggle="tab" data-bs-target="#act-alumni" type="button">New Alumni</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 text-xs font-weight-bold" id="act-jobs-tab" data-bs-toggle="tab" data-bs-target="#act-jobs" type="button">Recent Jobs</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-2 text-xs font-weight-bold" id="act-mentorship-tab" data-bs-toggle="tab" data-bs-target="#act-mentorship" type="button">Mentorship Activity</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="recentActivityContent">
+                    <!-- Recently Registered Students -->
+                    <div class="tab-pane fade show active" id="act-students" role="tabpanel">
+                        {% if lists.recent_students %}
+                            <div class="list-group list-group-flush">
+                                {% for stu in lists.recent_students %}
+                                    <div class="list-group-item px-0 py-2.5 d-flex align-items-center justify-content-between border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2.5">
+                                            <div class="rounded-circle bg-primary-soft text-primary d-flex align-items-center justify-content-center text-xs font-weight-bold" style="width:34px; height:34px;">
+                                                <i class="fa-solid fa-user-graduate"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-weight-semibold text-sm text-dark">{{ stu.full_name }}</div>
+                                                <small class="text-muted text-xs">{{ stu.email }} &bull; Class of {{ stu.graduation_year }}</small>
+                                            </div>
+                                        </div>
+                                        <a href="{{ url_for('admin.view_student_profile', student_id=stu.student_id) }}" class="btn btn-sm btn-outline-primary py-1 px-2.5 text-xs">
+                                            View Profile
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-xs text-center py-3 mb-0">No student registrations recorded yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Recently Registered Alumni -->
+                    <div class="tab-pane fade" id="act-alumni" role="tabpanel">
+                        {% if lists.recent_alumni %}
+                            <div class="list-group list-group-flush">
+                                {% for al in lists.recent_alumni %}
+                                    <div class="list-group-item px-0 py-2.5 d-flex align-items-center justify-content-between border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2.5">
+                                            <div class="rounded-circle bg-success-soft text-success d-flex align-items-center justify-content-center text-xs font-weight-bold" style="width:34px; height:34px;">
+                                                <i class="fa-solid fa-user-tie"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-weight-semibold text-sm text-dark">{{ al.full_name }}</div>
+                                                <small class="text-muted text-xs">{{ al.designation or 'Alumni' }} at {{ al.company or 'Company' }}</small>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {% if al.verification_status == 'approved' or al.verified %}
+                                                <span class="badge bg-success text-white text-2xs">Verified</span>
+                                            {% elif al.verification_status == 'rejected' %}
+                                                <span class="badge bg-danger text-white text-2xs">Rejected</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark text-2xs">Pending</span>
+                                            {% endif %}
+                                            <a href="{{ url_for('admin.view_alumni_profile', alumni_id=al.alumni_id) }}" class="btn btn-sm btn-outline-secondary py-1 px-2 text-xs ms-1">
+                                                View
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-xs text-center py-3 mb-0">No alumni registrations recorded yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Recently Posted Jobs -->
+                    <div class="tab-pane fade" id="act-jobs" role="tabpanel">
+                        {% if lists.recent_jobs %}
+                            <div class="list-group list-group-flush">
+                                {% for jb in lists.recent_jobs %}
+                                    <div class="list-group-item px-0 py-2.5 d-flex align-items-center justify-content-between border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2.5">
+                                            <div class="rounded-circle bg-info-soft text-info d-flex align-items-center justify-content-center text-xs font-weight-bold" style="width:34px; height:34px;">
+                                                <i class="fa-solid fa-briefcase"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-weight-semibold text-sm text-dark">{{ jb.title }}</div>
+                                                <small class="text-muted text-xs">{{ jb.company }} &bull; Posted by {{ jb.alumni_name }}</small>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-light text-dark border text-2xs">{{ jb.job_type or 'Full-Time' }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-xs text-center py-3 mb-0">No job postings recorded yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Recent Mentorship Activity -->
+                    <div class="tab-pane fade" id="act-mentorship" role="tabpanel">
+                        {% if lists.recent_requests %}
+                            <div class="list-group list-group-flush">
+                                {% for req in lists.recent_requests %}
+                                    <div class="list-group-item px-0 py-2.5 d-flex align-items-center justify-content-between border-bottom-0">
+                                        <div class="d-flex align-items-center gap-2.5">
+                                            <div class="rounded-circle bg-warning-soft text-warning d-flex align-items-center justify-content-center text-xs font-weight-bold" style="width:34px; height:34px;">
+                                                <i class="fa-solid fa-handshake"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-weight-semibold text-sm text-dark">{{ req.student_name }} &rarr; {{ req.alumni_name }}</div>
+                                                <small class="text-muted text-xs">Request Date: {{ req.request_date.strftime('%d %b %Y') if req.request_date else 'Recent' }}</small>
+                                            </div>
+                                        </div>
+                                        <span class="badge {% if req.status == 'approved' or req.status == 'accepted' %}bg-success{% elif req.status == 'rejected' %}bg-danger{% else %}bg-warning text-dark{% endif %} text-2xs">
+                                            {{ req.status | capitalize }}
+                                        </span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-xs text-center py-3 mb-0">No mentorship request activity logged.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Quick Broadcast Alert Card -->
+        <div class="col-lg-4">
+            
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 sticky-top" style="top: 90px;">
+                <h3 class="h6 text-uppercase font-weight-bold mb-3 text-dark">
+                    <i class="fa-solid fa-bullhorn text-danger me-2"></i>Send Broadcast Notification
+                </h3>
+                <p class="text-muted text-xs mb-3">Transmit an official administrative announcement to selected user groups.</p>
+
+                <form action="{{ url_for('admin.broadcast_notification') }}" method="POST" id="broadcastForm">
+                    <div class="mb-3">
+                        <label for="broadcastTitle" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Alert Title</label>
+                        <input type="text" class="form-control text-sm py-2 border shadow-none" id="broadcastTitle" name="title" placeholder="e.g. Verification Maintenance Notice" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="broadcastTarget" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Target Audience</label>
+                        <select class="form-select text-sm py-2 border shadow-none" id="broadcastTarget" name="target" required>
+                            <option value="all">Broadcast to All Users</option>
+                            <option value="students">Students Only</option>
+                            <option value="alumni">Alumni Only</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="broadcastMsg" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Announcement Body</label>
+                        <textarea class="form-control text-sm border shadow-none" id="broadcastMsg" name="message" rows="4" placeholder="Enter broadcast text message..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-sm w-100 py-2.5 font-weight-semibold text-white" id="broadcastSubmitBtn">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Transmit Announcement
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    .btn-xs {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+    }
+    .text-2xs {
+        font-size: 0.72rem;
+    }
+</style>
+{% endblock %}

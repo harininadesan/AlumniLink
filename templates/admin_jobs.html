@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Job Posts | Admin Panel | AlumniLink{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Admin Top Header Navigation -->
+    {% set active_page = 'jobs' %}
+    {% include 'admin_nav.html' %}
+
+    <!-- Stats Cards Bar -->
+    <div class="row g-3 mb-4">
+        <div class="col-4">
+            <div class="card border-0 shadow-sm rounded-3 p-3 text-center bg-white">
+                <div class="fs-3 font-weight-extrabold text-dark mb-1">{{ stats.total }}</div>
+                <div class="text-xs text-muted font-weight-bold text-uppercase">Total Job Posts</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card border-0 shadow-sm rounded-3 p-3 text-center bg-white border-start border-success border-4">
+                <div class="fs-3 font-weight-extrabold text-success mb-1">{{ stats.active }}</div>
+                <div class="text-xs text-muted font-weight-bold text-uppercase">Active Listings</div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card border-0 shadow-sm rounded-3 p-3 text-center bg-white border-start border-danger border-4">
+                <div class="fs-3 font-weight-extrabold text-danger mb-1">{{ stats.closed }}</div>
+                <div class="text-xs text-muted font-weight-bold text-uppercase">Closed Listings</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search + Filter -->
+    <form method="GET" action="{{ url_for('admin.manage_jobs') }}" id="adminJobSearchForm">
+        <div class="card border-0 shadow-sm rounded-3 p-4 mb-4 bg-white">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label text-xs font-weight-semibold text-muted text-uppercase mb-1">Search Listings</label>
+                    <input type="text" class="form-control text-sm py-2 shadow-none"
+                           name="search" value="{{ search or '' }}"
+                           placeholder="Title, company, alumni publisher, location…" id="adminJobSearch">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-xs font-weight-semibold text-muted text-uppercase mb-1">Status Filter</label>
+                    <select class="form-select text-sm py-2 shadow-none" name="status" id="adminStatusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="Active"  {% if filter_status == 'Active'  %}selected{% endif %}>🟢 Active Only</option>
+                        <option value="Closed"  {% if filter_status == 'Closed'  %}selected{% endif %}>🔴 Closed Only</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm flex-grow-1 py-2 font-weight-semibold" id="btnAdminFilter">
+                        <i class="fa-solid fa-filter me-1"></i>Filter
+                    </button>
+                    {% if search or filter_status %}
+                        <a href="{{ url_for('admin.manage_jobs') }}" class="btn btn-outline-secondary btn-sm py-2 px-3" id="btnAdminReset" title="Clear Filters">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Jobs Table -->
+    <div class="card border-0 shadow-sm bg-white rounded-3">
+        <div class="card-header bg-white border-bottom p-3.5 d-flex justify-content-between align-items-center">
+            <h2 class="h6 font-weight-bold text-dark mb-0">
+                <i class="fa-solid fa-briefcase me-2 text-primary"></i>Career Board Listings Database
+            </h2>
+            <span class="badge bg-light text-muted border text-xs">{{ jobs|length }} listing{% if jobs|length != 1 %}s{% endif %}</span>
+        </div>
+
+        {% if jobs %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 text-sm" id="adminJobsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4 py-3">Job & Company</th>
+                        <th class="py-3">Posted By</th>
+                        <th class="py-3">Job Type</th>
+                        <th class="py-3">Location</th>
+                        <th class="py-3">Posted Date</th>
+                        <th class="py-3">Applicants</th>
+                        <th class="py-3">Status</th>
+                        <th class="py-3 text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                    <tr id="adminJobRow-{{ job.job_id }}">
+                        <!-- Job Title & Company -->
+                        <td class="ps-4 py-3">
+                            <div class="font-weight-bold text-dark">{{ job.title }}</div>
+                            <div class="text-muted text-xs">
+                                <i class="fa-solid fa-building me-1 text-primary"></i>{{ job.company }}
+                            </div>
+                        </td>
+                        <!-- Posted By (Alumni) -->
+                        <td class="py-3">
+                            <div class="font-weight-semibold text-dark">{{ job.alumni_name }}</div>
+                            <div class="text-muted text-xs">{{ job.alumni_email }}</div>
+                        </td>
+                        <!-- Job Type -->
+                        <td class="py-3">
+                            <span class="badge text-2xs font-weight-semibold
+                                {% if job.job_type == 'Internship' %}bg-warning text-dark
+                                {% elif job.job_type == 'Part-Time' %}bg-info text-white
+                                {% else %}bg-success text-white{% endif %}">
+                                {{ job.job_type or 'Full-Time' }}
+                            </span>
+                        </td>
+                        <!-- Location -->
+                        <td class="py-3">
+                            <small class="text-muted">{{ job.location or 'Not specified' }}</small>
+                        </td>
+                        <!-- Posted Date -->
+                        <td class="py-3">
+                            <small class="text-muted">
+                                {{ job.created_at.strftime('%Y-%m-%d') if job.created_at else '—' }}
+                            </small>
+                        </td>
+                        <!-- Applicants -->
+                        <td class="py-3">
+                            <span class="badge rounded-pill text-2xs font-weight-bold
+                                {% if job.applicant_count > 0 %}bg-primary text-white{% else %}bg-light text-muted border{% endif %} px-2.5 py-1">
+                                <i class="fa-solid fa-users me-1"></i>{{ job.applicant_count }}
+                            </span>
+                        </td>
+                        <!-- Status -->
+                        <td class="py-3">
+                            <span class="badge rounded-pill text-2xs font-weight-semibold
+                                {% if job.status == 'Active' %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+                                {{ job.status or 'Active' }}
+                            </span>
+                        </td>
+                        <!-- Actions -->
+                        <td class="py-3 text-end pe-4">
+                            <div class="d-flex gap-1 justify-content-end align-items-center">
+                                <!-- View Details Modal Trigger -->
+                                <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2 font-weight-semibold"
+                                        onclick="viewJobDetails({{ job.job_id }})" title="View Details">
+                                    <i class="fa-solid fa-eye me-1"></i>View
+                                </button>
+                                {% if job.status == 'Active' %}
+                                <form action="{{ url_for('admin.admin_close_job') }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="job_id" value="{{ job.job_id }}">
+                                    <button type="submit"
+                                            class="btn btn-outline-warning btn-xs px-2 py-1"
+                                            title="Close Post"
+                                            id="adminBtnClose-{{ job.job_id }}"
+                                            onclick="return confirm('Close this job listing?')">
+                                        <i class="fa-solid fa-circle-xmark me-1"></i>Close
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <form action="{{ url_for('admin.delete_job') }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="job_id" value="{{ job.job_id }}">
+                                    <button type="submit"
+                                            class="btn btn-outline-danger btn-xs px-2 py-1"
+                                            title="Remove Post"
+                                            id="adminBtnRemove-{{ job.job_id }}"
+                                            onclick="return confirm('Permanently remove this job post? This action cannot be undone.')">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 p-4 text-muted">
+            <i class="fa-solid fa-briefcase text-muted mb-2 d-block fs-2 opacity-50"></i>
+            <div class="font-weight-semibold mb-1">No Job Posts Found</div>
+            <p class="text-xs mb-0">
+                {% if search or filter_status %}
+                    No listings match your search or filter criteria.
+                    <br><a href="{{ url_for('admin.manage_jobs') }}" class="btn btn-sm btn-outline-primary mt-2">Reset Filters</a>
+                {% else %}
+                    No job postings published by alumni yet.
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Job Details Modal -->
+<div class="modal fade" id="jobDetailModal" tabindex="-1" aria-labelledby="jobDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title h6 font-weight-bold" id="modalJobTitle">Job Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" id="modalJobBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewJobDetails(jobId) {
+    const modal = new bootstrap.Modal(document.getElementById('jobDetailModal'));
+    const body = document.getElementById('modalJobBody');
+    const title = document.getElementById('modalJobTitle');
+    
+    body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+    modal.show();
+
+    fetch('/admin/job/' + jobId)
+        .then(response => response.json())
+        .then(job => {
+            if (job.error) {
+                body.innerHTML = '<div class="alert alert-danger">' + job.error + '</div>';
+                return;
+            }
+            title.textContent = job.title + ' — ' + job.company;
+            
+            let html = '<div class="row g-3 mb-3">' +
+                '<div class="col-md-6"><strong class="d-block text-xs text-muted text-uppercase">Company</strong><span class="fs-6 font-weight-bold text-dark">' + (job.company || '') + '</span></div>' +
+                '<div class="col-md-6"><strong class="d-block text-xs text-muted text-uppercase">Posted By (Alumni)</strong><span class="fs-6 font-weight-semibold text-dark">' + (job.alumni_name || '') + ' (' + (job.alumni_email || '') + ')</span></div>' +
+                '<div class="col-md-4"><strong class="d-block text-xs text-muted text-uppercase">Job Type</strong><span class="badge bg-primary">' + (job.job_type || 'Full-Time') + '</span></div>' +
+                '<div class="col-md-4"><strong class="d-block text-xs text-muted text-uppercase">Work Mode</strong><span class="badge bg-secondary">' + (job.work_mode || 'On-site') + '</span></div>' +
+                '<div class="col-md-4"><strong class="d-block text-xs text-muted text-uppercase">Location</strong><span class="text-sm">' + (job.location || 'Not specified') + '</span></div>' +
+                '<div class="col-md-6"><strong class="d-block text-xs text-muted text-uppercase">Stipend / Salary</strong><span class="text-sm font-weight-semibold">' + (job.stipend_salary || 'Not specified') + '</span></div>' +
+                '<div class="col-md-6"><strong class="d-block text-xs text-muted text-uppercase">Application Deadline</strong><span class="text-sm text-danger font-weight-semibold">' + (job.deadline || 'Open') + '</span></div>' +
+                '</div><hr>' +
+                '<div class="mb-3"><strong class="d-block text-xs text-muted text-uppercase mb-1">Job Description</strong><div class="p-3 bg-light rounded text-sm whitespace-pre-line">' + (job.description || 'No description provided.') + '</div></div>';
+
+            if (job.required_skills) {
+                html += '<div class="mb-3"><strong class="d-block text-xs text-muted text-uppercase mb-1">Required Skills</strong><div class="p-2 bg-light rounded text-sm">' + job.required_skills + '</div></div>';
+            }
+            if (job.eligibility) {
+                html += '<div class="mb-3"><strong class="d-block text-xs text-muted text-uppercase mb-1">Eligibility Criteria</strong><div class="p-2 bg-light rounded text-sm">' + job.eligibility + '</div></div>';
+            }
+            if (job.application_link) {
+                html += '<div class="mb-2"><strong class="d-block text-xs text-muted text-uppercase mb-1">External Application Link</strong><a href="' + job.application_link + '" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-external-link me-1"></i>' + job.application_link + '</a></div>';
+            }
+            body.innerHTML = html;
+        })
+        .catch(err => {
+            body.innerHTML = '<div class="alert alert-danger">Error loading job details: ' + err + '</div>';
+        });
+}
+</script>
+
+<style>
+.btn-xs { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+.text-2xs { font-size: 0.72rem; }
+.whitespace-pre-line { white-space: pre-line; }
+</style>
+{% endblock %}

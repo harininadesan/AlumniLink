@@ -1,0 +1,159 @@
+{% extends "student_base.html" %}
+
+{% block title %}Mentorship Requests | AlumniLink{% endblock %}
+
+{% block student_content %}
+<div class="container-fluid p-0">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h3 font-weight-extrabold text-dark-theme mb-1">
+                <i class="fa-solid fa-handshake text-success me-2"></i>Mentorship Requests
+            </h1>
+            <p class="text-muted text-sm mb-0">
+                Track status and progress of 1-on-1 mentorship connections requested with verified alumni.
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('student.search_alumni') }}" class="btn btn-primary btn-sm rounded-pill px-4 font-weight-semibold">
+                <i class="fa-solid fa-plus me-1.5"></i>New Mentorship Request
+            </a>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="h6 text-uppercase font-weight-bold text-muted-custom small-tracking mb-0">
+                <i class="fa-solid fa-list-check me-2 text-primary"></i>Outgoing Connection Requests Log
+            </h5>
+            <span class="badge bg-secondary-custom text-dark-theme font-weight-semibold text-xs">Total: {{ requests | length }}</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle modern-table text-sm mb-0" id="mentorshipRequestsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" class="py-3">Alumni Name</th>
+                        <scope="col" class="py-3">Company & Position</th>
+                        <th scope="col" class="py-3">Request Date</th>
+                        <th scope="col" class="py-3">Status</th>
+                        <th scope="col" class="py-3 text-end">Action / Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if requests %}
+                        {% for req in requests %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2.5">
+                                        <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold text-xs" style="width: 36px; height: 36px;">
+                                            {{ (req.alumni_name or 'A')[0] | upper }}
+                                        </div>
+                                        <div>
+                                            <strong class="text-dark-theme d-block mb-0">{{ req.alumni_name }}</strong>
+                                            {% if req.alumni_email %}
+                                                <small class="text-muted text-xs">{{ req.alumni_email }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="font-weight-semibold text-dark-theme">{{ req.company or 'Tech Company' }}</span>
+                                    <small class="text-muted d-block text-xs">{{ req.designation or 'Mentor' }}</small>
+                                </td>
+                                <td>
+                                    <span class="text-muted-custom font-weight-medium text-xs">
+                                        <i class="fa-regular fa-calendar me-1"></i>
+                                        {% if req.request_date is string %}
+                                            {{ req.request_date }}
+                                        {% else %}
+                                            {{ req.request_date.strftime('%Y-%m-%d') if req.request_date else 'Recently' }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if req.status == 'approved' or req.status == 'accepted' %}
+                                        <span class="badge bg-success text-white px-3 py-1 rounded-pill text-xs font-weight-semibold">
+                                            <i class="fa-solid fa-circle-check me-1"></i>Accepted
+                                        </span>
+                                    {% elif req.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark px-3 py-1 rounded-pill text-xs font-weight-semibold">
+                                            <i class="fa-solid fa-clock me-1"></i>Pending
+                                        </span>
+                                    {% elif req.status == 'cancelled' %}
+                                        <span class="badge bg-secondary text-white px-3 py-1 rounded-pill text-xs font-weight-semibold">
+                                            <i class="fa-solid fa-ban me-1"></i>Cancelled
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger text-white px-3 py-1 rounded-pill text-xs font-weight-semibold">
+                                            <i class="fa-solid fa-circle-xmark me-1"></i>Rejected
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline-secondary btn-xs px-3 py-1 rounded-pill" data-bs-toggle="modal" data-bs-target="#viewMsgModal-{{ loop.index }}" id="btnViewMsg-{{ loop.index }}">
+                                        <i class="fa-solid fa-eye me-1"></i>View
+                                    </button>
+                                    {% if (req.status == 'accepted' or req.status == 'approved') and req.request_id %}
+                                       <a href="{{ url_for('student.student_chat', mentorship_id=req.request_id) }}"
+                                       class="btn btn-success btn-xs px-3 py-1 rounded-pill ms-1">
+                                       <i class="fa-solid fa-comments me-1"></i>Open Chat
+                                       </a>
+                                    {% endif %}
+                                    {% if req.status == 'pending' and req.request_id %}
+                                        <form action="{{ url_for('student.cancel_mentorship_request') }}" method="POST" class="d-inline" onsubmit="return confirm('Cancel this mentorship request?');">
+                                            <input type="hidden" name="request_id" value="{{ req.request_id }}">
+                                            <button type="submit" class="btn btn-outline-danger btn-xs px-3 py-1 rounded-pill ms-1" id="btnCancelReq-{{ loop.index }}">
+                                                <i class="fa-solid fa-xmark me-1"></i>Cancel
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- Message Detail Modal -->
+                            <div class="modal fade" id="viewMsgModal-{{ loop.index }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4">
+                                        <div class="modal-header bg-dark text-white border-0 py-3">
+                                            <h5 class="modal-title font-weight-bold h6">
+                                                Request Details: {{ req.alumni_name }}
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="mb-3">
+                                                <span class="text-xs font-weight-semibold text-muted text-uppercase small-tracking">Target Mentor</span>
+                                                <h6 class="font-weight-bold text-dark-theme mb-0">{{ req.alumni_name }} ({{ req.designation }} at {{ req.company }})</h6>
+                                            </div>
+                                            <div class="mb-3">
+                                                <span class="text-xs font-weight-semibold text-muted text-uppercase small-tracking">Submitted Message</span>
+                                                <div class="p-3 bg-light-theme rounded-3 border text-sm text-dark-theme mt-1">
+                                                    {{ req.message or 'No additional note included.' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 p-3 bg-light-theme">
+                                            <button type="button" class="btn btn-secondary btn-sm px-4 rounded-pill" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-handshake-slash text-muted mb-2 d-block fs-2"></i>
+                                No mentorship requests logged yet. <a href="{{ url_for('student.search_alumni') }}" class="text-primary font-weight-bold">Search alumni to request connection</a>.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

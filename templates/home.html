@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}AlumniLink – AI-Powered Privacy-First Alumni Networking Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Premium Backdrop Glows -->
+<section class="hero-section position-relative overflow-hidden py-5 d-flex align-items-center" id="hero">
+    <div class="hero-bg-glow-1"></div>
+    <div class="hero-bg-glow-2"></div>
+    <div class="container position-relative z-index-2">
+        <div class="row align-items-center justify-content-between gy-5">
+            <div class="col-lg-7 text-center text-lg-start">
+                <div class="badge-container mb-3">
+                    <span class="badge premium-badge px-3 py-2">
+                        <i class="fa-solid fa-shield-halved text-highlight-color me-2"></i>IT Department Initiative
+                    </span>
+                </div>
+                <h1 class="hero-title text-white font-weight-extrabold mb-3">
+                    Alumni<span class="gradient-text">Link</span>
+                </h1>
+                <h2 class="hero-subtitle text-white-50 font-weight-semibold mb-4">
+                    AI-Powered Privacy-First Alumni Networking Platform
+                </h2>
+                <p class="hero-description text-muted-custom mb-4 fs-5">
+                    Connect securely with verified IT department alumni. Forge mentorships, uncover internship pipelines, validate professional skills, and request career guidance under strict privacy guardrails.
+                </p>
+                <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
+                    <a href="#roles" class="btn btn-primary btn-premium btn-lg px-4 py-3" id="heroBtnExplore">
+                        Get Started <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-premium-outline btn-lg px-4 py-3" id="heroBtnFeatures">
+                        View Core Features <i class="fa-solid fa-list-check ms-2"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 col-xl-4 mx-auto">
+                <!-- Visual Landing Mockup Box -->
+                <div class="premium-mockup-card glass-card p-4">
+                    <div class="mockup-header d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex gap-1">
+                            <span class="dot-red"></span>
+                            <span class="dot-yellow"></span>
+                            <span class="dot-green"></span>
+                        </div>
+                        <span class="badge bg-secondary-custom font-weight-semibold text-xs">
+                            <i class="fa-solid fa-circle text-success me-1 pulse-dot"></i>Secure Pipeline
+                        </span>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="card-item d-flex align-items-center mb-3">
+                            <div class="icon-avatar bg-primary-soft me-3">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 text-white font-weight-semibold">Alumni Verified</h6>
+                                <small class="text-muted-custom">Google • Staff Software Engineer</small>
+                            </div>
+                            <span class="badge bg-success-soft"><i class="fa-solid fa-check"></i></span>
+                        </div>
+                        <div class="card-item d-flex align-items-center mb-3">
+                            <div class="icon-avatar bg-info-soft me-3">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 text-white font-weight-semibold">Smart Recommendation</h6>
+                                <small class="text-muted-custom">Recommended: Python, Flask, MySQL</small>
+                            </div>
+                            <span class="badge bg-primary-soft-badge"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                        </div>
+                        <div class="card-item d-flex align-items-center">
+                            <div class="icon-avatar bg-warning-soft me-3">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 text-white font-weight-semibold">Privacy Protected</h6>
+                                <small class="text-muted-custom">Emails masked. Request approval required.</small>
+                            </div>
+                            <span class="badge bg-warning-soft-badge"><i class="fa-solid fa-lock"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Role Selection Cards Section -->
+<section class="roles-section py-5 bg-section-light" id="roles">
+    <div class="container py-4">
+        <div class="text-center mb-5 max-w-700 mx-auto">
+            <h2 class="section-title text-dark-theme font-weight-bold mb-3">
+                Tailored Access for Every Role
+            </h2>
+            <p class="section-subtitle text-muted fs-6">
+                AlumniLink brings together the IT Department network under a structured permissions framework.
+            </p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <!-- Student Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-premium role-card text-center p-4">
+                    <div class="role-icon-wrapper mx-auto mb-4 bg-primary-soft text-primary">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="h5 font-weight-bold mb-3 text-dark-theme">Students</h3>
+                    <p class="text-muted text-sm mb-4">
+                        Discover verified alumni working in top-tier tech companies. Browse career insights, seek mentorship, request resume audits, and secure internship guidance.
+                    </p>
+                    <ul class="list-unstyled text-start mb-4 role-feature-list text-muted">
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i> Browse alumni profiles</li>
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i> Match via skills taxonomy</li>
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i> Request career sessions</li>
+                    </ul>
+                    <div class="mt-auto">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-role w-100 py-2.5">
+                            Enter Student Portal
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alumni Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-premium role-card text-center p-4">
+                    <div class="role-icon-wrapper mx-auto mb-4 bg-success-soft text-success">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <h3 class="h5 font-weight-bold mb-3 text-dark-theme">Alumni</h3>
+                    <p class="text-muted text-sm mb-4">
+                        Give back to the IT Department in a secure, controlled space. Share job listings, validate skills, and manage candidate requests on your own schedule.
+                    </p>
+                    <ul class="list-unstyled text-start mb-4 role-feature-list text-muted">
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i> 100% email & data protection</li>
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i> Toggle availability status</li>
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i> Review matched students</li>
+                    </ul>
+                    <div class="mt-auto">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-success btn-role w-100 py-2.5">
+                            Enter Alumni Portal
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-premium role-card text-center p-4">
+                    <div class="role-icon-wrapper mx-auto mb-4 bg-danger-soft text-danger">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <h3 class="h5 font-weight-bold mb-3 text-dark-theme">Administrators</h3>
+                    <p class="text-muted text-sm mb-4">
+                        Govern the networking space. Verify registrations, evaluate incoming credentials, audit user behavior, and review recommendations for compliance.
+                    </p>
+                    <ul class="list-unstyled text-start mb-4 role-feature-list text-muted">
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i> Verify alumni workplace email</li>
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i> Monitor matchmaking statistics</li>
+                        <li><i class="fa-solid fa-circle-check text-success me-2"></i> System logs and moderation</li>
+                    </ul>
+                    <div class="mt-auto">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-danger btn-role w-100 py-2.5">
+                            Enter Admin Portal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Core Platform Features Section -->
+<section class="features-section py-5 bg-dark-theme text-white position-relative" id="features">
+    <div class="container py-4 position-relative z-index-2">
+        <div class="text-center mb-5 max-w-700 mx-auto">
+            <h2 class="section-title text-white font-weight-bold mb-3">
+                Key Features Overview
+            </h2>
+            <p class="section-subtitle text-muted-custom fs-6">
+                Designed to operate securely, locally, and without exposing sensitive user contact details.
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="feature-item-card glass-card p-4 h-100 d-flex gap-3 align-items-start">
+                    <div class="feature-icon-wrapper bg-primary-soft text-primary-light">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div>
+                        <h4 class="h5 font-weight-bold mb-2 text-white">Privacy-First Architecture</h4>
+                        <p class="text-muted-custom mb-0 text-sm">
+                            Email addresses and phone numbers are completely masked. Connection requests are sent internally, and contact sharing is only enabled after explicit user consent.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-item-card glass-card p-4 h-100 d-flex gap-3 align-items-start">
+                    <div class="feature-icon-wrapper bg-info-soft text-info-light">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div>
+                        <h4 class="h5 font-weight-bold mb-2 text-white">Rule-Based Skill Recommendations</h4>
+                        <p class="text-muted-custom mb-0 text-sm">
+                            A local, rules-guided matching algorithm compares student skill requirements with the tech stack profiles of alumni to highlight perfect mentors automatically.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-item-card glass-card p-4 h-100 d-flex gap-3 align-items-start">
+                    <div class="feature-icon-wrapper bg-success-soft text-success-light">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div>
+                        <h4 class="h5 font-weight-bold mb-2 text-white">Verification Engine</h4>
+                        <p class="text-muted-custom mb-0 text-sm">
+                            Alumni validation is managed strictly by department administrators. Verification mechanisms ensure that only legitimate graduates enter the system.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-item-card glass-card p-4 h-100 d-flex gap-3 align-items-start">
+                    <div class="feature-icon-wrapper bg-warning-soft text-warning-light">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <h4 class="h5 font-weight-bold mb-2 text-white">Internship & Referral Pipeline</h4>
+                        <p class="text-muted-custom mb-0 text-sm">
+                            Alumni can directly post internal department referrals or mock job roles. Students are matching against these roles to fast-track career opportunities.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section py-5 bg-section-light" id="about">
+    <div class="container py-4">
+        <div class="row align-items-center justify-content-between gy-4">
+            <div class="col-lg-6">
+                <h2 class="section-title text-dark-theme font-weight-bold mb-3">
+                    IT Department Vision
+                </h2>
+                <p class="text-muted mb-3">
+                    In the fast-evolving tech landscape, classrooms provide fundamental pillars, but real-world industry feedback makes graduates competent. AlumniLink bridges this transition gap securely.
+                </p>
+                <p class="text-muted mb-4">
+                    Developed inside the IT Department, this server-hosted platform eliminates reliance on external SaaS applications, maintaining full sovereign ownership of data privacy and school network parameters.
+                </p>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bullet-tag"><i class="fa-solid fa-circle-nodes me-2 text-primary"></i>Local DB Hosting</div>
+                    <div class="bullet-tag"><i class="fa-solid fa-key me-2 text-success"></i>Bcrypt Hashes</div>
+                    <div class="bullet-tag"><i class="fa-solid fa-server me-2 text-danger"></i>No Cloud Exposure</div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="about-card p-4 shadow-premium border-0 card bg-white">
+                    <h4 class="h5 font-weight-bold text-dark-theme mb-3">
+                        Project Specifications
+                    </h4>
+                    <table class="table table-borderless table-sm mb-0 specification-table text-muted text-sm">
+                        <tbody>
+                            <tr>
+                                <td class="font-weight-semibold py-2">Backend</td>
+                                <td class="py-2 text-dark-theme">Python Flask (Modular MVC)</td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-semibold py-2">Frontend</td>
+                                <td class="py-2 text-dark-theme">HTML5, CSS3, Bootstrap 5</td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-semibold py-2">Security</td>
+                                <td class="py-2 text-dark-theme">Flask-Login, Bcrypt Password Encryption</td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-semibold py-2">Database</td>
+                                <td class="py-2 text-dark-theme">MySQL (Local host)</td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-semibold py-2">Target Audience</td>
+                                <td class="py-2 text-dark-theme">IT Students & IT Alumni</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

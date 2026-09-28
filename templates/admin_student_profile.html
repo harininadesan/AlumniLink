@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Student Profile - {{ student.full_name }} | Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Admin Top Header Navigation -->
+    {% set active_page = 'students' %}
+    {% include 'admin_nav.html' %}
+
+    <div class="mb-3">
+        <a href="{{ url_for('admin.manage_students') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="fa-solid fa-arrow-left me-1.5"></i>Back to Students Catalog
+        </a>
+    </div>
+
+    <!-- Student Profile Header Card -->
+    <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                {% if student.profile_photo %}
+                    <img src="{{ url_for('static', filename=student.profile_photo) }}" alt="Avatar" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold fs-2 shadow-sm" style="width: 80px; height: 80px;">
+                        {{ (student.full_name or 'S')[0] | upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h2 class="h4 font-weight-extrabold text-dark mb-1">{{ student.full_name }}</h2>
+                    <p class="text-muted mb-1 text-sm font-weight-medium">
+                        <i class="fa-solid fa-envelope text-primary me-1.5"></i>{{ student.email }}
+                    </p>
+                    <div class="d-flex align-items-center gap-2 flex-wrap text-xs">
+                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-id-card me-1 text-secondary"></i>ID: {{ student.register_number or 'N/A' }}</span>
+                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-building-columns me-1 text-secondary"></i>{{ student.department or 'Information Technology' }}</span>
+                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-graduation-cap me-1 text-secondary"></i>Graduation Year: {{ student.graduation_year or 'N/A' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <form action="{{ url_for('admin.delete_student') }}" method="POST" onsubmit="return confirm('PERMANENTLY delete {{ student.full_name }}\'s student account?');">
+                    <input type="hidden" name="student_id" value="{{ student.student_id }}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm font-weight-bold px-3 py-2" id="btnDeleteStudentProfile">
+                        <i class="fa-solid fa-trash-can me-1.5"></i>Remove Student Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Biography Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-user text-primary me-2"></i>Student Bio & Summary
+                </h3>
+                <p class="text-secondary text-sm leading-relaxed mb-0">
+                    {{ student.bio or 'No bio provided by student.' }}
+                </p>
+            </div>
+
+            <!-- Career Goals Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-bullseye text-primary me-2"></i>Career Goal & Objectives
+                </h3>
+                <p class="text-secondary text-sm leading-relaxed mb-0">
+                    {{ student.career_goal or 'No career goal specified.' }}
+                </p>
+            </div>
+
+            <!-- Technical Skills Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-code text-primary me-2"></i>Technical Skills
+                </h3>
+                {% if student.skills %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for sk in student.skills.split(',') %}
+                            <span class="badge bg-primary-soft text-primary border border-primary-subtle px-3 py-1.5 text-xs font-weight-semibold">
+                                {{ sk.strip() }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-sm mb-0">No technical skills listed.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Resume & Portfolio Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-file-lines text-primary me-2"></i>Resume & Profiles
+                </h3>
+
+                <div class="mb-3 pb-3 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold mb-1">Uploaded Resume</span>
+                    {% if student.resume %}
+                        <a href="{{ url_for('static', filename=student.resume) }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary w-100 font-weight-bold py-2">
+                            <i class="fa-solid fa-file-pdf me-1.5 text-danger"></i>View Uploaded Resume
+                        </a>
+                    {% else %}
+                        <span class="text-sm text-muted">No resume uploaded yet.</span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3 pb-3 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold mb-1">LinkedIn Profile</span>
+                    {% if student.linkedin %}
+                        <a href="{{ student.linkedin }}" target="_blank" rel="noopener" class="text-sm font-weight-semibold text-primary text-decoration-none">
+                            <i class="fa-brands fa-linkedin me-1.5"></i>{{ student.linkedin }}
+                        </a>
+                    {% else %}
+                        <span class="text-sm text-muted">Not provided</span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3 pb-3 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold mb-1">GitHub Profile</span>
+                    {% if student.github %}
+                        <a href="{{ student.github }}" target="_blank" rel="noopener" class="text-sm font-weight-semibold text-dark text-decoration-none">
+                            <i class="fa-brands fa-github me-1.5"></i>{{ student.github }}
+                        </a>
+                    {% else %}
+                        <span class="text-sm text-muted">Not provided</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold mb-1">Registration Date</span>
+                    <span class="text-sm text-muted">
+                        {{ student.user_created_at.strftime('%Y-%m-%d %H:%M') if student.user_created_at else '—' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

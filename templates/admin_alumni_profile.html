@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Alumni Profile - {{ alumnus.full_name }} | Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Admin Top Header Navigation -->
+    {% set active_page = 'alumni' %}
+    {% include 'admin_nav.html' %}
+
+    <div class="mb-3">
+        <a href="{{ url_for('admin.manage_alumni') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="fa-solid fa-arrow-left me-1.5"></i>Back to Alumni Management
+        </a>
+    </div>
+
+    <!-- Alumni Profile Header Card -->
+    <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                {% if alumnus.profile_photo %}
+                    <img src="{{ url_for('static', filename=alumnus.profile_photo) }}" alt="Avatar" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold fs-2 shadow-sm" style="width: 80px; height: 80px;">
+                        {{ (alumnus.full_name or 'A')[0] | upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h2 class="h4 font-weight-extrabold text-dark mb-1">{{ alumnus.full_name }}</h2>
+                    <p class="text-muted mb-1 text-sm font-weight-medium">
+                        <i class="fa-solid fa-briefcase text-primary me-1.5"></i>{{ alumnus.designation or 'Alumnus' }} at <span class="text-dark font-weight-semibold">{{ alumnus.company or 'Not specified' }}</span>
+                    </p>
+                    <div class="d-flex align-items-center gap-2 flex-wrap text-xs">
+                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-graduation-cap me-1 text-secondary"></i>Class of {{ alumnus.graduation_year or '—' }}</span>
+                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-building-columns me-1 text-secondary"></i>{{ alumnus.department or 'Information Technology' }}</span>
+                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-location-dot me-1 text-danger"></i>{{ alumnus.location or 'Not specified' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification Action Banner -->
+            <div class="card border-0 bg-light p-3 rounded-3 text-md-end min-w-200">
+                <div class="text-xs text-muted text-uppercase font-weight-bold mb-1">Verification Status</div>
+                {% set vs = alumnus.verification_status or ('approved' if alumnus.verified else 'pending') %}
+                {% if vs == 'approved' %}
+                    <span class="badge bg-success text-white py-1.5 px-3 fs-6 mb-2 d-inline-block">
+                        <i class="fa-solid fa-circle-check me-1"></i>VERIFIED & APPROVED
+                    </span>
+                {% elif vs == 'rejected' %}
+                    <span class="badge bg-danger text-white py-1.5 px-3 fs-6 mb-2 d-inline-block">
+                        <i class="fa-solid fa-circle-xmark me-1"></i>REJECTED
+                    </span>
+                {% else %}
+                    <span class="badge bg-warning text-dark py-1.5 px-3 fs-6 mb-2 d-inline-block">
+                        <i class="fa-solid fa-clock me-1"></i>PENDING VERIFICATION
+                    </span>
+                {% endif %}
+
+                <div class="d-flex justify-content-md-end gap-2 mt-2">
+                    {% if vs != 'approved' %}
+                        <form action="{{ url_for('admin.verify_alumni') }}" method="POST" class="d-inline" onsubmit="return confirm('Approve {{ alumnus.full_name }}\'s account?');">
+                            <input type="hidden" name="alumni_id" value="{{ alumnus.alumni_id }}">
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn btn-success btn-sm px-3 font-weight-bold text-white" id="btnApproveProfile">
+                                <i class="fa-solid fa-check me-1"></i>Approve
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if vs != 'rejected' %}
+                        <form action="{{ url_for('admin.verify_alumni') }}" method="POST" class="d-inline" onsubmit="return confirm('Reject {{ alumnus.full_name }}\'s verification request?');">
+                            <input type="hidden" name="alumni_id" value="{{ alumnus.alumni_id }}">
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn btn-outline-danger btn-sm px-3 font-weight-bold" id="btnRejectProfile">
+                                <i class="fa-solid fa-xmark me-1"></i>Reject
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Information Grid -->
+    <div class="row g-4">
+        <!-- Left Column: Primary Profile Info -->
+        <div class="col-lg-8">
+            <!-- Biography Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-user text-primary me-2"></i>Professional Summary / Bio
+                </h3>
+                <p class="text-secondary text-sm leading-relaxed mb-0">
+                    {{ alumnus.bio or 'No bio provided by alumnus.' }}
+                </p>
+            </div>
+
+            <!-- Career Experience Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-briefcase text-primary me-2"></i>Career & Work Experience
+                </h3>
+                <p class="text-secondary text-sm leading-relaxed mb-0">
+                    {{ alumnus.experience or 'No detailed work experience listed.' }}
+                </p>
+            </div>
+
+            <!-- Technical Skills Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-code text-primary me-2"></i>Technical Skills & Domain Specializations
+                </h3>
+                {% if alumnus.skills %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for sk in alumnus.skills.split(',') %}
+                            <span class="badge bg-primary-soft text-primary border border-primary-subtle px-3 py-1.5 text-xs font-weight-semibold">
+                                {{ sk.strip() }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-sm mb-0">No skills listed.</p>
+                {% endif %}
+            </div>
+
+            <!-- Achievements Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-trophy text-warning me-2"></i>Key Achievements & Recognition
+                </h3>
+                <p class="text-secondary text-sm leading-relaxed mb-0">
+                    {{ alumnus.achievements or 'No achievements listed.' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Column: Verification Metadata & Contact Links -->
+        <div class="col-lg-4">
+            <!-- Account & Contact Verification Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-id-card text-primary me-2"></i>Verification Metadata
+                </h3>
+
+                <div class="mb-3 pb-3 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">Registered Email</span>
+                    <a href="mailto:{{ alumnus.email }}" class="text-sm font-weight-semibold text-dark text-decoration-none">
+                        <i class="fa-solid fa-envelope me-1.5 text-primary"></i>{{ alumnus.email }}
+                    </a>
+                </div>
+
+                <div class="mb-3 pb-3 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">Contact Phone Number</span>
+                    <span class="text-sm font-weight-semibold text-dark">
+                        <i class="fa-solid fa-phone me-1.5 text-success"></i>{{ alumnus.phone or 'Not provided' }}
+                    </span>
+                </div>
+
+                <div class="mb-3 pb-3 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">LinkedIn Profile</span>
+                    {% if alumnus.linkedin %}
+                        <a href="{{ alumnus.linkedin }}" target="_blank" rel="noopener" class="text-sm font-weight-semibold text-primary text-decoration-none">
+                            <i class="fa-brands fa-linkedin me-1.5"></i>{{ alumnus.linkedin }}
+                        </a>
+                    {% else %}
+                        <span class="text-sm text-muted">Not provided</span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3 pb-3 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">GitHub Profile</span>
+                    {% if alumnus.github %}
+                        <a href="{{ alumnus.github }}" target="_blank" rel="noopener" class="text-sm font-weight-semibold text-dark text-decoration-none">
+                            <i class="fa-brands fa-github me-1.5"></i>{{ alumnus.github }}
+                        </a>
+                    {% else %}
+                        <span class="text-sm text-muted">Not provided</span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3 pb-3 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">Mentorship Availability Status</span>
+                    {% if alumnus.mentor_status %}
+                        <span class="badge bg-success text-white px-2.5 py-1 text-2xs mt-1">
+                            <i class="fa-solid fa-handshake me-1"></i>Active Mentoring Available
+                        </span>
+                    {% else %}
+                        <span class="badge bg-secondary text-white px-2.5 py-1 text-2xs mt-1">
+                            Not Currently Accepting Mentees
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">Account Registration Date</span>
+                    <span class="text-sm text-muted">
+                        {{ alumnus.user_created_at.strftime('%Y-%m-%d %H:%M') if alumnus.user_created_at else '—' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Danger Zone Delete Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 border-start border-danger border-4">
+                <h3 class="h6 text-uppercase font-weight-bold text-danger mb-2">Danger Zone</h3>
+                <p class="text-muted text-xs mb-3">Permanently delete this alumnus account and all associated data.</p>
+                <form action="{{ url_for('admin.delete_alumni') }}" method="POST" onsubmit="return confirm('Are you sure you want to PERMANENTLY delete {{ alumnus.full_name }}\'s account?');">
+                    <input type="hidden" name="alumni_id" value="{{ alumnus.alumni_id }}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100 font-weight-bold py-2" id="btnDeleteAlumnusProfile">
+                        <i class="fa-solid fa-trash-can me-1.5"></i>Delete Alumni Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

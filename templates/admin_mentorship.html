@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}Mentorship Requests | Admin Panel | AlumniLink{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Admin Top Header Navigation -->
+    {% set active_page = 'mentorship' %}
+    {% include 'admin_nav.html' %}
+
+    <!-- Stats Bar -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_mentorship') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm text-center p-3 bg-white rounded-3 {% if not filter_status %}border-start border-primary border-4{% endif %}">
+                    <div class="fs-3 font-weight-extrabold text-dark">{{ stats.total }}</div>
+                    <div class="text-xs text-muted font-weight-bold text-uppercase">Total Requests</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_mentorship', status='pending') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm text-center p-3 bg-white rounded-3 {% if filter_status == 'pending' %}border-start border-warning border-4{% endif %}">
+                    <div class="fs-3 font-weight-extrabold text-warning">{{ stats.pending }}</div>
+                    <div class="text-xs text-muted font-weight-bold text-uppercase">Pending Requests</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_mentorship', status='approved') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm text-center p-3 bg-white rounded-3 {% if filter_status == 'approved' %}border-start border-success border-4{% endif %}">
+                    <div class="fs-3 font-weight-extrabold text-success">{{ stats.approved }}</div>
+                    <div class="text-xs text-muted font-weight-bold text-uppercase">Accepted Connections</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.manage_mentorship', status='rejected') }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm text-center p-3 bg-white rounded-3 {% if filter_status == 'rejected' %}border-start border-danger border-4{% endif %}">
+                    <div class="fs-3 font-weight-extrabold text-danger">{{ stats.rejected }}</div>
+                    <div class="text-xs text-muted font-weight-bold text-uppercase">Declined Requests</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Search + Filter Form -->
+    <div class="card border-0 shadow-sm p-4 mb-4 bg-white rounded-3">
+        <form action="{{ url_for('admin.manage_mentorship') }}" method="GET" id="mentorshipSearchForm">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label text-xs font-weight-semibold text-muted text-uppercase mb-1">Search Mentorship Logs</label>
+                    <input type="text" class="form-control text-sm py-2 shadow-none" name="search"
+                           placeholder="Search by student name, alumni name, or request message…"
+                           value="{{ search or '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-xs font-weight-semibold text-muted text-uppercase mb-1">Status Filter</label>
+                    <select class="form-select text-sm py-2 shadow-none" name="status" id="mentorshipStatusFilter">
+                        <option value="" {% if not filter_status %}selected{% endif %}>All Statuses</option>
+                        <option value="pending"  {% if filter_status == 'pending'  %}selected{% endif %}>⏳ Pending Requests</option>
+                        <option value="approved" {% if filter_status == 'approved' %}selected{% endif %}>✅ Accepted / Approved</option>
+                        <option value="rejected" {% if filter_status == 'rejected' %}selected{% endif %}>❌ Declined / Rejected</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm flex-grow-1 py-2 font-weight-semibold" id="btnFilterMentorship">
+                        <i class="fa-solid fa-filter me-1"></i>Filter
+                    </button>
+                    {% if search or filter_status %}
+                        <a href="{{ url_for('admin.manage_mentorship') }}" class="btn btn-outline-secondary btn-sm py-2 px-3" title="Clear Filters">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Requests Table -->
+    <div class="card border-0 shadow-sm bg-white rounded-3">
+        <div class="card-header bg-white border-bottom p-3.5 d-flex justify-content-between align-items-center">
+            <h2 class="h6 font-weight-bold text-dark mb-0">
+                <i class="fa-solid fa-handshake me-2 text-purple"></i>Student & Alumni Mentorship Interactions
+            </h2>
+            <span class="badge bg-light text-muted border text-xs">{{ requests|length }} request{% if requests|length != 1 %}s{% endif %}</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-sm mb-0" id="adminMentorshipTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Student</th>
+                            <th>Alumnus Target</th>
+                            <th>Request Date</th>
+                            <th>Status</th>
+                            <th>Message Snippet</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if requests %}
+                            {% for req in requests %}
+                                <tr>
+                                    <!-- Student Info -->
+                                    <td class="ps-4">
+                                        <div class="font-weight-bold text-dark">{{ req.student_name }}</div>
+                                        <small class="text-muted text-xs">{{ req.student_email }} &bull; {{ req.student_dept or 'IT' }}</small>
+                                    </td>
+                                    <!-- Alumni Info -->
+                                    <td>
+                                        <div class="font-weight-bold text-dark">{{ req.alumni_name }}</div>
+                                        <small class="text-muted text-xs">{{ req.alumni_designation or 'Alumni' }} at {{ req.alumni_company or 'Company' }}</small>
+                                    </td>
+                                    <!-- Request Date -->
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ req.created_at.strftime('%Y-%m-%d %H:%M') if req.created_at else '—' }}
+                                        </small>
+                                    </td>
+                                    <!-- Status -->
+                                    <td>
+                                        {% if req.status == 'approved' or req.status == 'accepted' %}
+                                            <span class="badge bg-success text-white text-2xs px-2.5 py-1">
+                                                <i class="fa-solid fa-circle-check me-1"></i>Accepted
+                                            </span>
+                                        {% elif req.status == 'rejected' %}
+                                            <span class="badge bg-danger text-white text-2xs px-2.5 py-1">
+                                                <i class="fa-solid fa-circle-xmark me-1"></i>Declined
+                                            </span>
+                                        {% elif req.status == 'cancelled' %}
+                                            <span class="badge bg-secondary text-white text-2xs px-2.5 py-1">
+                                                Cancelled
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark text-2xs px-2.5 py-1">
+                                                <i class="fa-solid fa-clock me-1"></i>Pending
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <!-- Message Snippet -->
+                                    <td>
+                                        <small class="text-secondary text-truncate d-inline-block" style="max-width: 250px;">
+                                            {{ req.message or 'No message provided.' }}
+                                        </small>
+                                    </td>
+                                    <!-- Action -->
+                                    <td class="text-end pe-4">
+                                        <button type="button" class="btn btn-outline-secondary btn-xs py-1 px-2.5 font-weight-semibold"
+                                                onclick="showMentorshipModal('{{ req.student_name|e }}', '{{ req.alumni_name|e }}', '{{ req.status|capitalize }}', '{{ req.created_at.strftime('%Y-%m-%d %H:%M') if req.created_at else '' }}', '{{ req.message|e|replace('\n', ' ') }}')"
+                                                title="View Details">
+                                            <i class="fa-solid fa-eye me-1"></i>View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-handshake-slash text-muted mb-2 d-block fs-2 opacity-50"></i>
+                                    <div class="font-weight-semibold mb-1">No Mentorship Requests Found</div>
+                                    <p class="text-xs mb-0">
+                                        {% if search or filter_status %}
+                                            No request logs match your filter criteria.
+                                            <br><a href="{{ url_for('admin.manage_mentorship') }}" class="btn btn-sm btn-outline-primary mt-2">Reset Filters</a>
+                                        {% else %}
+                                            No student mentorship requests submitted yet.
+                                        {% endif %}
+                                    </p>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Mentorship Details Modal -->
+<div class="modal fade" id="mentorshipModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title h6 font-weight-bold">Mentorship Request Detail</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3 pb-2 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">Student Name</span>
+                    <span class="fs-6 font-weight-bold text-dark" id="modalStudentName"></span>
+                </div>
+                <div class="mb-3 pb-2 border-bottom">
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">Target Alumnus</span>
+                    <span class="fs-6 font-weight-bold text-dark" id="modalAlumniName"></span>
+                </div>
+                <div class="row g-2 mb-3 pb-2 border-bottom">
+                    <div class="col-6">
+                        <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">Submission Date</span>
+                        <span class="text-sm font-weight-semibold text-muted" id="modalRequestDate"></span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-xs text-muted text-uppercase d-block font-weight-semibold">Current Status</span>
+                        <span class="badge bg-primary text-2xs" id="modalStatusBadge"></span>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs text-muted text-uppercase d-block font-weight-semibold mb-1">Student's Request Message</span>
+                    <div class="p-3 bg-light rounded text-sm whitespace-pre-line" id="modalMessage"></div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showMentorshipModal(student, alumni, status, reqDate, message) {
+    document.getElementById('modalStudentName').textContent = student;
+    document.getElementById('modalAlumniName').textContent = alumni;
+    document.getElementById('modalRequestDate').textContent = reqDate;
+    document.getElementById('modalStatusBadge').textContent = status;
+    document.getElementById('modalMessage').textContent = message || 'No message provided.';
+    
+    const modal = new bootstrap.Modal(document.getElementById('mentorshipModal'));
+    modal.show();
+}
+</script>
+
+<style>
+.btn-xs { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+.text-2xs { font-size: 0.72rem; }
+.whitespace-pre-line { white-space: pre-line; }
+</style>
+{% endblock %}

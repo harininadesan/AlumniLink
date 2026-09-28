@@ -1,0 +1,305 @@
+{% extends "student_base.html" %}
+
+{% block title %}{{ job.title }} at {{ job.company }} | AlumniLink{% endblock %}
+
+{% block student_content %}
+<div class="container-fluid p-0">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb text-sm">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('student.view_jobs') }}" class="text-primary text-decoration-none">
+                    <i class="fa-solid fa-briefcase me-1"></i>Job Portal
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">{{ job.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+
+        <!-- ===== Left: Main Job Details ===== -->
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="{% if job.job_type == 'Internship' %}bg-warning{% elif job.job_type == 'Part-Time' %}bg-info{% else %}bg-primary{% endif %}" style="height:5px;"></div>
+
+                <div class="p-4 p-md-5">
+                    <!-- Company & Badges -->
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-3 mb-4">
+                        <div>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge rounded-pill font-weight-semibold text-sm px-3 py-2
+                                    {% if job.job_type == 'Internship' %}bg-warning text-dark
+                                    {% elif job.job_type == 'Part-Time' %}bg-info text-white
+                                    {% else %}bg-success text-white{% endif %}">
+                                    <i class="fa-solid fa-briefcase me-2"></i>{{ job.job_type or 'Full-Time' }}
+                                </span>
+                                <span class="badge rounded-pill font-weight-semibold text-sm px-3 py-2
+                                    {% if job.work_mode == 'Remote' %}bg-primary text-white
+                                    {% elif job.work_mode == 'Hybrid' %}bg-secondary text-white
+                                    {% else %}bg-dark text-white{% endif %}">
+                                    <i class="fa-solid fa-{% if job.work_mode == 'Remote' %}wifi{% elif job.work_mode == 'Hybrid' %}network-wired{% else %}building{% endif %} me-2"></i>
+                                    {{ job.work_mode or 'On-site' }}
+                                </span>
+                                {% if job.status == 'Closed' %}
+                                <span class="badge rounded-pill bg-danger text-white font-weight-semibold text-sm px-3 py-2">
+                                    <i class="fa-solid fa-circle-xmark me-1"></i>Closed
+                                </span>
+                                {% endif %}
+                            </div>
+                            <h1 class="h3 font-weight-extrabold text-dark-theme mb-1">{{ job.title }}</h1>
+                            <p class="text-muted mb-0 fs-6">
+                                <i class="fa-solid fa-building me-2 text-primary"></i>
+                                <strong class="text-dark-theme">{{ job.company }}</strong>
+                                {% if job.location %}
+                                    &nbsp;·&nbsp;
+                                    <i class="fa-solid fa-location-dot me-1 text-danger"></i>{{ job.location }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <!-- Company Icon -->
+                        <div class="job-detail-icon flex-shrink-0">
+                            <i class="fa-solid fa-building text-primary" style="font-size: 1.75rem;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Key Details Pills -->
+                    <div class="d-flex flex-wrap gap-3 mb-4 p-3 rounded-3" style="background: rgba(67,97,238,0.04); border: 1px solid rgba(67,97,238,0.08);">
+                        {% if job.stipend_salary %}
+                        <div class="d-flex align-items-center gap-2 text-sm">
+                            <div class="detail-icon-bubble bg-success-soft">
+                                <i class="fa-solid fa-indian-rupee-sign text-success"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted text-xs">Stipend / Salary</div>
+                                <strong class="text-dark-theme">{{ job.stipend_salary }}</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if job.deadline %}
+                        <div class="d-flex align-items-center gap-2 text-sm">
+                            <div class="detail-icon-bubble bg-warning-soft">
+                                <i class="fa-solid fa-calendar-xmark text-warning"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted text-xs">Application Deadline</div>
+                                <strong class="text-dark-theme">
+                                    {{ job.deadline.strftime('%d %B %Y') if job.deadline and job.deadline.__class__.__name__ == 'date' else job.deadline }}
+                                </strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if job.work_mode %}
+                        <div class="d-flex align-items-center gap-2 text-sm">
+                            <div class="detail-icon-bubble bg-info-soft">
+                                <i class="fa-solid fa-laptop-house text-info"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted text-xs">Work Mode</div>
+                                <strong class="text-dark-theme">{{ job.work_mode }}</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if job.location %}
+                        <div class="d-flex align-items-center gap-2 text-sm">
+                            <div class="detail-icon-bubble" style="background:rgba(239,68,68,0.08);">
+                                <i class="fa-solid fa-location-dot text-danger"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted text-xs">Location</div>
+                                <strong class="text-dark-theme">{{ job.location }}</strong>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h4 class="h6 font-weight-bold text-dark-theme text-uppercase small-tracking mb-3">
+                            <i class="fa-solid fa-file-lines me-2 text-primary"></i>Job Description
+                        </h4>
+                        <div class="text-muted text-sm lh-lg job-description-text">
+                            {{ job.description | replace('\n', '<br>') | safe }}
+                        </div>
+                    </div>
+
+                    <!-- Eligibility -->
+                    {% if job.eligibility %}
+                    <div class="mb-4">
+                        <h4 class="h6 font-weight-bold text-dark-theme text-uppercase small-tracking mb-3">
+                            <i class="fa-solid fa-graduation-cap me-2 text-success"></i>Eligibility Criteria
+                        </h4>
+                        <div class="p-3 rounded-3 text-sm text-muted lh-lg" style="background: rgba(16,185,129,0.05); border-left: 3px solid #10b981;">
+                            {{ job.eligibility | replace('\n', '<br>') | safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Required Skills -->
+                    {% if job.required_skills %}
+                    <div class="mb-4">
+                        <h4 class="h6 font-weight-bold text-dark-theme text-uppercase small-tracking mb-3">
+                            <i class="fa-solid fa-code me-2 text-info"></i>Required Skills
+                        </h4>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for skill in job.required_skills.split(',') %}
+                            <span class="skill-tag-lg">{{ skill.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== Right: Apply Card + Alumni Info ===== -->
+        <div class="col-lg-4">
+
+            <!-- Apply Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 sticky-top" style="top: 80px; z-index: 10;">
+                <h5 class="h6 font-weight-bold text-dark-theme mb-3">
+                    <i class="fa-solid fa-paper-plane me-2 text-primary"></i>Apply for This Role
+                </h5>
+
+                {% if job.status == 'Closed' %}
+                    <!-- Closed State -->
+                    <div class="alert border-0 rounded-3 text-center py-3" style="background: rgba(239,68,68,0.08);">
+                        <i class="fa-solid fa-circle-xmark text-danger mb-2" style="font-size: 1.5rem;"></i>
+                        <p class="text-danger font-weight-semibold mb-0 text-sm">This position is closed</p>
+                        <p class="text-muted text-xs mb-0 mt-1">Applications are no longer accepted.</p>
+                    </div>
+
+                {% elif already_applied %}
+                    <!-- Already Applied State -->
+                    <div class="alert border-0 rounded-3 text-center py-3 mb-3" style="background: rgba(16,185,129,0.08);">
+                        <i class="fa-solid fa-circle-check text-success mb-2" style="font-size: 1.5rem;"></i>
+                        <p class="text-success font-weight-semibold mb-0 text-sm">Application Submitted!</p>
+                        <p class="text-muted text-xs mb-0 mt-1">You've already applied for this position.</p>
+                    </div>
+
+                {% elif job.application_link %}
+                    <!-- External Link Apply -->
+                    <p class="text-muted text-sm mb-3">This role has an external application portal.</p>
+                    <a href="{{ job.application_link }}" target="_blank" rel="noopener noreferrer"
+                       class="btn btn-primary w-100 py-3 rounded-pill font-weight-bold shadow-sm"
+                       id="btnApplyExternal">
+                        <i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Apply on External Site
+                    </a>
+                    <p class="text-muted text-xs text-center mt-2 mb-0">
+                        <i class="fa-solid fa-info-circle me-1"></i>You'll be redirected to the company's portal.
+                    </p>
+
+                {% else %}
+                    <!-- Internal Apply -->
+                    <p class="text-muted text-sm mb-3">Submit your application through AlumniLink. The alumni will be notified.</p>
+                    <form action="{{ url_for('student.apply_job', job_id=job.job_id) }}" method="POST" id="applyJobForm">
+                        <button type="submit"
+                                class="btn btn-primary w-100 py-3 rounded-pill font-weight-bold shadow-sm"
+                                id="btnApplyInternally"
+                                onclick="return confirm('Submit your application for {{ job.title }} at {{ job.company }}?')">
+                            <i class="fa-solid fa-paper-plane me-2"></i>Submit Application
+                        </button>
+                    </form>
+                    <p class="text-muted text-xs text-center mt-2 mb-0">
+                        <i class="fa-solid fa-lock me-1"></i>Your profile info will be shared with the alumni.
+                    </p>
+                {% endif %}
+
+                <a href="{{ url_for('student.view_jobs') }}"
+                   class="btn btn-outline-secondary w-100 mt-3 rounded-pill font-weight-semibold text-sm"
+                   id="btnBackToJobs">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Back to All Jobs
+                </a>
+            </div>
+
+            <!-- Alumni Info Card -->
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h5 class="h6 font-weight-bold text-dark-theme mb-3">
+                    <i class="fa-solid fa-user-check me-2 text-success"></i>Posted By
+                </h5>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Avatar -->
+                    <div class="alumni-avatar-circle">
+                        {% if job.alumni_photo %}
+                            <img src="{{ url_for('static', filename=job.alumni_photo) }}"
+                                 alt="{{ job.alumni_name }}"
+                                 class="rounded-circle" style="width:100%;height:100%;object-fit:cover;">
+                        {% else %}
+                            <span class="font-weight-bold text-primary fs-5">
+                                {{ (job.alumni_name or 'A')[0] | upper }}
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="font-weight-bold text-dark-theme mb-0 text-sm">{{ job.alumni_name }}</p>
+                        <p class="text-muted text-xs mb-0">{{ job.alumni_designation or '' }}{% if job.alumni_company %} at {{ job.alumni_company }}{% endif %}</p>
+                        <span class="badge bg-success-soft text-success text-xs mt-1">
+                            <i class="fa-solid fa-shield-check me-1"></i>Verified Alumni
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Post Date -->
+                <div class="mt-3 pt-3 border-top text-xs text-muted">
+                    <i class="fa-solid fa-clock me-1"></i>Posted on
+                    {{ job.created_at.strftime('%d %B %Y') if job.created_at and job.created_at.__class__.__name__ in ['date', 'datetime'] else job.created_at or 'Recently' }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<style>
+.job-detail-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(67,97,238,0.08), rgba(76,201,240,0.08));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(67,97,238,0.12);
+}
+.detail-icon-bubble {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.bg-success-soft { background: rgba(16,185,129,0.1); }
+.bg-warning-soft { background: rgba(245,158,11,0.1); }
+.bg-info-soft    { background: rgba(6,182,212,0.1); }
+.skill-tag-lg {
+    font-size: 0.78rem;
+    background: rgba(67,97,238,0.08);
+    color: var(--color-primary);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-weight: 600;
+    border: 1px solid rgba(67,97,238,0.15);
+}
+.alumni-avatar-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(67,97,238,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 2px solid rgba(67,97,238,0.15);
+    overflow: hidden;
+}
+.job-description-text { white-space: pre-wrap; }
+.bg-success-soft { background: rgba(16,185,129,0.1); }
+</style>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block navbar %}
+<!-- Student Top Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark student-navbar" id="studentNavbar">
+    <div class="container-fluid px-lg-4">
+        <!-- AlumniLink Logo -->
+        <a class="navbar-brand d-flex align-items-center" href="{{ url_for('student.dashboard') }}" id="studentNavBrand">
+            <div class="brand-logo-container me-2">
+                <i class="fa-solid fa-graduation-cap brand-icon"></i>
+            </div>
+            <span class="brand-text">Alumni<span class="brand-text-highlight">Link</span></span>
+            <span class="badge bg-primary-soft-badge ms-2 text-xs text-uppercase font-weight-bold d-none d-sm-inline-block">Student Portal</span>
+        </a>
+
+        <!-- Sidebar Toggle for Mobile -->
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#studentSidebarCanvas" aria-controls="studentSidebarCanvas" id="sidebarToggleMobile">
+            <i class="fa-solid fa-bars text-white fs-5"></i>
+        </button>
+
+        <!-- Navbar Right Elements -->
+        <div class="collapse navbar-collapse justify-content-end" id="studentNavbarContent">
+            <div class="d-flex align-items-center gap-3">
+                <!-- Notifications Icon with Badge -->
+                <a href="{{ url_for('student.view_notifications') }}" class="position-relative text-white-50 hover-white p-2 rounded-circle nav-icon-btn" title="Notifications" id="navNotificationBtn">
+                    <i class="fa-solid fa-bell fs-5 text-white"></i>
+                    {% set unread_cnt = unread_notifications_count if unread_notifications_count is defined else 0 %}
+                    {% if unread_cnt > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger text-xs shadow-sm">
+                            {{ unread_cnt }}
+                            <span class="visually-hidden">unread notifications</span>
+                        </span>
+                    {% endif %}
+                </a>
+
+                <!-- Profile Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-dark-glass dropdown-toggle d-flex align-items-center gap-2 py-1.5 px-3 rounded-pill" type="button" id="studentProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if current_user.profile_photo %}
+                            <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                        {% else %}
+                            <div class="avatar-placeholder rounded-circle bg-primary text-white text-xs d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-weight: 700;">
+                                {{ (current_user.full_name or 'S')[0] | upper }}
+                            </div>
+                        {% endif %}
+                        <span class="text-white text-sm font-weight-semibold d-none d-md-inline-block">{{ current_user.full_name or 'Student' }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark glass-dropdown shadow-lg border-0 mt-2" aria-labelledby="studentProfileDropdown">
+                        <li>
+                            <div class="dropdown-header text-muted-custom text-xs text-uppercase font-weight-bold">Signed in as</div>
+                            <div class="px-3 pb-2 text-white font-weight-bold text-sm">{{ current_user.email }}</div>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary opacity-25"></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ url_for('student.view_profile') }}" id="dropMyProfile">
+                                <i class="fa-solid fa-user text-primary"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ url_for('student.view_profile') }}#edit" id="dropEditProfile">
+                                <i class="fa-solid fa-pen-to-square text-info"></i> Edit Profile
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary opacity-25"></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="{{ url_for('auth.logout') }}" id="dropLogout">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Direct Logout Button -->
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-sm rounded-pill px-3 d-none d-lg-inline-flex align-items-center gap-1.5" id="navLogoutBtn">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="student-dashboard-layout d-flex min-vh-100">
+    
+    <!-- Sidebar Navigation for Desktop -->
+    <aside class="student-sidebar d-none d-lg-block flex-shrink-0" id="desktopStudentSidebar">
+        <div class="sidebar-inner p-3 d-flex flex-column h-100">
+            <div class="sidebar-menu-header mb-3 px-2 text-xs font-weight-bold text-uppercase text-muted-custom small-tracking">
+                Navigation Menu
+            </div>
+            <ul class="nav nav-pills flex-column gap-1 sidebar-nav mb-auto">
+                <li class="nav-item">
+                    <a href="{{ url_for('student.dashboard') }}" class="nav-link sidebar-link {% if active_page == 'dashboard' %}active{% endif %}" id="sideLinkDashboard">
+                        <i class="fa-solid fa-gauge-high sidebar-icon"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.search_alumni') }}" class="nav-link sidebar-link {% if active_page == 'search' %}active{% endif %}" id="sideLinkSearch">
+                        <i class="fa-solid fa-magnifying-glass sidebar-icon"></i>
+                        <span>Search Alumni</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.view_requests') }}" class="nav-link sidebar-link {% if active_page == 'requests' %}active{% endif %}" id="sideLinkRequests">
+                        <i class="fa-solid fa-handshake sidebar-icon"></i>
+                        <span>Mentorship Requests</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.view_jobs') }}" class="nav-link sidebar-link {% if active_page == 'jobs' %}active{% endif %}" id="sideLinkJobs">
+                        <i class="fa-solid fa-briefcase sidebar-icon"></i>
+                        <span>Job Opportunities</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.view_notifications') }}" class="nav-link sidebar-link {% if active_page == 'notifications' %}active{% endif %}" id="sideLinkNotifications">
+                        <i class="fa-solid fa-bell sidebar-icon"></i>
+                        <span>Notifications</span>
+                        {% if unread_notifications_count is defined and unread_notifications_count > 0 %}
+                            <span class="badge rounded-pill bg-danger ms-auto text-xs">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.view_profile') }}" class="nav-link sidebar-link {% if active_page == 'profile' %}active{% endif %}" id="sideLinkProfile">
+                        <i class="fa-solid fa-user-gear sidebar-icon"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Sidebar Card Promo / IT Info -->
+            <div class="sidebar-footer-card p-3 rounded-4 bg-dark-surface border border-secondary border-opacity-10 text-white mt-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="fa-solid fa-shield-halved text-primary-light fs-5"></i>
+                    <span class="font-weight-bold text-xs">Privacy-First</span>
+                </div>
+                <p class="text-xs text-muted-custom mb-0">Your profile and activity remain protected within the IT Alumni network.</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Offcanvas Mobile Sidebar -->
+    <div class="offcanvas offcanvas-start bg-dark-theme text-white student-mobile-sidebar" tabindex="-1" id="studentSidebarCanvas" aria-labelledby="studentSidebarCanvasLabel">
+        <div class="offcanvas-header border-bottom border-secondary border-opacity-25">
+            <h5 class="offcanvas-title font-weight-bold d-flex align-items-center gap-2" id="studentSidebarCanvasLabel">
+                <i class="fa-solid fa-graduation-cap text-primary"></i> AlumniLink Menu
+            </h5>
+            <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-3">
+            <ul class="nav nav-pills flex-column gap-2 sidebar-nav">
+                <li class="nav-item">
+                    <a href="{{ url_for('student.dashboard') }}" class="nav-link sidebar-link {% if active_page == 'dashboard' %}active{% endif %}">
+                        <i class="fa-solid fa-gauge-high sidebar-icon"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.search_alumni') }}" class="nav-link sidebar-link {% if active_page == 'search' %}active{% endif %}">
+                        <i class="fa-solid fa-magnifying-glass sidebar-icon"></i> Search Alumni
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.view_requests') }}" class="nav-link sidebar-link {% if active_page == 'requests' %}active{% endif %}">
+                        <i class="fa-solid fa-handshake sidebar-icon"></i> Mentorship Requests
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.view_jobs') }}" class="nav-link sidebar-link {% if active_page == 'jobs' %}active{% endif %}">
+                        <i class="fa-solid fa-briefcase sidebar-icon"></i> Job Opportunities
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.view_notifications') }}" class="nav-link sidebar-link {% if active_page == 'notifications' %}active{% endif %}">
+                        <i class="fa-solid fa-bell sidebar-icon"></i> Notifications
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('student.view_profile') }}" class="nav-link sidebar-link {% if active_page == 'profile' %}active{% endif %}">
+                        <i class="fa-solid fa-user-gear sidebar-icon"></i> My Profile
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="student-main-content flex-grow-1 p-3 p-md-4 p-xl-5">
+        {% block student_content %}{% endblock %}
+    </main>
+
+</div>
+{% endblock %}

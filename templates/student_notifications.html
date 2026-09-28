@@ -1,0 +1,87 @@
+{% extends "student_base.html" %}
+
+{% block title %}Notifications | AlumniLink{% endblock %}
+
+{% block student_content %}
+<div class="container-fluid p-0">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h3 font-weight-extrabold text-dark-theme mb-1">
+                <i class="fa-solid fa-bell text-danger me-2"></i>Notifications Hub
+            </h1>
+            <p class="text-muted text-sm mb-0">
+                View real-time updates regarding mentorship request responses, new job postings, and system alerts.
+            </p>
+        </div>
+        <div>
+            <span class="badge bg-secondary-custom text-dark-theme font-weight-semibold p-2 px-3 rounded-pill text-xs">
+                <i class="fa-solid fa-check-double me-1"></i>All Notifications Logged
+            </span>
+        </div>
+    </div>
+
+    <!-- Notifications List Container -->
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <h5 class="h6 text-uppercase font-weight-bold text-muted-custom small-tracking mb-0">
+                        Recent Alerts Feed
+                    </h5>
+                    <span class="text-xs text-muted-custom">Total: {{ notifications | length }}</span>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    {% if notifications %}
+                        {% for notice in notifications %}
+                            <div class="p-3.5 border rounded-4 {% if notice.is_read == 0 or not notice.is_read %}bg-light-theme border-primary border-opacity-25{% else %}bg-white{% endif %} hover-shadow transition-smooth d-flex align-items-start gap-3">
+                                <div class="role-icon-wrapper rounded-circle p-2 flex-shrink-0 {% if notice.icon %}{{ notice.icon }}{% else %}bg-primary-soft text-primary{% endif %}" style="width: 44px; height: 44px; font-size: 1.1rem;">
+                                    {% if 'check' in (notice.icon or '') %}
+                                        <i class="fa-solid fa-circle-check text-success"></i>
+                                    {% elif 'briefcase' in (notice.icon or '') %}
+                                        <i class="fa-solid fa-briefcase text-info"></i>
+                                    {% elif 'graduation' in (notice.icon or '') %}
+                                        <i class="fa-solid fa-graduation-cap text-primary"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-bell text-primary"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-1">
+                                        <h6 class="font-weight-bold text-dark-theme mb-0 text-sm">
+                                            {{ notice.title }}
+                                            {% if notice.is_read == 0 or not notice.is_read %}
+                                                <span class="badge bg-danger ms-1 text-2xs">New</span>
+                                            {% endif %}
+                                        </h6>
+                                        <span class="text-muted-custom text-xs">
+                                            <i class="fa-regular fa-clock me-1"></i>
+                                            {% if notice.created_at is string %}
+                                                {{ notice.created_at }}
+                                            {% else %}
+                                                {{ notice.created_at.strftime('%Y-%m-%d %H:%M') if notice.created_at else 'Just now' }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <p class="text-muted text-xs mb-0">
+                                        {{ notice.message }}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-bell-slash text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="h6 font-weight-bold text-dark-theme mb-1">No Notifications</h5>
+                            <p class="text-muted text-sm mb-0">You have no active notification alerts at this time.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

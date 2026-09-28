@@ -1,0 +1,206 @@
+{% extends "student_base.html" %}
+
+{% block title %}Search Alumni | AlumniLink{% endblock %}
+
+{% block student_content %}
+<div class="container-fluid p-0">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h3 font-weight-extrabold text-dark-theme mb-1">
+                <i class="fa-solid fa-users text-primary me-2"></i>Search Verified Alumni
+            </h1>
+            <p class="text-muted text-sm mb-0">
+                Explore alumni profiles from the IT Department, view career experience, and send 1-on-1 mentorship requests.
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('student.view_requests') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-clock-rotate-left me-1.5"></i>My Sent Requests
+            </a>
+        </div>
+    </div>
+
+    <!-- Search & Filter Card -->
+    <div class="card border-0 shadow-sm p-4 bg-white rounded-4 mb-4">
+        <h5 class="h6 text-uppercase font-weight-bold text-muted-custom small-tracking mb-3">
+            <i class="fa-solid fa-filter text-primary me-2"></i>Filter Alumni Directory
+        </h5>
+        <form action="{{ url_for('student.search_alumni') }}" method="GET" id="searchAlumniForm">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="searchCompany" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Company</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-building"></i></span>
+                        <input type="text" class="form-control text-sm border-start-0 bg-light py-2" id="searchCompany" name="company" placeholder="e.g. Google, Amazon, Stripe" value="{{ search_company }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="searchDomain" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Position / Role</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-user-tie"></i></span>
+                        <input type="text" class="form-control text-sm border-start-0 bg-light py-2" id="searchDomain" name="domain" placeholder="e.g. Software Engineer, Architect" value="{{ search_domain }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="searchSkills" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Skill Set</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-code"></i></span>
+                        <input type="text" class="form-control text-sm border-start-0 bg-light py-2" id="searchSkills" name="skills" placeholder="e.g. Python, AWS, React" value="{{ search_skills }}">
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-end gap-2 pt-2">
+                    <a href="{{ url_for('student.search_alumni') }}" class="btn btn-light btn-sm border px-3 py-2 text-xs font-weight-semibold">
+                        Reset Filters
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 py-2 text-xs font-weight-semibold" id="submitSearchBtn">
+                        <i class="fa-solid fa-magnifying-glass me-1.5"></i>Search Mentors
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Alumni Cards Grid -->
+    <div class="row g-4">
+        {% if alumni_list %}
+            {% for alumnus in alumni_list %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 bg-white hover-shadow transition-smooth position-relative overflow-hidden">
+                        <!-- Top Accent Line -->
+                        <div class="position-absolute top-0 start-0 end-0" style="height: 4px; background: var(--gradient-accent);"></div>
+
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            {% if alumnus.profile_photo %}
+                                <img src="{{ url_for('static', filename=alumnus.profile_photo) }}" class="alumni-card-avatar" alt="Photo">
+                            {% else %}
+                                <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-extrabold fs-4" style="width: 64px; height: 64px; border: 3px solid rgba(67, 97, 238, 0.2);">
+                                    {{ (alumnus.full_name or 'A')[0] | upper }}
+                                </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h5 class="h6 font-weight-bold mb-0 text-dark-theme">{{ alumnus.full_name }}</h5>
+                                    {% if alumnus.verified %}
+                                        <span class="badge bg-primary-soft text-primary" title="Verified Alumni">
+                                            <i class="fa-solid fa-circle-check"></i>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <span class="text-xs font-weight-semibold text-primary d-block mt-0.5">{{ alumnus.designation or 'IT Professional' }}</span>
+                                <small class="text-muted text-xs d-block"><i class="fa-solid fa-building me-1"></i>{{ alumnus.company or 'Tech Industry' }}</small>
+                            </div>
+                        </div>
+
+                        <!-- Info Pills / Department & Passing Year -->
+                        <div class="bg-light-theme p-3 rounded-3 mb-3 text-xs">
+                            <div class="d-flex justify-content-between mb-1.5">
+                                <span class="text-muted"><i class="fa-solid fa-graduation-cap me-1"></i>Department:</span>
+                                <strong class="text-dark-theme">{{ alumnus.department or 'Information Technology' }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1.5">
+                                <span class="text-muted"><i class="fa-solid fa-calendar me-1"></i>Passing Year:</span>
+                                <strong class="text-dark-theme">{{ alumnus.graduation_year or '2021' }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted"><i class="fa-solid fa-location-dot me-1"></i>Location:</span>
+                                <strong class="text-dark-theme">{{ alumnus.location or 'Global / Remote' }}</strong>
+                            </div>
+                        </div>
+
+                        <!-- Skills List -->
+                        <div class="mb-3">
+                            <span class="text-xs font-weight-semibold text-muted text-uppercase small-tracking d-block mb-1.5">Skills & Specializations</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% if alumnus.skills %}
+                                    {% for skill in alumnus.skills.split(',') %}
+                                        <span class="skill-tag">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="skill-tag">Software Engineering</span>
+                                    <span class="skill-tag">Python</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Mentor Status Badge & Action Button -->
+                        <div class="mt-auto border-top pt-3 d-flex align-items-center justify-content-between">
+                            <div>
+                                {% if alumnus.mentor_status %}
+                                    <span class="badge badge-mentor">
+                                        <i class="fa-solid fa-circle text-success me-1" style="font-size:0.5rem;"></i>Accepting Mentees
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-mentor-busy">
+                                        <i class="fa-solid fa-circle text-danger me-1" style="font-size:0.5rem;"></i>Busy
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            {% if alumnus.mentor_status %}
+                                <button type="button" class="btn btn-primary btn-sm px-3 font-weight-semibold text-xs rounded-pill" data-bs-toggle="modal" data-bs-target="#requestModal-{{ alumnus.alumni_id }}" id="btnRequestMentor-{{ alumnus.alumni_id }}">
+                                    <i class="fa-solid fa-paper-plane me-1"></i>Request Mentorship
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-secondary btn-sm px-3 font-weight-semibold text-xs rounded-pill border-0" disabled>
+                                    Unavailable
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mentorship Request Modal -->
+                <div class="modal fade" id="requestModal-{{ alumnus.alumni_id }}" tabindex="-1" aria-labelledby="requestModalLabel-{{ alumnus.alumni_id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg rounded-4">
+                            <div class="modal-header bg-dark text-white border-0 py-3">
+                                <h5 class="modal-title font-weight-bold h6" id="requestModalLabel-{{ alumnus.alumni_id }}">
+                                    <i class="fa-solid fa-paper-plane text-primary me-2"></i>Mentorship Request to {{ alumnus.full_name }}
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{{ url_for('student.request_mentorship') }}" method="POST">
+                                <input type="hidden" name="alumni_id" value="{{ alumnus.alumni_id }}">
+                                <div class="modal-body p-4">
+                                    <div class="d-flex align-items-center gap-3 p-3 bg-light-theme rounded-3 mb-3">
+                                        <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold text-sm" style="width: 40px; height: 40px;">
+                                            {{ (alumnus.full_name or 'A')[0] | upper }}
+                                        </div>
+                                        <div>
+                                            <h6 class="font-weight-bold text-dark-theme mb-0 text-sm">{{ alumnus.full_name }}</h6>
+                                            <small class="text-muted text-xs">{{ alumnus.designation }} at {{ alumnus.company }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="message-{{ alumnus.alumni_id }}" class="form-label font-weight-semibold text-xs text-muted text-uppercase small-tracking">Personalized Message</label>
+                                        <textarea class="form-control text-sm" id="message-{{ alumnus.alumni_id }}" name="message" rows="4" placeholder="Hello {{ alumnus.full_name }}, I am an IT student looking for guidance on..." required></textarea>
+                                        <small class="text-muted-custom text-xs mt-1 d-block">State your academic focus, career goals, or specific guidance requested.</small>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 p-3 bg-light-theme justify-content-end gap-2">
+                                    <button type="button" class="btn btn-light btn-sm border px-3" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill font-weight-semibold">
+                                        Send Request
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5 bg-white rounded-4 shadow-sm p-5">
+                    <i class="fa-solid fa-users-slash text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h5 class="h6 font-weight-bold text-dark-theme mb-1">No Alumni Found</h5>
+                    <p class="text-muted text-sm mb-3">No verified alumni match your specific search criteria.</p>
+                    <a href="{{ url_for('student.search_alumni') }}" class="btn btn-primary btn-sm px-4 rounded-pill">Clear Filters</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

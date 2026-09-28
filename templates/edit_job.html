@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Job Post | AlumniLink Alumni Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+
+            <!-- Header -->
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a href="{{ url_for('alumni.manage_jobs') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btnBackJobs">
+                    <i class="fa-solid fa-arrow-left me-1"></i>Back
+                </a>
+                <div>
+                    <h1 class="h4 font-weight-extrabold text-dark-theme mb-0">
+                        <i class="fa-solid fa-pen-to-square text-warning me-2"></i>Edit Job Listing
+                    </h1>
+                    <p class="text-muted text-xs mb-0 mt-1">
+                        Editing: <strong>{{ job.title }}</strong> at {{ job.company }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form action="{{ url_for('alumni.edit_job', job_id=job.job_id) }}" method="POST" id="editJobForm">
+
+                <!-- Basic Info -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 rounded-top-4 px-4 pt-4 pb-2">
+                        <h5 class="h6 font-weight-bold text-dark-theme mb-0">
+                            <i class="fa-solid fa-1 text-primary me-2"></i>Basic Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-sm-8">
+                                <label for="title" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Job Title <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control shadow-none py-2" id="title" name="title"
+                                       value="{{ job.title }}" required maxlength="150">
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="job_type" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Job Type <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select shadow-none py-2" id="job_type" name="job_type" required>
+                                    <option value="Internship" {% if job.job_type == 'Internship' %}selected{% endif %}>Internship</option>
+                                    <option value="Full-Time"  {% if job.job_type == 'Full-Time' or not job.job_type %}selected{% endif %}>Full-Time</option>
+                                    <option value="Part-Time"  {% if job.job_type == 'Part-Time' %}selected{% endif %}>Part-Time</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="company" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Company <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control shadow-none py-2" id="company" name="company"
+                                       value="{{ job.company }}" required maxlength="150">
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="work_mode" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Work Mode</label>
+                                <select class="form-select shadow-none py-2" id="work_mode" name="work_mode">
+                                    <option value="Remote"  {% if job.work_mode == 'Remote'  %}selected{% endif %}>Remote</option>
+                                    <option value="Hybrid"  {% if job.work_mode == 'Hybrid'  %}selected{% endif %}>Hybrid</option>
+                                    <option value="On-site" {% if job.work_mode == 'On-site' or not job.work_mode %}selected{% endif %}>On-site</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="location" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Location</label>
+                                <input type="text" class="form-control shadow-none py-2" id="location" name="location"
+                                       value="{{ job.location or '' }}" maxlength="150">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compensation & Timeline -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 rounded-top-4 px-4 pt-4 pb-2">
+                        <h5 class="h6 font-weight-bold text-dark-theme mb-0">
+                            <i class="fa-solid fa-2 text-primary me-2"></i>Compensation &amp; Timeline
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label for="stipend_salary" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    Stipend / Salary
+                                </label>
+                                <input type="text" class="form-control shadow-none py-2" id="stipend_salary" name="stipend_salary"
+                                       value="{{ job.stipend_salary or '' }}" maxlength="100"
+                                       placeholder="e.g. ₹15,000/month">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="deadline" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Deadline</label>
+                                <input type="date" class="form-control shadow-none py-2" id="deadline" name="deadline"
+                                       value="{{ job.deadline.strftime('%Y-%m-%d') if job.deadline and job.deadline.__class__.__name__ == 'date' else job.deadline or '' }}">
+                            </div>
+                            <div class="col-12">
+                                <label for="application_link" class="form-label text-xs font-weight-semibold text-muted text-uppercase">
+                                    External Application Link
+                                </label>
+                                <input type="url" class="form-control shadow-none py-2" id="application_link" name="application_link"
+                                       value="{{ job.application_link or '' }}" placeholder="https://…">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requirements -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 rounded-top-4 px-4 pt-4 pb-2">
+                        <h5 class="h6 font-weight-bold text-dark-theme mb-0">
+                            <i class="fa-solid fa-3 text-primary me-2"></i>Requirements
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="required_skills" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Required Skills</label>
+                                <input type="text" class="form-control shadow-none py-2" id="required_skills" name="required_skills"
+                                       value="{{ job.required_skills or '' }}" maxlength="500"
+                                       placeholder="Python, Flask, MySQL (comma-separated)">
+                            </div>
+                            <div class="col-12">
+                                <label for="eligibility" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Eligibility</label>
+                                <textarea class="form-control shadow-none py-2" id="eligibility" name="eligibility"
+                                          rows="3" maxlength="1000"
+                                          placeholder="Eligibility criteria…">{{ job.eligibility or '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 rounded-top-4 px-4 pt-4 pb-2">
+                        <h5 class="h6 font-weight-bold text-dark-theme mb-0">
+                            <i class="fa-solid fa-4 text-primary me-2"></i>Job Description
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <textarea class="form-control shadow-none py-2" id="description" name="description"
+                                  rows="6" required maxlength="5000">{{ job.description or '' }}</textarea>
+                        <div class="form-text text-xs d-flex justify-content-between">
+                            <span>Describe roles, responsibilities and perks.</span>
+                            <span id="editDescCharCount" class="text-muted">{{ (job.description or '')|length }} / 5000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-3 justify-content-between align-items-center">
+                    <!-- Danger Zone -->
+                    <form action="{{ url_for('alumni.delete_job', job_id=job.job_id) }}" method="POST" class="d-inline" id="deleteJobForm">
+                        <button type="submit" class="btn btn-outline-danger px-4 py-2 rounded-pill font-weight-semibold"
+                                id="btnDeleteFromEdit"
+                                onclick="return confirm('Permanently delete this job post?')">
+                            <i class="fa-solid fa-trash me-2"></i>Delete Post
+                        </button>
+                    </form>
+                    <div class="d-flex gap-3">
+                        <a href="{{ url_for('alumni.manage_jobs') }}"
+                           class="btn btn-outline-secondary px-4 py-2 rounded-pill font-weight-semibold"
+                           id="btnCancelEdit">Cancel</a>
+                        <button type="submit" class="btn btn-warning px-5 py-2 rounded-pill font-weight-bold shadow-sm text-dark"
+                                id="btnSaveEdit">
+                            <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const editDescArea = document.getElementById('description');
+const editDescCount = document.getElementById('editDescCharCount');
+if (editDescArea && editDescCount) {
+    editDescArea.addEventListener('input', function() {
+        editDescCount.textContent = `${this.value.length} / 5000`;
+    });
+}
+</script>
+{% endblock %}

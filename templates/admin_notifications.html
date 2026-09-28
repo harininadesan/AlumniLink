@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Notifications | AlumniLink{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Admin Top Header Navigation -->
+    {% set active_page = 'notifications' %}
+    {% include 'admin_nav.html' %}
+
+    <div class="row g-4">
+        <!-- Left Column: System Alert Log Feeds -->
+        <div class="col-lg-7">
+            
+            <!-- Pending Alumni Verification Alerts Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h6 text-uppercase font-weight-bold text-dark mb-0">
+                        <i class="fa-solid fa-user-clock text-warning me-2"></i>Pending Verification Alerts
+                    </h2>
+                    <span class="badge bg-warning text-dark font-weight-bold">{{ pending_alumni_alerts|length }} Pending</span>
+                </div>
+
+                {% if pending_alumni_alerts %}
+                    <div class="list-group list-group-flush">
+                        {% for al in pending_alumni_alerts %}
+                            <div class="list-group-item px-0 py-3 border-bottom d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-warning-soft text-warning d-flex align-items-center justify-content-center text-sm font-weight-bold" style="width:40px; height:40px;">
+                                        <i class="fa-solid fa-user-shield"></i>
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('admin.view_alumni_profile', alumni_id=al.alumni_id) }}" class="font-weight-bold text-dark text-decoration-none hover-primary">
+                                            {{ al.full_name }}
+                                        </a>
+                                        <small class="d-block text-muted text-xs">{{ al.designation or 'Alumni' }} at {{ al.company or 'Company' }} &bull; {{ al.email }}</small>
+                                        <small class="text-muted text-xs">Registered: {{ al.created_at.strftime('%Y-%m-%d %H:%M') if al.created_at else 'Recent' }}</small>
+                                    </div>
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('admin.view_alumni_profile', alumni_id=al.alumni_id) }}" class="btn btn-sm btn-warning text-dark font-weight-semibold py-1 px-3">
+                                        Review & Verify
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa-solid fa-circle-check text-success fs-3 mb-2 d-block"></i>
+                        <span class="text-sm">No pending alumni verification alerts.</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Recent Job Posts Alerts -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h2 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-briefcase text-info me-2"></i>New Job Postings Log
+                </h2>
+
+                {% if job_alerts %}
+                    <div class="list-group list-group-flush">
+                        {% for jb in job_alerts %}
+                            <div class="list-group-item px-0 py-2.5 border-bottom d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="font-weight-semibold text-dark text-sm">{{ jb.title }} &mdash; <span class="text-primary">{{ jb.company }}</span></div>
+                                    <small class="text-muted text-xs">Published by {{ jb.alumni_name }} on {{ jb.created_at.strftime('%Y-%m-%d %H:%M') if jb.created_at else 'Recent' }}</small>
+                                </div>
+                                <a href="{{ url_for('admin.manage_jobs') }}" class="btn btn-sm btn-outline-secondary py-1 px-2.5 text-xs">
+                                    Moderate
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-sm py-2 mb-0">No recent job posts recorded.</p>
+                {% endif %}
+            </div>
+
+            <!-- Recent Mentorship Requests Log -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3">
+                <h2 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-handshake text-purple me-2"></i>Mentorship Requests Activity
+                </h2>
+
+                {% if mentorship_alerts %}
+                    <div class="list-group list-group-flush">
+                        {% for req in mentorship_alerts %}
+                            <div class="list-group-item px-0 py-2.5 border-bottom d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="font-weight-semibold text-dark text-sm">{{ req.student_name }} &rarr; {{ req.alumni_name }}</div>
+                                    <small class="text-muted text-xs">Status: {{ req.status|capitalize }} &bull; {{ req.created_at.strftime('%Y-%m-%d %H:%M') if req.created_at else 'Recent' }}</small>
+                                </div>
+                                <a href="{{ url_for('admin.manage_mentorship') }}" class="btn btn-sm btn-outline-secondary py-1 px-2.5 text-xs">
+                                    View Log
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-sm py-2 mb-0">No recent mentorship activity recorded.</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Right Column: Broadcast Announcement Form & Sent Log -->
+        <div class="col-lg-5">
+            
+            <!-- Send Broadcast Notification Card -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3 mb-4">
+                <h2 class="h6 text-uppercase font-weight-bold mb-2 text-dark">
+                    <i class="fa-solid fa-bullhorn text-danger me-2"></i>Global Broadcast Tool
+                </h2>
+                <p class="text-muted text-xs mb-3">Transmit an official notification alert directly into user notification feeds.</p>
+
+                <form action="{{ url_for('admin.broadcast_notification') }}" method="POST" id="adminBroadcastForm">
+                    <div class="mb-3">
+                        <label for="broadcastTitle" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Notification Title</label>
+                        <input type="text" class="form-control text-sm py-2 shadow-none" id="broadcastTitle" name="title" placeholder="e.g. Platform System Update" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="broadcastTarget" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Target Audience Segment</label>
+                        <select class="form-select text-sm py-2 shadow-none" id="broadcastTarget" name="target" required>
+                            <option value="all">Broadcast to ALL Platform Users</option>
+                            <option value="students">Students Only</option>
+                            <option value="alumni">Verified Alumni Only</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="broadcastMsg" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Alert Message Content</label>
+                        <textarea class="form-control text-sm shadow-none" id="broadcastMsg" name="message" rows="4" placeholder="Enter broadcast notification message..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-sm w-100 py-2.5 font-weight-semibold text-white" id="broadcastSubmitBtn">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Transmit Notification
+                    </button>
+                </form>
+            </div>
+
+            <!-- Recent System Notifications Table -->
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-3">
+                <h2 class="h6 text-uppercase font-weight-bold text-dark mb-3">
+                    <i class="fa-solid fa-list-check text-secondary me-2"></i>Sent Notification History
+                </h2>
+
+                {% if sent_broadcasts %}
+                    <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                        <table class="table table-sm table-hover text-xs mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Recipient</th>
+                                    <th>Notification Title</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for nb in sent_broadcasts %}
+                                    <tr>
+                                        <td class="font-weight-medium">{{ nb.recipient_name }} <small class="text-muted">({{ nb.recipient_role }})</small></td>
+                                        <td class="text-truncate" style="max-width: 150px;">{{ nb.title }}</td>
+                                        <td class="text-muted">{{ nb.created_at.strftime('%m-%d %H:%M') if nb.created_at else '' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-xs py-2 mb-0">No notifications sent yet.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

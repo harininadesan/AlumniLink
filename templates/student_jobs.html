@@ -1,0 +1,337 @@
+{% extends "student_base.html" %}
+
+{% block title %}Job & Internship Portal | AlumniLink{% endblock %}
+
+{% block student_content %}
+<div class="container-fluid p-0">
+
+    <!-- ===== Page Header ===== -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h3 font-weight-extrabold text-dark-theme mb-1">
+                <i class="fa-solid fa-briefcase text-info me-2"></i>Job &amp; Internship Portal
+            </h1>
+            <p class="text-muted text-sm mb-0">
+                Explore internships, full-time, and part-time opportunities posted exclusively by verified IT alumni.
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-info-soft text-info font-weight-semibold px-3 py-2 rounded-pill text-xs">
+                <i class="fa-solid fa-shield-check me-1"></i>Verified Opportunities
+            </span>
+            <span class="badge bg-success text-white font-weight-semibold px-3 py-2 rounded-pill text-xs">
+                {{ jobs|length }} Listing{% if jobs|length != 1 %}s{% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- ===== Search + Filter Bar ===== -->
+    <form method="GET" action="{{ url_for('student.view_jobs') }}" id="jobSearchForm">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 job-filter-card">
+            <div class="row g-3 align-items-end">
+
+                <!-- Search Input -->
+                <div class="col-md-4">
+                    <label class="form-label text-xs font-weight-semibold text-muted text-uppercase mb-1">Search</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text border-0 bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" class="form-control border-0 bg-light shadow-none py-2"
+                               name="q" value="{{ search_query }}"
+                               placeholder="Company, title, skills, location…" id="jobSearchInput"
+                               autocomplete="off">
+                    </div>
+                </div>
+
+                <!-- Job Type Filter -->
+                <div class="col-md-2">
+                    <label class="form-label text-xs font-weight-semibold text-muted text-uppercase mb-1">Job Type</label>
+                    <select class="form-select form-select-sm border-0 bg-light shadow-none py-2" name="job_type" id="filterJobType">
+                        <option value="">All Types</option>
+                        <option value="Internship"  {% if filter_type == 'Internship'  %}selected{% endif %}>Internship</option>
+                        <option value="Full-Time"   {% if filter_type == 'Full-Time'   %}selected{% endif %}>Full-Time</option>
+                        <option value="Part-Time"   {% if filter_type == 'Part-Time'   %}selected{% endif %}>Part-Time</option>
+                    </select>
+                </div>
+
+                <!-- Work Mode Filter -->
+                <div class="col-md-2">
+                    <label class="form-label text-xs font-weight-semibold text-muted text-uppercase mb-1">Work Mode</label>
+                    <select class="form-select form-select-sm border-0 bg-light shadow-none py-2" name="work_mode" id="filterWorkMode">
+                        <option value="">All Modes</option>
+                        <option value="Remote"  {% if filter_mode == 'Remote'  %}selected{% endif %}>Remote</option>
+                        <option value="Hybrid"  {% if filter_mode == 'Hybrid'  %}selected{% endif %}>Hybrid</option>
+                        <option value="On-site" {% if filter_mode == 'On-site' %}selected{% endif %}>On-site</option>
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div class="col-md-2">
+                    <label class="form-label text-xs font-weight-semibold text-muted text-uppercase mb-1">Sort By</label>
+                    <select class="form-select form-select-sm border-0 bg-light shadow-none py-2" name="sort" id="sortJobs">
+                        <option value="latest"   {% if sort_by == 'latest'   %}selected{% endif %}>Latest First</option>
+                        <option value="deadline" {% if sort_by == 'deadline' %}selected{% endif %}>Deadline</option>
+                        <option value="company"  {% if sort_by == 'company'  %}selected{% endif %}>Company A–Z</option>
+                    </select>
+                </div>
+
+                <!-- Actions -->
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm flex-grow-1 py-2 font-weight-semibold rounded-pill shadow-sm" id="btnApplyFilter">
+                        <i class="fa-solid fa-filter me-1"></i>Filter
+                    </button>
+                    <a href="{{ url_for('student.view_jobs') }}" class="btn btn-outline-secondary btn-sm py-2 rounded-pill" title="Reset filters" id="btnResetFilter">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Active Filter Chips -->
+            {% if search_query or filter_type or filter_mode %}
+            <div class="d-flex flex-wrap gap-2 mt-3 pt-3 border-top">
+                <span class="text-xs text-muted font-weight-semibold me-1 align-self-center">Active filters:</span>
+                {% if search_query %}
+                    <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1 text-xs">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i>{{ search_query }}
+                    </span>
+                {% endif %}
+                {% if filter_type %}
+                    <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 text-xs">
+                        <i class="fa-solid fa-briefcase me-1"></i>{{ filter_type }}
+                    </span>
+                {% endif %}
+                {% if filter_mode %}
+                    <span class="badge bg-info-soft text-info rounded-pill px-3 py-1 text-xs">
+                        <i class="fa-solid fa-laptop-house me-1"></i>{{ filter_mode }}
+                    </span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- ===== Job Cards Grid ===== -->
+    <div class="row g-4" id="jobCardsGrid">
+        {% if jobs %}
+            {% for job in jobs %}
+            <div class="col-md-6 col-xl-4 job-card-wrapper">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-0 overflow-hidden position-relative job-card hover-lift">
+
+                    <!-- Top Gradient Accent Bar -->
+                    <div class="job-card-accent-bar
+                        {% if job.job_type == 'Internship' %}accent-internship
+                        {% elif job.job_type == 'Part-Time' %}accent-parttime
+                        {% else %}accent-fulltime{% endif %}">
+                    </div>
+
+                    <div class="p-4">
+                        <!-- Header Row -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="flex-grow-1 me-3">
+                                <!-- Badges Row -->
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    <span class="badge rounded-pill text-xs font-weight-semibold
+                                        {% if job.job_type == 'Internship' %}bg-warning text-dark
+                                        {% elif job.job_type == 'Part-Time' %}bg-info text-white
+                                        {% else %}bg-success text-white{% endif %}">
+                                        <i class="fa-solid fa-briefcase me-1"></i>{{ job.job_type or 'Full-Time' }}
+                                    </span>
+                                    <span class="badge rounded-pill text-xs font-weight-semibold
+                                        {% if job.work_mode == 'Remote' %}bg-primary text-white
+                                        {% elif job.work_mode == 'Hybrid' %}bg-secondary text-white
+                                        {% else %}bg-dark text-white{% endif %}">
+                                        <i class="fa-solid fa-
+                                            {% if job.work_mode == 'Remote' %}wifi
+                                            {% elif job.work_mode == 'Hybrid' %}network-wired
+                                            {% else %}building{% endif %} me-1"></i>{{ job.work_mode or 'On-site' }}
+                                    </span>
+                                </div>
+                                <h5 class="h6 font-weight-bold text-dark-theme mb-0 job-title-text">
+                                    {{ job.title }}
+                                </h5>
+                                <p class="text-muted text-xs mb-0 mt-1">
+                                    <i class="fa-solid fa-building me-1 text-primary"></i>
+                                    <strong>{{ job.company }}</strong>
+                                </p>
+                            </div>
+                            <!-- Company Icon -->
+                            <div class="job-company-icon">
+                                <i class="fa-solid fa-building fs-4 text-primary opacity-75"></i>
+                            </div>
+                        </div>
+
+                        <!-- Meta Info Row -->
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            {% if job.location %}
+                            <span class="job-meta-pill">
+                                <i class="fa-solid fa-location-dot text-danger me-1"></i>{{ job.location }}
+                            </span>
+                            {% endif %}
+                            {% if job.stipend_salary %}
+                            <span class="job-meta-pill">
+                                <i class="fa-solid fa-indian-rupee-sign text-success me-1"></i>{{ job.stipend_salary }}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Required Skills -->
+                        {% if job.required_skills %}
+                        <div class="mb-3">
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for skill in job.required_skills.split(',')[:4] %}
+                                <span class="skill-pill">{{ skill.strip() }}</span>
+                                {% endfor %}
+                                {% if job.required_skills.split(',')|length > 4 %}
+                                <span class="skill-pill skill-pill-more">+{{ job.required_skills.split(',')|length - 4 }} more</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Footer: Posted By & Deadline -->
+                        <div class="border-top pt-3 mt-auto">
+                            <div class="d-flex align-items-center justify-content-between text-xs mb-3">
+                                <span class="text-muted">
+                                    <i class="fa-solid fa-user-check me-1 text-success"></i>
+                                    <strong>{{ job.alumni_name or 'Verified Alumni' }}</strong>
+                                </span>
+                                <span class="text-muted">
+                                    <i class="fa-solid fa-calendar-xmark me-1 text-warning"></i>
+                                    {% if job.deadline %}
+                                        {{ job.deadline.strftime('%d %b %Y') if job.deadline and job.deadline.__class__.__name__ == 'date' else job.deadline }}
+                                    {% else %}
+                                        Open
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('student.job_detail', job_id=job.job_id) }}"
+                                   class="btn btn-outline-primary btn-sm flex-grow-1 rounded-pill font-weight-semibold text-xs py-2"
+                                   id="btnViewJob-{{ job.job_id }}">
+                                    <i class="fa-solid fa-eye me-1"></i>View Details
+                                </a>
+                                {% if job.application_link %}
+                                    <a href="{{ job.application_link }}" target="_blank" rel="noopener noreferrer"
+                                       class="btn btn-primary btn-sm flex-grow-1 rounded-pill font-weight-semibold text-xs py-2"
+                                       id="btnApplyExternal-{{ job.job_id }}">
+                                        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Apply Now
+                                    </a>
+                                {% elif job.job_id in applied_job_ids %}
+                                    <button type="button" class="btn btn-success btn-sm flex-grow-1 rounded-pill font-weight-semibold text-xs py-2" disabled>
+                                        <i class="fa-solid fa-circle-check me-1"></i>Applied
+                                    </button>
+                                {% else %}
+                                    <form action="{{ url_for('student.apply_job', job_id=job.job_id) }}" method="POST" class="flex-grow-1">
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm w-100 rounded-pill font-weight-semibold text-xs py-2"
+                                                id="btnApplyJob-{{ job.job_id }}"
+                                                onclick="return confirm('Apply for {{ job.title }} at {{ job.company }}?')">
+                                            <i class="fa-solid fa-paper-plane me-1"></i>Apply
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="col-12">
+                <div class="text-center py-5 card border-0 shadow-sm rounded-4 p-5">
+                    <div class="mb-3">
+                        <div class="empty-state-icon-wrapper mx-auto">
+                            <i class="fa-solid fa-briefcase text-muted" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h5 class="h6 font-weight-bold text-dark-theme mb-2">No Listings Found</h5>
+                    {% if search_query or filter_type or filter_mode %}
+                        <p class="text-muted text-sm mb-3">No jobs match your current filters. Try adjusting your search.</p>
+                        <a href="{{ url_for('student.view_jobs') }}" class="btn btn-primary btn-sm rounded-pill px-4" id="btnClearFilters">
+                            <i class="fa-solid fa-rotate-left me-1"></i>Clear Filters
+                        </a>
+                    {% else %}
+                        <p class="text-muted text-sm mb-0">No active job listings at the moment. Check back soon!</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<style>
+/* ---- Job Card Styles ---- */
+.job-filter-card {
+    background: var(--color-light-surface);
+}
+.job-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    background: #fff;
+}
+.job-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(67, 97, 238, 0.12) !important;
+}
+.job-card-accent-bar {
+    height: 4px;
+    width: 100%;
+}
+.accent-internship { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.accent-fulltime   { background: linear-gradient(90deg, #4361ee, #4cc9f0); }
+.accent-parttime   { background: linear-gradient(90deg, #06b6d4, #10b981); }
+
+.job-company-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(67,97,238,0.08), rgba(76,201,240,0.08));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(67,97,238,0.12);
+}
+.job-title-text {
+    font-size: 0.92rem;
+    line-height: 1.4;
+}
+.job-meta-pill {
+    font-size: 0.72rem;
+    color: #475569;
+    background: #f1f5f9;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-weight: 500;
+}
+.skill-pill {
+    font-size: 0.68rem;
+    background: rgba(67, 97, 238, 0.08);
+    color: var(--color-primary);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-weight: 600;
+    border: 1px solid rgba(67,97,238,0.15);
+}
+.skill-pill-more {
+    background: rgba(100,116,139,0.1);
+    color: #64748b;
+    border-color: rgba(100,116,139,0.15);
+}
+.empty-state-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(100,116,139,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bg-info-soft   { background: rgba(6, 182, 212, 0.12); }
+.bg-primary-soft { background: rgba(67, 97, 238, 0.10); }
+.bg-success-soft { background: rgba(16, 185, 129, 0.10); }
+.hover-lift { cursor: pointer; }
+</style>
+{% endblock %}
