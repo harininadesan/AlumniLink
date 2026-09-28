@@ -1,25 +1,12 @@
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
+from flask_login import current_user
 from functools import wraps
-from werkzeug.utils import secure_filename
 from models.database import get_db_connection
+from profile_photos import ProfilePhotoError, remove_profile_photo, save_profile_photo
 
 # Define the alumni blueprint
 alumni_bp = Blueprint('alumni', __name__, url_prefix='/alumni')
-
-# Define target directories for static file uploads
-UPLOAD_FOLDER_PHOTOS = os.path.join('static', 'uploads', 'profile_photos')
-os.makedirs(UPLOAD_FOLDER_PHOTOS, exist_ok=True)
-
-# Allowed file extensions helper
-ALLOWED_PHOTO_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-def allowed_file(filename):
-    """
-    Validates if the file suffix belongs to the allowed extensions set.
-    """
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_PHOTO_EXTENSIONS
-
 
 def alumni_required(f):
     """
@@ -29,6 +16,9 @@ def alumni_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         role = str(session.get('role', '')).strip().lower()
+        if current_user.is_authenticated:
+            role = str(current_user.role).strip().lower()
+            session['role'] = current_user.role
         if 'user_id' not in session or role != 'alumni':
             flash('Please log in as an Alumni to access the page.', 'warning')
             return redirect(url_for('auth.login'))
@@ -103,6 +93,7 @@ def dashboard():
             cursor.execute("""
                 SELECT mr.id AS request_id, mr.message, mr.status, mr.request_date,
                        u.full_name AS student_name, u.email AS student_email,
+                       u.profile_photo AS student_photo,
                        s.department, s.graduation_year, s.skills, s.resume
                 FROM mentorship_requests mr
                 JOIN students s ON mr.student_id = s.student_id
@@ -167,7 +158,7 @@ def view_profile():
         cursor.execute("""
             SELECT u.full_name, u.email, u.profile_photo, a.alumni_id, 
                    a.company, a.designation, a.experience, a.skills, a.linkedin, a.location, a.mentor_status,
-                   a.graduation_year, a.phone, a.github, a.bio, a.achievements, a.share_email, a.share_phone
+                   a.admission_year, a.graduation_year, a.phone, a.github, a.bio, a.achievements, a.share_email, a.share_phone
             FROM users u
             JOIN alumni a ON u.user_id = a.user_id
             WHERE u.user_id = %s
@@ -273,36 +264,60 @@ def upload_photo():
     if file.filename == '':
         flash('No file selected.', 'danger')
         return redirect(url_for('alumni.view_profile'))
-        
-    if file and allowed_file(file.filename):
-        filename = f"user_{session['user_id']}_" + secure_filename(file.filename)
-        file_path = os.path.join(UPLOAD_FOLDER_PHOTOS, filename)
-        
-        conn = None
-        cursor = None
-        try:
-            file.save(file_path)
-            web_path = f"uploads/profile_photos/{filename}"
-            
-            conn = get_db_connection()
-            if conn:
-                cursor = conn.cursor()
-                cursor.execute("UPDATE users SET profile_photo = %s WHERE user_id = %s", (web_path, session['user_id']))
-                conn.commit()
-                flash('Profile photo updated successfully!', 'success')
-            else:
-                flash('Database unavailable.', 'danger')
-        except Exception as e:
-            if conn:
-                conn.rollback()
-            flash(f"Failed to upload photo: {e}", 'danger')
-        finally:
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
-    else:
-        flash('Allowed image types are png, jpg, jpeg, gif.', 'danger')
+
+    conn = None
+    cursor = None
+    new_reference = None
+    committed = False
+    storage_path = current_app.config.get('PROFILE_PHOTO_STORAGE_PATH')
+
+    try:
+        new_reference, _ = save_profile_photo(
+            file,
+            session['user_id'],
+            storage_path
+        )
+        conn = get_db_connection()
+        if conn is None:
+            raise RuntimeError('Database unavailable.')
+
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            'SELECT profile_photo FROM users WHERE user_id = %s FOR UPDATE',
+            (session['user_id'],)
+        )
+        user = cursor.fetchone()
+        if not user:
+            raise RuntimeError('Alumni account not found.')
+
+        cursor.execute(
+            'UPDATE users SET profile_photo = %s WHERE user_id = %s',
+            (new_reference, session['user_id'])
+        )
+        conn.commit()
+        committed = True
+
+        remove_profile_photo(
+            user.get('profile_photo'),
+            storage_path,
+            os.path.join(current_app.static_folder, 'uploads', 'profile_photos')
+        )
+        flash('Profile photo updated successfully!', 'success')
+    except Exception as error:
+        if conn:
+            conn.rollback()
+        if new_reference and not committed:
+            remove_profile_photo(
+                new_reference,
+                storage_path,
+                os.path.join(current_app.static_folder, 'uploads', 'profile_photos')
+            )
+        flash(f'Failed to upload photo: {error}', 'danger')
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
         
     return redirect(url_for('alumni.view_profile'))
 

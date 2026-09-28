@@ -110,6 +110,7 @@ add_column("alumni", "bio TEXT DEFAULT NULL")
 add_column("alumni", "achievements TEXT DEFAULT NULL")
 add_column("alumni", "share_email BOOLEAN DEFAULT TRUE")
 add_column("alumni", "share_phone BOOLEAN DEFAULT FALSE")
+add_column("alumni", "admission_year INT DEFAULT NULL")
 add_column("alumni", "graduation_year INT DEFAULT NULL")
 # department column - might already exist from schema
 add_column("alumni", "department VARCHAR(100) NOT NULL DEFAULT 'Information Technology'")
@@ -125,6 +126,54 @@ print("\n[ students ]")
 add_column("students", "linkedin VARCHAR(255) DEFAULT NULL")
 add_column("students", "github VARCHAR(255) DEFAULT NULL")
 add_column("students", "bio TEXT DEFAULT NULL")
+add_column("students", "admission_year INT DEFAULT NULL")
+add_column("students", "graduation_year INT DEFAULT NULL")
+add_column("students", "graduation_verified BOOLEAN NOT NULL DEFAULT FALSE")
+
+# ── 6. student-to-alumni conversion policy and audit ──────────────────────────
+print("\n[ student conversion ]")
+run_sql("""CREATE TABLE IF NOT EXISTS student_conversion_settings (
+    setting_id TINYINT UNSIGNED PRIMARY KEY,
+    mode ENUM('automatic', 'admin_approval') NOT NULL DEFAULT 'automatic',
+    require_graduation_verification BOOLEAN NOT NULL DEFAULT TRUE,
+    updated_by INT DEFAULT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (updated_by) REFERENCES users (user_id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""", "CREATE student_conversion_settings")
+run_sql("""CREATE TABLE IF NOT EXISTS student_conversion_requests (
+    conversion_request_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    student_id INT NOT NULL,
+    passing_out_year INT DEFAULT NULL,
+    status ENUM('not_eligible', 'eligible', 'awaiting_verification', 'pending_approval', 'rejected', 'converted') NOT NULL,
+    reviewed_by INT DEFAULT NULL,
+    reviewed_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students (student_id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewed_by) REFERENCES users (user_id) ON DELETE SET NULL,
+    INDEX idx_conversion_status_year (status, passing_out_year)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""", "CREATE student_conversion_requests")
+run_sql("""CREATE TABLE IF NOT EXISTS student_conversion_history (
+    conversion_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    previous_role VARCHAR(30) NOT NULL,
+    new_role VARCHAR(30) NOT NULL,
+    converted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    conversion_method ENUM('automatic', 'admin_approved', 'manual_admin') NOT NULL,
+    admin_id INT DEFAULT NULL,
+    verification_status ENUM('verified', 'not_required') NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (admin_id) REFERENCES users (user_id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""", "CREATE student_conversion_history")
+run_sql("""INSERT IGNORE INTO student_conversion_settings
+    (setting_id, mode, require_graduation_verification)
+    VALUES (1, 'automatic', TRUE)""", "Seed student conversion settings")
+run_sql("""UPDATE student_conversion_settings
+    SET mode = 'automatic', require_graduation_verification = TRUE
+    WHERE setting_id = 1 AND updated_by IS NULL""",
+        "Set untouched conversion defaults")
 
 # ── Done ─────────────────────────────────────────────────────────────────────
 cursor.close()

@@ -1,19 +1,23 @@
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
+from flask_login import current_user
 from functools import wraps
 from werkzeug.utils import secure_filename
 from models.database import get_db_connection
 from datetime import datetime
+from profile_photos import remove_profile_photo, save_profile_photo
+from student_conversions import (
+    get_conversion_settings,
+    is_conversion_eligible,
+    valid_passing_out_year,
+)
 
 student_bp = Blueprint('student', __name__, url_prefix='/student')
 
-UPLOAD_FOLDER_PHOTOS = os.path.join('static', 'uploads', 'profile_photos')
 UPLOAD_FOLDER_RESUMES = os.path.join('static', 'uploads', 'resumes')
 
-os.makedirs(UPLOAD_FOLDER_PHOTOS, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER_RESUMES, exist_ok=True)
 
-ALLOWED_PHOTO_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 ALLOWED_RESUME_EXTENSIONS = {'pdf', 'doc', 'docx'}
 
 
@@ -31,6 +35,9 @@ def student_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         role = str(session.get('role', '')).strip().lower()
+        if current_user.is_authenticated:
+            role = str(current_user.role).strip().lower()
+            session['role'] = current_user.role
 
         if 'user_id' not in session or role != 'student':
             flash('Please log in as a Student to access this page.', 'warning')
@@ -56,6 +63,7 @@ def fetch_student_profile(user_id):
             'full_name': session.get('full_name', 'Student User'),
             'email': '',
             'department': 'Information Technology',
+            'admission_year': None,
             'graduation_year': 2026,
             'register_number': f"IT{user_id:04d}",
             'skills': '',
@@ -77,7 +85,10 @@ def fetch_student_profile(user_id):
                 u.profile_photo,
                 s.student_id,
                 s.department,
+                s.admission_year,
                 s.graduation_year,
+                s.graduation_verified,
+                cr.status AS conversion_status,
                 s.register_number,
                 s.skills,
                 s.resume,
@@ -88,6 +99,8 @@ def fetch_student_profile(user_id):
             FROM users u
             LEFT JOIN students s
                 ON u.user_id = s.user_id
+            LEFT JOIN student_conversion_requests cr
+                ON cr.user_id = u.user_id
             WHERE u.user_id = %s
         """, (user_id,))
 
@@ -102,6 +115,7 @@ def fetch_student_profile(user_id):
                 (
                     user_id,
                     department,
+                    admission_year,
                     graduation_year,
                     register_number,
                     skills,
@@ -112,6 +126,7 @@ def fetch_student_profile(user_id):
                 (
                     %s,
                     'Information Technology',
+                    NULL,
                     2026,
                     %s,
                     '',
@@ -129,7 +144,10 @@ def fetch_student_profile(user_id):
                     u.profile_photo,
                     s.student_id,
                     s.department,
+                    s.admission_year,
                     s.graduation_year,
+                    s.graduation_verified,
+                    cr.status AS conversion_status,
                     s.register_number,
                     s.skills,
                     s.resume,
@@ -140,6 +158,8 @@ def fetch_student_profile(user_id):
                 FROM users u
                 JOIN students s
                     ON u.user_id = s.user_id
+                LEFT JOIN student_conversion_requests cr
+                    ON cr.user_id = u.user_id
                 WHERE u.user_id = %s
             """, (user_id,))
 
@@ -151,6 +171,17 @@ def fetch_student_profile(user_id):
             profile['bio'] = profile.get('bio') or ''
             profile['skills'] = profile.get('skills') or ''
             profile['career_goal'] = profile.get('career_goal') or ''
+            if not profile.get('conversion_status'):
+                settings = get_conversion_settings(cursor)
+                if not is_conversion_eligible(profile.get('graduation_year')):
+                    profile['conversion_status'] = 'not_eligible'
+                elif (
+                    settings['require_graduation_verification']
+                    and not profile.get('graduation_verified')
+                ):
+                    profile['conversion_status'] = 'awaiting_verification'
+                else:
+                    profile['conversion_status'] = 'eligible'
 
         return profile
 
@@ -966,6 +997,7 @@ def view_requests():
                         mr.created_at AS request_date,
                         u.full_name AS alumni_name,
                         u.email AS alumni_email,
+                        u.profile_photo AS alumni_photo,
                         a.company,
                         a.designation
                     FROM mentorship_requests mr
@@ -1426,6 +1458,11 @@ def edit_profile():
         ''
     ).strip()
 
+    admission_year_text = request.form.get(
+        'admission_year',
+        ''
+    ).strip()
+
     skills = request.form.get(
         'skills',
         ''
@@ -1451,7 +1488,12 @@ def edit_profile():
         ''
     ).strip()
 
-    if not full_name or not department or not graduation_year:
+    graduation_year = valid_passing_out_year(graduation_year)
+    admission_year = None
+    if admission_year_text:
+        admission_year = valid_passing_out_year(admission_year_text)
+
+    if not full_name or not department or graduation_year is None:
 
         flash(
             'Full Name, Department, and Graduation Year are required.',
@@ -1461,6 +1503,12 @@ def edit_profile():
         return redirect(
             url_for('student.view_profile')
         )
+
+    if admission_year_text and (
+        admission_year is None or admission_year > graduation_year
+    ):
+        flash('Admission year must be valid and no later than the passing-out year.', 'danger')
+        return redirect(url_for('student.view_profile'))
 
     conn = get_db_connection()
 
@@ -1483,6 +1531,7 @@ def edit_profile():
                 UPDATE students
                 SET
                     department = %s,
+                    admission_year = %s,
                     graduation_year = %s,
                     skills = %s,
                     career_goal = %s,
@@ -1492,6 +1541,7 @@ def edit_profile():
                 WHERE user_id = %s
             """, (
                 department,
+                admission_year,
                 graduation_year,
                 skills,
                 career_goal,
@@ -2161,85 +2211,60 @@ def upload_photo():
             url_for('student.view_profile')
         )
 
-    if file and allowed_file(
-        file.filename,
-        ALLOWED_PHOTO_EXTENSIONS
-    ):
+    conn = None
+    cursor = None
+    new_reference = None
+    committed = False
+    storage_path = current_app.config.get('PROFILE_PHOTO_STORAGE_PATH')
 
-        filename = (
-            f"user_{session['user_id']}_"
-            + secure_filename(file.filename)
+    try:
+        new_reference, _ = save_profile_photo(
+            file,
+            session['user_id'],
+            storage_path
         )
+        conn = get_db_connection()
+        if conn is None:
+            raise RuntimeError('Database unavailable.')
 
-        file_path = os.path.join(
-            UPLOAD_FOLDER_PHOTOS,
-            filename
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            'SELECT profile_photo FROM users WHERE user_id = %s FOR UPDATE',
+            (session['user_id'],)
         )
+        user = cursor.fetchone()
+        if not user:
+            raise RuntimeError('Student account not found.')
 
-        conn = None
-        cursor = None
+        cursor.execute("""
+            UPDATE users
+            SET profile_photo = %s
+            WHERE user_id = %s
+        """, (new_reference, session['user_id']))
+        conn.commit()
+        committed = True
 
-        try:
-
-            file.save(file_path)
-
-            web_path = (
-                f"uploads/profile_photos/{filename}"
+        remove_profile_photo(
+            user.get('profile_photo'),
+            storage_path,
+            os.path.join(current_app.static_folder, 'uploads', 'profile_photos')
+        )
+        flash('Profile photo updated successfully!', 'success')
+    except Exception as error:
+        if conn:
+            conn.rollback()
+        if new_reference and not committed:
+            remove_profile_photo(
+                new_reference,
+                storage_path,
+                os.path.join(current_app.static_folder, 'uploads', 'profile_photos')
             )
-
-            conn = get_db_connection()
-
-            if conn:
-
-                cursor = conn.cursor()
-
-                cursor.execute("""
-                    UPDATE users
-                    SET profile_photo = %s
-                    WHERE user_id = %s
-                """, (
-                    web_path,
-                    session['user_id']
-                ))
-
-                conn.commit()
-
-                flash(
-                    'Profile photo updated successfully!',
-                    'success'
-                )
-
-            else:
-
-                flash(
-                    'Database unavailable.',
-                    'danger'
-                )
-
-        except Exception as e:
-
-            if conn:
-                conn.rollback()
-
-            flash(
-                f"Failed to upload photo: {e}",
-                'danger'
-            )
-
-        finally:
-
-            if cursor:
-                cursor.close()
-
-            if conn:
-                conn.close()
-
-    else:
-
-        flash(
-            'Allowed image types are png, jpg, jpeg, gif, webp.',
-            'danger'
-        )
+        flash(f'Failed to upload photo: {error}', 'danger')
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
     return redirect(
         url_for('student.view_profile')

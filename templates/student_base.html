@@ -37,7 +37,7 @@
                 <div class="dropdown">
                     <button class="btn btn-dark-glass dropdown-toggle d-flex align-items-center gap-2 py-1.5 px-3 rounded-pill" type="button" id="studentProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         {% if current_user.profile_photo %}
-                            <img src="{{ url_for('static', filename=current_user.profile_photo) }}" alt="Avatar" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                            <img src="{{ profile_photo_url(current_user.profile_photo) }}" alt="Avatar" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
                         {% else %}
                             <div class="avatar-placeholder rounded-circle bg-primary text-white text-xs d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-weight: 700;">
                                 {{ (current_user.full_name or 'S')[0] | upper }}

@@ -34,6 +34,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ url_for('admin.student_conversions') }}" class="nav-link text-white text-sm py-2 px-3 rounded-pill {% if active_page == 'conversions' %}bg-primary font-weight-bold active{% else %}bg-white-10 hover-bg-white-20{% endif %}" id="adminNavStudentConversions">
+                            <i class="fa-solid fa-arrow-right-arrow-left me-1.5"></i>Student Conversions
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ url_for('admin.manage_alumni') }}" class="nav-link text-white text-sm py-2 px-3 rounded-pill {% if active_page == 'alumni' %}bg-primary font-weight-bold active{% else %}bg-white-10 hover-bg-white-20{% endif %}" id="adminNavAlumni">
                             <i class="fa-solid fa-user-tie me-1.5"></i>Manage Alumni
                         </a>

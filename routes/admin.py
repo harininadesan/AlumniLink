@@ -1,6 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from flask_login import current_user
 from functools import wraps
 from models.database import get_db_connection
+from student_conversions import (
+    convert_student,
+    get_conversion_settings,
+    is_conversion_eligible,
+    set_conversion_request,
+    valid_passing_out_year,
+)
 
 # Define the admin blueprint
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -14,6 +22,9 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         role = str(session.get('role', '')).strip().lower()
+        if current_user.is_authenticated:
+            role = str(current_user.role).strip().lower()
+            session['role'] = current_user.role
         if 'user_id' not in session or role != 'admin':
             flash('Please log in as an Administrator to access the panel.', 'danger')
             return redirect(url_for('auth.login'))
@@ -222,7 +233,7 @@ def manage_students():
         
         if search:
             query = """
-                SELECT s.student_id, s.user_id, u.full_name, u.email, u.profile_photo, u.created_at,
+                SELECT s.student_id, s.user_id, u.full_name, u.email, u.profile_photo, u.created_at, u.role,
                        s.department, s.graduation_year, s.register_number, s.skills, s.resume, s.career_goal, s.bio
                 FROM students s
                 JOIN users u ON s.user_id = u.user_id
@@ -233,7 +244,7 @@ def manage_students():
             cursor.execute(query, (sp, sp, sp, sp))
         else:
             query = """
-                SELECT s.student_id, s.user_id, u.full_name, u.email, u.profile_photo, u.created_at,
+                SELECT s.student_id, s.user_id, u.full_name, u.email, u.profile_photo, u.created_at, u.role,
                        s.department, s.graduation_year, s.register_number, s.skills, s.resume, s.career_goal, s.bio
                 FROM students s
                 JOIN users u ON s.user_id = u.user_id
@@ -267,15 +278,28 @@ def view_student_profile(student_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT s.*, u.full_name, u.email, u.profile_photo, u.created_at AS user_created_at
+                 SELECT s.*, u.full_name, u.email, u.profile_photo, u.role,
+                     cr.status AS conversion_status, u.created_at AS user_created_at
             FROM students s
             JOIN users u ON s.user_id = u.user_id
+                 LEFT JOIN student_conversion_requests cr ON cr.user_id = u.user_id
             WHERE s.student_id = %s
         """, (student_id,))
         student = cursor.fetchone()
         if not student:
             flash("Student profile not found.", "danger")
             return redirect(url_for('admin.manage_students'))
+        settings = get_conversion_settings(cursor)
+        if not student.get('conversion_status'):
+            if not is_conversion_eligible(student.get('graduation_year')):
+                student['conversion_status'] = 'not_eligible'
+            elif (
+                settings['require_graduation_verification']
+                and not student.get('graduation_verified')
+            ):
+                student['conversion_status'] = 'awaiting_verification'
+            else:
+                student['conversion_status'] = 'eligible'
     except Exception as e:
         flash(f"Error loading student profile: {e}", "danger")
         return redirect(url_for('admin.manage_students'))
@@ -286,6 +310,283 @@ def view_student_profile(student_id):
             conn.close()
             
     return render_template('admin_student_profile.html', student=student)
+
+
+@admin_bp.route('/student/promote', methods=['POST'])
+@admin_required
+def promote_student_to_alumni():
+    """Promotes an existing student account without replacing its user record."""
+    student_id = request.form.get('student_id', '').strip()
+    if not student_id.isdigit():
+        flash('Invalid student account.', 'danger')
+        return redirect(url_for('admin.manage_students'))
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            raise RuntimeError('Database unavailable.')
+        cursor = conn.cursor(dictionary=True)
+        settings = get_conversion_settings(cursor)
+        student = convert_student(
+            cursor,
+            int(student_id),
+            settings,
+            'manual_admin',
+            int(session['user_id']),
+        )
+        conn.commit()
+        flash(f"{student['full_name']} has been promoted to Alumni.", 'success')
+    except ValueError as e:
+        if conn:
+            conn.rollback()
+        flash(str(e), 'warning')
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f"Failed to promote student: {e}", 'danger')
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+    return redirect(url_for('admin.view_student_profile', student_id=student_id))
+
+
+@admin_bp.route('/student-conversions', methods=['GET'])
+@admin_required
+def student_conversions():
+    conn = None
+    cursor = None
+    students = []
+    history = []
+    settings = {'mode': 'automatic', 'require_graduation_verification': True}
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            raise RuntimeError('Database unavailable.')
+        cursor = conn.cursor(dictionary=True)
+        settings = get_conversion_settings(cursor)
+        cursor.execute("""
+            SELECT s.student_id, s.user_id, s.admission_year, s.graduation_year,
+                   s.graduation_verified, u.full_name, u.email, u.role,
+                   cr.status AS request_status,
+                   COALESCE(cr.status, CASE
+                       WHEN s.graduation_year BETWEEN 1990 AND 2100
+                            AND s.graduation_year <= YEAR(CURDATE()) THEN 'eligible'
+                       ELSE 'not_eligible'
+                   END) AS conversion_status
+            FROM students s
+            JOIN users u ON s.user_id = u.user_id
+            LEFT JOIN student_conversion_requests cr ON cr.user_id = u.user_id
+            WHERE LOWER(u.role) = 'student'
+            ORDER BY s.graduation_year ASC, u.full_name ASC
+        """)
+        students = cursor.fetchall()
+        for student in students:
+            if student.get('request_status'):
+                student['conversion_status'] = student['request_status']
+            elif not is_conversion_eligible(student.get('graduation_year')):
+                student['conversion_status'] = 'not_eligible'
+            elif (
+                settings['require_graduation_verification']
+                and not student.get('graduation_verified')
+            ):
+                student['conversion_status'] = 'awaiting_verification'
+            else:
+                student['conversion_status'] = 'eligible'
+        cursor.execute("""
+            SELECT h.user_id, h.previous_role, h.new_role, h.converted_at,
+                   h.conversion_method, h.verification_status,
+                   u.full_name, u.email, admin_user.full_name AS admin_name
+            FROM student_conversion_history h
+            JOIN users u ON h.user_id = u.user_id
+            LEFT JOIN users admin_user ON h.admin_id = admin_user.user_id
+            ORDER BY h.converted_at DESC
+            LIMIT 100
+        """)
+        history = cursor.fetchall()
+    except Exception as e:
+        flash(f'Unable to load student conversions: {e}', 'danger')
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    return render_template(
+        'admin_student_conversions.html',
+        students=students,
+        history=history,
+        settings=settings,
+        active_page='conversions',
+    )
+
+
+@admin_bp.route('/student-conversions/settings', methods=['POST'])
+@admin_required
+def update_student_conversion_settings():
+    mode = request.form.get('mode', '').strip()
+    if mode not in {'automatic', 'admin_approval'}:
+        flash('Select a valid conversion mode.', 'danger')
+        return redirect(url_for('admin.student_conversions'))
+
+    require_verification = request.form.get('require_graduation_verification') == '1'
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            raise RuntimeError('Database unavailable.')
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO student_conversion_settings
+                (setting_id, mode, require_graduation_verification, updated_by)
+            VALUES (1, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                mode = VALUES(mode),
+                require_graduation_verification = VALUES(require_graduation_verification),
+                updated_by = VALUES(updated_by)
+        """, (mode, require_verification, session['user_id']))
+        conn.commit()
+        flash('Student conversion settings updated.', 'success')
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f'Unable to update conversion settings: {e}', 'danger')
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    return redirect(url_for('admin.student_conversions'))
+
+
+@admin_bp.route('/student-conversions/review', methods=['POST'])
+@admin_required
+def review_student_conversion():
+    student_id = request.form.get('student_id', '').strip()
+    action = request.form.get('action', '').strip()
+    if not student_id.isdigit() or action not in {'approve', 'reject'}:
+        flash('Invalid conversion review request.', 'danger')
+        return redirect(url_for('admin.student_conversions'))
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            raise RuntimeError('Database unavailable.')
+        cursor = conn.cursor(dictionary=True)
+        settings = get_conversion_settings(cursor)
+        cursor.execute("""
+            SELECT s.*, u.user_id, u.role, u.full_name
+            FROM students s
+            JOIN users u ON s.user_id = u.user_id
+            WHERE s.student_id = %s
+            FOR UPDATE
+        """, (int(student_id),))
+        student = cursor.fetchone()
+        if not student or str(student.get('role', '')).lower() != 'student':
+            raise ValueError('This account is not currently a student.')
+        if not is_conversion_eligible(student.get('graduation_year')):
+            raise ValueError('The student has not reached a valid passing-out year.')
+
+        cursor.execute("""
+            SELECT status
+            FROM student_conversion_requests
+            WHERE user_id = %s FOR UPDATE
+        """, (student['user_id'],))
+        request_row = cursor.fetchone()
+        if not request_row:
+            raise ValueError('No conversion request exists for this student.')
+
+        if action == 'approve':
+            if request_row['status'] not in {'pending_approval', 'eligible'}:
+                raise ValueError('This conversion request is not ready for approval.')
+            converted = convert_student(
+                cursor, int(student_id), settings, 'admin_approved', int(session['user_id'])
+            )
+            conn.commit()
+            flash(f"{converted['full_name']} has been promoted to Alumni.", 'success')
+        else:
+            if request_row['status'] not in {
+                'pending_approval', 'eligible', 'awaiting_verification'
+            }:
+                raise ValueError('This conversion request cannot be rejected.')
+            set_conversion_request(cursor, student, 'rejected', int(session['user_id']))
+            conn.commit()
+            flash(f"Conversion request for {student['full_name']} rejected.", 'info')
+    except ValueError as e:
+        if conn:
+            conn.rollback()
+        flash(str(e), 'warning')
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f'Unable to review conversion request: {e}', 'danger')
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    return redirect(url_for('admin.student_conversions'))
+
+
+@admin_bp.route('/student-conversions/verify', methods=['POST'])
+@admin_required
+def verify_student_graduation():
+    student_id = request.form.get('student_id', '').strip()
+    if not student_id.isdigit():
+        flash('Invalid student account.', 'danger')
+        return redirect(url_for('admin.student_conversions'))
+
+    verified = request.form.get('verified') == '1'
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            raise RuntimeError('Database unavailable.')
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT s.*, u.user_id, u.full_name, u.role
+            FROM students s
+            JOIN users u ON s.user_id = u.user_id
+            WHERE s.student_id = %s
+            FOR UPDATE
+        """, (int(student_id),))
+        student = cursor.fetchone()
+        if not student or str(student.get('role', '')).lower() != 'student':
+            raise ValueError('This account is not currently a student.')
+        cursor.execute(
+            'UPDATE students SET graduation_verified = %s WHERE student_id = %s',
+            (verified, int(student_id))
+        )
+        settings = get_conversion_settings(cursor)
+        if verified and is_conversion_eligible(student.get('graduation_year')):
+            status = 'pending_approval' if settings['mode'] == 'admin_approval' else 'eligible'
+            set_conversion_request(cursor, student, status, int(session['user_id']))
+        conn.commit()
+        flash(
+            f"Graduation {'verified' if verified else 'verification removed'} for {student['full_name']}.",
+            'success'
+        )
+    except ValueError as e:
+        if conn:
+            conn.rollback()
+        flash(str(e), 'warning')
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f'Unable to update graduation verification: {e}', 'danger')
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    return redirect(url_for('admin.student_conversions'))
 
 
 @admin_bp.route('/alumni', methods=['GET'], endpoint='alumni')

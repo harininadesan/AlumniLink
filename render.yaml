@@ -1,0 +1,18 @@
+services:
+  - type: cron
+    name: alumnilink-student-conversion-check
+    runtime: python
+    schedule: "15 0 * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python database/check_student_conversions.py
+    envVars:
+      - key: STUDENT_CONVERSION_SCHEDULE_ENABLED
+        value: "true"
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false

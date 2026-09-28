@@ -225,7 +225,7 @@
                         <div class="p-3 border rounded-3 bg-light-theme d-flex align-items-center justify-content-between hover-shadow transition-smooth">
                             <div class="d-flex align-items-center gap-3">
                                 {% if alumnus.profile_photo %}
-                                    <img src="{{ url_for('static', filename=alumnus.profile_photo) }}" class="rounded-circle" style="width: 42px; height: 42px; object-fit: cover;" alt="Alumni">
+                                    <img src="{{ profile_photo_url(alumnus.profile_photo) }}" class="rounded-circle" style="width: 42px; height: 42px; object-fit: cover;" alt="Alumni">
                                 {% else %}
                                     <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold text-xs" style="width: 42px; height: 42px;">
                                         {{ (alumnus.full_name or 'A')[0] | upper }}

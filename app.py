@@ -1,10 +1,14 @@
 import os
-from flask import Flask, render_template
+import logging
+import shutil
+from urllib.parse import urlsplit
+from flask import Flask, render_template, send_from_directory, url_for
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
 from config import config_by_name
 from models.database import User
+from werkzeug.exceptions import NotFound
 
 # Load environment variables
 load_dotenv()
@@ -24,6 +28,67 @@ def create_app(config_name=None):
         config_name = os.environ.get('FLASK_ENV', 'development')
     
     app.config.from_object(config_by_name.get(config_name, config_by_name['default']))
+
+    photo_storage_path = os.environ.get('PROFILE_PHOTO_STORAGE_PATH') or None
+    is_render = os.environ.get('RENDER', '').lower() in {'1', 'true', 'yes'}
+    if photo_storage_path:
+        photo_storage_path = os.path.abspath(photo_storage_path)
+        if is_render:
+            render_disk_path = os.path.abspath(
+                os.environ.get('RENDER_DISK_MOUNT_PATH', '/var/data')
+            )
+            try:
+                is_persistent_path = (
+                    os.path.ismount(render_disk_path)
+                    and os.path.commonpath((photo_storage_path, render_disk_path)) == render_disk_path
+                )
+            except ValueError:
+                is_persistent_path = False
+            if not is_persistent_path:
+                photo_storage_path = None
+    elif not is_render:
+        photo_storage_path = os.path.join(app.instance_path, 'profile_photos')
+
+    app.config['PROFILE_PHOTO_STORAGE_PATH'] = photo_storage_path
+    if photo_storage_path:
+        os.makedirs(photo_storage_path, exist_ok=True)
+        legacy_photo_path = os.path.join(
+            app.static_folder, 'uploads', 'profile_photos'
+        )
+        if os.path.isdir(legacy_photo_path):
+            for entry in os.scandir(legacy_photo_path):
+                if not entry.is_file(follow_symlinks=False):
+                    continue
+                extension = os.path.splitext(entry.name)[1].lower()
+                if extension not in {'.png', '.jpg', '.jpeg', '.gif', '.webp'}:
+                    continue
+                destination = os.path.join(photo_storage_path, entry.name)
+                if os.path.exists(destination):
+                    continue
+                try:
+                    shutil.copy2(entry.path, destination)
+                except OSError:
+                    logging.getLogger(__name__).warning(
+                        'Could not copy legacy profile photo %s to persistent storage.',
+                        entry.name,
+                        exc_info=True,
+                    )
+
+    def profile_photo_url(photo_reference):
+        if not photo_reference:
+            return url_for('static', filename='profile-avatar.svg')
+
+        reference = str(photo_reference).strip()
+        parsed_reference = urlsplit(reference)
+        if parsed_reference.scheme in {'http', 'https'}:
+            return reference
+
+        filename = os.path.basename(parsed_reference.path.replace('\\', '/'))
+        if not filename:
+            return url_for('static', filename='profile-avatar.svg')
+        return url_for('profile_photo_media', filename=filename)
+
+    app.add_template_global(profile_photo_url, name='profile_photo_url')
     
     # Initialize extensions with the app context
     login_manager.init_app(app)
@@ -47,6 +112,23 @@ def create_app(config_name=None):
     @app.route('/')
     def home():
         return render_template('home.html')
+
+    @app.route('/media/profile_photos/<path:filename>')
+    def profile_photo_media(filename):
+        photo_directories = [app.config.get('PROFILE_PHOTO_STORAGE_PATH')]
+        photo_directories.append(
+            os.path.join(app.static_folder, 'uploads', 'profile_photos')
+        )
+
+        for directory in photo_directories:
+            if not directory:
+                continue
+            try:
+                return send_from_directory(directory, filename)
+            except NotFound:
+                continue
+
+        return send_from_directory(app.static_folder, 'profile-avatar.svg')
         
     return app
 

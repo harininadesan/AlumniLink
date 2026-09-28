@@ -84,14 +84,21 @@
                         <!-- Student Specific Fields (Hidden by default) -->
                         <div id="student-fields" style="display: none;">
                             <div class="row g-3 mb-3">
-                                <div class="col-sm-6">
-                                    <label for="graduation_year" class="form-label text-sm font-weight-semibold text-white-50">Graduation Year</label>
+                                <div class="col-sm-4">
+                                    <label for="admission_year" class="form-label text-sm font-weight-semibold text-white-50">Admission Year (Optional)</label>
+                                    <div class="input-group-custom">
+                                        <span class="input-icon-wrapper"><i class="fa-solid fa-calendar-plus"></i></span>
+                                        <input type="number" class="form-control-custom" id="admission_year" name="admission_year" placeholder="2022" min="1990" max="2100">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label for="graduation_year" class="form-label text-sm font-weight-semibold text-white-50">Passing-Out Year</label>
                                     <div class="input-group-custom">
                                         <span class="input-icon-wrapper"><i class="fa-solid fa-calendar-days"></i></span>
                                         <input type="number" class="form-control-custom" id="graduation_year" name="graduation_year" placeholder="2026" min="1990" max="2100">
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-4">
                                     <label for="register_number" class="form-label text-sm font-weight-semibold text-white-50">Register Number</label>
                                     <div class="input-group-custom">
                                         <span class="input-icon-wrapper"><i class="fa-solid fa-id-card"></i></span>

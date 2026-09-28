@@ -148,8 +148,16 @@
                         <i class="fa-solid fa-comments me-2"></i>
 
                         {% if user_role == 'student' %}
+                            <img src="{{ profile_photo_url(connection.alumni_photo) }}"
+                                 alt="{{ connection.alumni_name }}"
+                                 class="rounded-circle me-2"
+                                 style="width: 36px; height: 36px; object-fit: cover;">
                             {{ connection.alumni_name }}
                         {% else %}
+                            <img src="{{ profile_photo_url(connection.student_photo) }}"
+                                 alt="{{ connection.student_name }}"
+                                 class="rounded-circle me-2"
+                                 style="width: 36px; height: 36px; object-fit: cover;">
                             {{ connection.student_name }}
                         {% endif %}
 

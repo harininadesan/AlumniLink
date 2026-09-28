@@ -30,7 +30,7 @@
                 <!-- Avatar Display & Upload Form -->
                 <div class="position-relative d-inline-block mx-auto mb-3">
                     {% if profile.profile_photo %}
-                        <img src="{{ url_for('static', filename=profile.profile_photo) }}" alt="Profile Photo" class="profile-avatar shadow-md">
+                        <img src="{{ profile_photo_url(profile.profile_photo) }}" alt="Profile Photo" class="profile-avatar shadow-md">
                     {% else %}
                         <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-extrabold display-4 shadow-md mx-auto" style="width: 120px; height: 120px; border: 4px solid #4361ee;">
                             {{ (profile.full_name or 'S')[0] | upper }}
@@ -86,10 +86,27 @@
                     <h5 class="h6 text-uppercase font-weight-bold text-dark-theme mb-0 small-tracking">
                         <i class="fa-solid fa-id-card text-primary me-2"></i>Academic Record
                     </h5>
-                    <span class="badge bg-success-soft text-success text-xs"><i class="fa-solid fa-check me-1"></i>Active Student</span>
+                    {% set conversion_status = profile.conversion_status or 'not_eligible' %}
+                    {% if conversion_status == 'pending_approval' %}
+                        <span class="badge bg-warning text-dark text-xs">Awaiting Admin Approval</span>
+                    {% elif conversion_status == 'awaiting_verification' %}
+                        <span class="badge bg-warning text-dark text-xs">Awaiting Graduation Verification</span>
+                    {% elif conversion_status == 'eligible' %}
+                        <span class="badge bg-info text-dark text-xs">Eligible for Alumni Conversion</span>
+                    {% elif conversion_status == 'rejected' %}
+                        <span class="badge bg-danger text-white text-xs">Conversion Request Rejected</span>
+                    {% else %}
+                        <span class="badge bg-success-soft text-success text-xs"><i class="fa-solid fa-check me-1"></i>Currently a Student</span>
+                    {% endif %}
                 </div>
 
                 <div class="row g-3 text-sm">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light-theme rounded-3 border">
+                            <span class="text-muted text-xs font-weight-medium d-block mb-1">Admission Year</span>
+                            <strong class="text-dark-theme font-weight-bold">{{ profile.admission_year or 'Not specified' }}</strong>
+                        </div>
+                    </div>
                     <div class="col-sm-6">
                         <div class="p-3 bg-light-theme rounded-3 border">
                             <span class="text-muted text-xs font-weight-medium d-block mb-1">Registration Number</span>
@@ -199,8 +216,12 @@
                             <input type="text" class="form-control text-sm py-2" id="editDept" name="department" value="{{ profile.department or 'Information Technology' }}" required>
                         </div>
                         <div class="col-md-6">
+                            <label for="editAdmissionYear" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Admission Year (Optional)</label>
+                            <input type="number" class="form-control text-sm py-2" id="editAdmissionYear" name="admission_year" min="1990" max="2100" value="{{ profile.admission_year or '' }}">
+                        </div>
+                        <div class="col-md-6">
                             <label for="editGradYear" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Graduation Year / Batch</label>
-                            <input type="number" class="form-control text-sm py-2" id="editGradYear" name="graduation_year" value="{{ profile.graduation_year or 2026 }}" required>
+                            <input type="number" class="form-control text-sm py-2" id="editGradYear" name="graduation_year" min="1990" max="2100" value="{{ profile.graduation_year or 2026 }}" required>
                         </div>
                         <div class="col-md-6">
                             <label for="editCareerGoal" class="form-label text-xs font-weight-semibold text-muted text-uppercase">Target Career Goal</label>

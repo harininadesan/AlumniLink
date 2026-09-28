@@ -109,7 +109,7 @@
                                     <td class="ps-4">
                                         <div class="d-flex align-items-center gap-2.5">
                                             {% if al.profile_photo %}
-                                                <img src="{{ url_for('static', filename=al.profile_photo) }}" alt="Avatar" class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover;">
+                                                <img src="{{ profile_photo_url(al.profile_photo) }}" alt="Avatar" class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover;">
                                             {% else %}
                                                 <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center text-sm font-weight-bold" style="width: 38px; height: 38px;">
                                                     {{ (al.full_name or 'A')[0] | upper }}

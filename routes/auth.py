@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_user, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from models.database import get_db_connection, User
+from student_conversions import valid_passing_out_year
 import re
 
 # Create the authentication blueprint
@@ -63,6 +64,7 @@ def register():
 
         # Role-specific fields
         graduation_year = None
+        admission_year = None
         register_number = None
         company = None
         designation = None
@@ -72,6 +74,10 @@ def register():
 
             graduation_year = request.form.get(
                 'graduation_year', ''
+            ).strip()
+
+            admission_year_text = request.form.get(
+                'admission_year', ''
             ).strip()
 
             register_number = request.form.get(
@@ -85,14 +91,19 @@ def register():
                 )
                 return render_template('register.html')
 
-            try:
-                graduation_year = int(graduation_year)
-            except ValueError:
+            graduation_year = valid_passing_out_year(graduation_year)
+            if graduation_year is None:
                 flash(
-                    'Graduation year must be a valid number.',
+                    'Passing-out year must be between 1990 and 2100.',
                     'danger'
                 )
                 return render_template('register.html')
+
+            if admission_year_text:
+                admission_year = valid_passing_out_year(admission_year_text)
+                if admission_year is None or admission_year > graduation_year:
+                    flash('Admission year must be valid and no later than the passing-out year.', 'danger')
+                    return render_template('register.html')
 
         elif role == 'alumni':
 
@@ -191,12 +202,13 @@ def register():
                 cursor.execute(
                     """
                     INSERT INTO students
-                    (user_id, department, graduation_year, register_number)
-                    VALUES (%s, %s, %s, %s)
+                    (user_id, department, admission_year, graduation_year, register_number)
+                    VALUES (%s, %s, %s, %s, %s)
                     """,
                     (
                         user_id,
                         'Information Technology',
+                        admission_year,
                         graduation_year,
                         register_number
                     )

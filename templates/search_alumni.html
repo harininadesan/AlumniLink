@@ -123,7 +123,7 @@
                         <!-- Header Details: Profile Photo & Basic Identity -->
                         <div class="d-flex align-items-start gap-3 mb-3">
                             {% if alumnus.profile_photo %}
-                                <img src="{{ url_for('static', filename=alumnus.profile_photo) }}" class="alumni-card-avatar" alt="Photo">
+                                <img src="{{ profile_photo_url(alumnus.profile_photo) }}" class="alumni-card-avatar" alt="Photo">
                             {% else %}
                                 <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-extrabold fs-4 shadow-sm" style="width: 72px; height: 72px; border: 3px solid rgba(67, 97, 238, 0.25);">
                                     {{ (alumnus.full_name or 'A')[0] | upper }}

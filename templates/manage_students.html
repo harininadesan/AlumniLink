@@ -63,7 +63,7 @@
                                     <td class="ps-4">
                                         <div class="d-flex align-items-center gap-2.5">
                                             {% if stu.profile_photo %}
-                                                <img src="{{ url_for('static', filename=stu.profile_photo) }}" alt="Avatar" class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover;">
+                                                <img src="{{ profile_photo_url(stu.profile_photo) }}" alt="Avatar" class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover;">
                                             {% else %}
                                                 <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center text-sm font-weight-bold" style="width: 38px; height: 38px;">
                                                     {{ (stu.full_name or 'S')[0] | upper }}
@@ -74,6 +74,7 @@
                                                     {{ stu.full_name }}
                                                 </a>
                                                 <small class="d-block text-muted text-xs">{{ stu.email }}</small>
+                                                <span class="badge bg-info-subtle text-info-emphasis border mt-1">{{ stu.role|capitalize }}</span>
                                             </div>
                                         </div>
                                     </td>

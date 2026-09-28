@@ -20,7 +20,7 @@
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
             <div class="d-flex align-items-center gap-3">
                 {% if student.profile_photo %}
-                    <img src="{{ url_for('static', filename=student.profile_photo) }}" alt="Avatar" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
+                    <img src="{{ profile_photo_url(student.profile_photo) }}" alt="Avatar" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
                 {% else %}
                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold fs-2 shadow-sm" style="width: 80px; height: 80px;">
                         {{ (student.full_name or 'S')[0] | upper }}
@@ -35,11 +35,32 @@
                         <span class="badge bg-light text-dark border"><i class="fa-solid fa-id-card me-1 text-secondary"></i>ID: {{ student.register_number or 'N/A' }}</span>
                         <span class="badge bg-light text-dark border"><i class="fa-solid fa-building-columns me-1 text-secondary"></i>{{ student.department or 'Information Technology' }}</span>
                         <span class="badge bg-light text-dark border"><i class="fa-solid fa-graduation-cap me-1 text-secondary"></i>Graduation Year: {{ student.graduation_year or 'N/A' }}</span>
+                        <span class="badge bg-info-subtle text-info-emphasis border">Role: {{ student.role|capitalize }}</span>
+                        <span class="badge bg-light text-dark border">Admission Year: {{ student.admission_year or 'Not specified' }}</span>
+                        {% set conversion_status = student.conversion_status or 'not_eligible' %}
+                        <span class="badge {% if conversion_status == 'pending_approval' %}bg-warning text-dark{% elif conversion_status == 'eligible' %}bg-info text-dark{% elif conversion_status == 'converted' %}bg-success text-white{% else %}bg-secondary text-white{% endif %}">
+                            {% if conversion_status == 'pending_approval' %}Awaiting Admin Approval
+                            {% elif conversion_status == 'awaiting_verification' %}Awaiting Graduation Verification
+                            {% elif conversion_status == 'converted' %}Converted to Alumni
+                            {% elif conversion_status == 'not_eligible' %}Currently a Student
+                            {% else %}Eligible for Alumni Conversion{% endif %}
+                        </span>
+                        {% if student.graduation_verified %}
+                            <span class="badge bg-success text-white">Graduation Verified</span>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div>
+            <div class="d-flex flex-column flex-sm-row gap-2">
+                {% if student.role|lower == 'student' %}
+                    <form action="{{ url_for('admin.promote_student_to_alumni') }}" method="POST" onsubmit="return confirm('Promote {{ student.full_name }} to Alumni? Their existing account and login credentials will be retained.');">
+                        <input type="hidden" name="student_id" value="{{ student.student_id }}">
+                        <button type="submit" class="btn btn-outline-success btn-sm font-weight-bold px-3 py-2" id="btnPromoteStudentProfile">
+                            <i class="fa-solid fa-user-graduate me-1.5"></i>Promote to Alumni
+                        </button>
+                    </form>
+                {% endif %}
                 <form action="{{ url_for('admin.delete_student') }}" method="POST" onsubmit="return confirm('PERMANENTLY delete {{ student.full_name }}\'s student account?');">
                     <input type="hidden" name="student_id" value="{{ student.student_id }}">
                     <button type="submit" class="btn btn-outline-danger btn-sm font-weight-bold px-3 py-2" id="btnDeleteStudentProfile">

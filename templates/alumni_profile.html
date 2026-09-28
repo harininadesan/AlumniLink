@@ -68,7 +68,7 @@
                                     aria-expanded="false">
 
                                 {% if profile.profile_photo %}
-                                    <img src="{{ url_for('static', filename=profile.profile_photo) }}"
+                                    <img src="{{ profile_photo_url(profile.profile_photo) }}"
                                          alt="Avatar"
                                          class="rounded-circle"
                                          style="width:30px;height:30px;object-fit:cover;">
@@ -168,7 +168,7 @@
 
                             {% if alumnus.profile_photo %}
 
-                                <img src="{{ url_for('static', filename=alumnus.profile_photo) }}"
+                                <img src="{{ profile_photo_url(alumnus.profile_photo) }}"
                                      alt="Alumni Photo"
                                      class="alumni-profile-photo">
 
@@ -192,7 +192,7 @@
 
                         <span class="alumni-batch-badge">
                             <i class="fa-solid fa-graduation-cap me-1"></i>
-                            Class of {{ alumnus.graduation_year or '2021' }} · IT
+                            {% if alumnus.admission_year %}{{ alumnus.admission_year }} - {% endif %}Class of {{ alumnus.graduation_year or '2021' }} · IT
                         </span>
 
                     </div>
@@ -665,7 +665,7 @@
 
                         {% if profile.profile_photo %}
 
-                            <img src="{{ url_for('static', filename=profile.profile_photo) }}"
+                            <img src="{{ profile_photo_url(profile.profile_photo) }}"
                                  alt="Profile Photo"
                                  class="edit-profile-photo">
 

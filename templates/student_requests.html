@@ -48,9 +48,7 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center gap-2.5">
-                                        <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold text-xs" style="width: 36px; height: 36px;">
-                                            {{ (req.alumni_name or 'A')[0] | upper }}
-                                        </div>
+                                        <img src="{{ profile_photo_url(req.alumni_photo) }}" alt="{{ req.alumni_name }}" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;">
                                         <div>
                                             <strong class="text-dark-theme d-block mb-0">{{ req.alumni_name }}</strong>
                                             {% if req.alumni_email %}

@@ -35,7 +35,9 @@ CREATE TABLE `students` (
     `student_id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
     `department` VARCHAR(100) NOT NULL DEFAULT 'Information Technology',
+    `admission_year` INT DEFAULT NULL,
     `graduation_year` INT NOT NULL,
+    `graduation_verified` BOOLEAN NOT NULL DEFAULT FALSE,
     `register_number` VARCHAR(50) UNIQUE NOT NULL,
     `skills` TEXT DEFAULT NULL, -- Comma-separated list for simplified search
     `resume` VARCHAR(255) DEFAULT NULL,
@@ -59,6 +61,7 @@ CREATE TABLE `alumni` (
     `verified` BOOLEAN DEFAULT FALSE, -- FALSE: pending admin verification, TRUE: verified
     `verification_status` ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     `department` VARCHAR(100) NOT NULL DEFAULT 'Information Technology',
+    `admission_year` INT DEFAULT NULL,
     `graduation_year` INT DEFAULT NULL,
     `phone` VARCHAR(50) DEFAULT NULL,
     `github` VARCHAR(255) DEFAULT NULL,
@@ -77,7 +80,46 @@ CREATE TABLE `admins` (
     FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5. MENTORSHIP REQUESTS TABLE
+-- 5. STUDENT CONVERSION POLICY AND AUDIT
+CREATE TABLE `student_conversion_settings` (
+    `setting_id` TINYINT UNSIGNED PRIMARY KEY,
+    `mode` ENUM('automatic', 'admin_approval') NOT NULL DEFAULT 'automatic',
+    `require_graduation_verification` BOOLEAN NOT NULL DEFAULT TRUE,
+    `updated_by` INT DEFAULT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`updated_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `student_conversion_requests` (
+    `conversion_request_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL UNIQUE,
+    `student_id` INT NOT NULL,
+    `passing_out_year` INT DEFAULT NULL,
+    `status` ENUM('not_eligible', 'eligible', 'awaiting_verification', 'pending_approval', 'rejected', 'converted') NOT NULL,
+    `reviewed_by` INT DEFAULT NULL,
+    `reviewed_at` TIMESTAMP NULL DEFAULT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
+    INDEX `idx_conversion_status_year` (`status`, `passing_out_year`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `student_conversion_history` (
+    `conversion_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL UNIQUE,
+    `previous_role` VARCHAR(30) NOT NULL,
+    `new_role` VARCHAR(30) NOT NULL,
+    `converted_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `conversion_method` ENUM('automatic', 'admin_approved', 'manual_admin') NOT NULL,
+    `admin_id` INT DEFAULT NULL,
+    `verification_status` ENUM('verified', 'not_required') NOT NULL,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`admin_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 6. MENTORSHIP REQUESTS TABLE
 -- Manages requests initiated by students to seek professional mentorship or feedback from alumni.
 CREATE TABLE `mentorship_requests` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,

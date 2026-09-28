@@ -20,7 +20,7 @@
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
             <div class="d-flex align-items-center gap-3">
                 {% if alumnus.profile_photo %}
-                    <img src="{{ url_for('static', filename=alumnus.profile_photo) }}" alt="Avatar" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
+                    <img src="{{ profile_photo_url(alumnus.profile_photo) }}" alt="Avatar" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
                 {% else %}
                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold fs-2 shadow-sm" style="width: 80px; height: 80px;">
                         {{ (alumnus.full_name or 'A')[0] | upper }}

@@ -97,7 +97,7 @@
                     <div class="d-flex align-items-center gap-3">
                         <div class="applicant-avatar">
                             {% if applicant.profile_photo %}
-                                <img src="{{ url_for('static', filename=applicant.profile_photo) }}"
+                                <img src="{{ profile_photo_url(applicant.profile_photo) }}"
                                      alt="{{ applicant.full_name }}"
                                      class="rounded-circle w-100 h-100" style="object-fit:cover;">
                             {% else %}
